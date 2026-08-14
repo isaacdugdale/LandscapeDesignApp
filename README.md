@@ -20,6 +20,8 @@ because Pages only serves from `/` or `/docs`.
 | `index.html` | The app — plan editor, checks, stages, the reference sections, ask |
 | `site-data.js` | The site: boundaries, contours, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
 | `handbook.js` | The reference half: the Site, Works and Risks sections, as blocks the app renders |
+| `bloom.js` | Flowering month and flower colour per plant — horticultural, not survey |
+| `printsheet.js` | The printable set: plan, schedules and bloom calendar, drawn in mm at a true scale |
 | `support.js` | Rendering runtime the app loads |
 | `_ds/organic-…/` | The Organic design system: tokens stylesheet and component bundle |
 | `vendor/` | React and the two typefaces, served from here rather than a CDN |
@@ -52,6 +54,20 @@ there and every screen follows.
   no signal. To change a vendored file, bump `CACHE` in `sw.js` or devices keep the
   old copy — the app also reloads itself once when a newer worker takes over, so a
   published change lands on the first open rather than the second.
+- **Print** builds a three-sheet set from the current scheme — the plan at a true,
+  stated scale with numbered keys and a title block, the schedules those numbers refer
+  to, and the bloom calendar — then hands it to the browser's print dialog, where iOS
+  offers *Save to Files* as a PDF. A4 and A3, both landscape; the plan takes the largest
+  standard scale that fits (1:125 on A3, 1:200 on A4) and says which. The drawing is
+  vector, so it stays sharp at any size and a ruler on the paper reads true.
+- The bloom calendar plots mature height against month, the bar's thickness being the
+  plant's mature spread and its colour the flower's own. Flowering months and colours
+  live in `bloom.js` and are the one part of the app that is judgement rather than
+  survey — correct anything you disagree with. Plants grown for foliage are named under
+  the chart rather than silently dropped.
+- The **expand** button on the plan (with the zoom controls) drops the sidebar, header,
+  palette and inspector so the drawing has the whole screen. It is for once the palette
+  has done its job and you are only moving things around.
 - Schemes are per-device: they live in that browser's local storage. **Schemes → Back
   up** writes them to a JSON file through the share sheet and **Restore** reads one
   back, which is how a scheme reaches a second device. Restoring only adds; an
