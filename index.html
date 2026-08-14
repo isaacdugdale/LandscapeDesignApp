@@ -11,7 +11,26 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<script>
+/* Serve React from this repo instead of unpkg.com, so the app opens with no
+   network. The runtime checks __resources before reaching for a CDN. The two
+   files in vendor/ are the same bytes unpkg served — they match the runtime's
+   published SRI hashes. */
+window.__resources={
+  "https://unpkg.com/react@18.3.1/umd/react.production.min.js":"vendor/react.production.min.js",
+  "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"vendor/react-dom.production.min.js"
+};
+</script>
 <script src="./support.js"></script>
+<script>
+/* Caches the app on first visit so it opens later with no signal. Only works
+   over https (or localhost); on a file:// copy it is skipped. */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
 </head>
 <body>
 <x-dc>
@@ -23,8 +42,7 @@
 <meta name="apple-mobile-web-app-title" content="234 Duffy">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#f5ead8"/><circle cx="60" cy="52" r="21" fill="#7a8a5e"/><rect x="57" y="52" width="6" height="34" rx="3" fill="#c67139"/><rect x="34" y="86" width="52" height="6" rx="3" fill="#c67139"/></svg></template>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/fonts.css">
 <script src="site-data.js"></script>
 <style>
 body{margin:0;background:#e6dcc9;font-family:"Figtree",system-ui,sans-serif}
@@ -419,6 +437,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
               </sc-if>
             </div>
           </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--color-divider)">
+          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45">Schemes are kept on this iPad only. Back them up to a file to move them to another device, or to keep them if this app is removed.</div>
+          <div onClick="{{ backup }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Back up</div>
+          <div onClick="{{ restore }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Restore</div>
         </div>
       </div>
     </div>
@@ -1045,6 +1068,7 @@ class Component extends DCLogic {
       openSchemes:()=>this.setState({sheetOpen:true}), closeSheet:()=>this.setState({sheetOpen:false}),
       stop:ev=>{if(ev&&ev.stopPropagation)ev.stopPropagation();}, sheetOpen:s.sheetOpen, schemeList:schemeList,
       newScheme:()=>this.newScheme(),
+      backup:()=>this.backup(), restore:()=>this.restore(),
       undo:()=>{ if(!this.hist||!this.hist.length) return; const items=JSON.parse(this.hist.pop()); this.commit(items,null); },
       canvasRef:el=>{ this.canvas=el; if(el){ this.bindCanvas(); if(!el._first){el._first=true; setTimeout(()=>{this.fit();this.draw();},0);} } },
       chatRef:el=>{ this.chatEl=el; },
@@ -1133,6 +1157,66 @@ class Component extends DCLogic {
   delScheme(id){ const rest=this.state.schemes.filter(x=>x.id!==id); if(!rest.length) return;
     if(id===this.state.schemeId){ this.setState({schemes:rest},()=>this.switchScheme(rest[0].id)); }
     else this.setState({schemes:rest},()=>this.persist()); }
+
+  /* ---------- backup ----------
+     Schemes live in this browser on this device. These two carry them out to a
+     file and back in, so a scheme can reach another iPad, and so deleting the
+     home-screen icon is not the end of the work. */
+  stamp(){ const d=new Date(), p=n=>String(n).padStart(2,'0');
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+  backupData(){ this.persist();
+    const all=JSON.parse(localStorage.getItem(this.key())||'{}');
+    return JSON.stringify({app:'234-duffy-studio',version:1,exported:Date.now(),
+      index:all.index||this.state.schemes,schemes:all.schemes||{},todos:all.todos||[]},null,1); }
+  async backup(){
+    const name='234-duffy-schemes-'+this.stamp()+'.json', text=this.backupData();
+    /* The share sheet is the only route to Files or AirDrop from a home-screen
+       app on iOS; a download link there goes nowhere. */
+    try{ if(navigator.canShare){ const f=new File([text],name,{type:'application/json'});
+      if(navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:'234 Duffy schemes'});
+        this.toast('Saved — pick Files or AirDrop from the sheet'); return; } } }
+    catch(e){ if(e&&e.name==='AbortError') return; }
+    try{ const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));
+      const a=document.createElement('a'); a.href=url; a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+      this.toast('Saved to your downloads as '+name); return; }catch(e){}
+    try{ await navigator.clipboard.writeText(text); this.toast('Backup copied to the clipboard — paste it into a note.'); }
+    catch(e){ this.toast('Could not save the backup on this device.'); }
+  }
+  restore(){
+    const inp=document.createElement('input');
+    inp.type='file'; inp.accept='application/json,.json';
+    inp.onchange=()=>{ const f=inp.files&&inp.files[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=()=>{ try{ this.merge(JSON.parse(String(r.result))); }
+        catch(e){ this.toast('That file is not a 234 Duffy backup.'); } };
+      r.onerror=()=>this.toast('That file could not be read.');
+      r.readAsText(f); };
+    inp.click();
+  }
+  /* Adds what is in the file. Nothing already on this device is overwritten:
+     an incoming scheme whose id is taken comes in under a fresh id. */
+  merge(data){
+    if(!data||data.app!=='234-duffy-studio'||!data.index||!data.schemes){ this.toast('That file is not a 234 Duffy backup.'); return; }
+    this.persist();
+    const all=JSON.parse(localStorage.getItem(this.key())||'{}');
+    all.schemes=all.schemes||{}; all.index=all.index||this.state.schemes.slice();
+    const taken=new Set(all.index.map(x=>x.id));
+    let n=0;
+    (data.index||[]).forEach((meta,i)=>{
+      const sc=data.schemes[meta.id]; if(!sc||!sc.items) return;
+      const id=taken.has(meta.id)?'s'+Date.now()+'x'+i:meta.id;
+      const name=taken.has(meta.id)?meta.name+' (imported)':meta.name;
+      taken.add(id);
+      all.index=all.index.concat([{id:id,name:name,created:meta.created||Date.now()}]);
+      all.schemes[id]={name:name,items:sc.items,uid:sc.uid||sc.items.length+1,updated:sc.updated||Date.now()};
+      n++;
+    });
+    if(!n){ this.toast('That backup had no schemes in it.'); return; }
+    localStorage.setItem(this.key(),JSON.stringify(all));
+    this.setState({schemes:all.index},()=>this.toast(n===1?'1 scheme added.':n+' schemes added.'));
+  }
 }
 
 </script>
