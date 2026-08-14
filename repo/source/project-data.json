@@ -1,0 +1,464 @@
+{
+ "_README": "Derived reference data for 234 Duffy Street, Ainslie. Everything here was computed from the source documents and validated; reuse it rather than re-deriving.",
+ "site": {
+  "address": "234 Duffy Street, Ainslie ACT 2602",
+  "block": "Block 14, Section 105",
+  "area_m2": 807,
+  "lat": -35.25622,
+  "lon": 149.15585,
+  "mga_zone55_E": 696125.07,
+  "mga_zone55_N": 6096411.73,
+  "source_of_coords": "Fortify Geotech borehole log, converted from MGA2020 zone 55 (EPSG:7855)"
+ },
+ "local_frame": {
+  "description": "All geometry uses a local metric frame taken from the Enfold site plan A1.01. Origin is the block corner shared by the 40.005 m south boundary and the 21.775 m rear boundary. +x runs along the 40 m boundary, +y along the frontage.",
+  "boundary_corners_m": [
+   [
+    0,
+    0
+   ],
+   [
+    39.999,
+    0
+   ],
+   [
+    39.999,
+    21.333
+   ],
+   [
+    4.343,
+    21.333
+   ]
+  ],
+  "closure_check_m2": 807.2,
+  "bearing_of_local_plus_x_deg": 345.6611,
+  "meaning": "+x = north-north-west toward Duffy Street. -x = south-south-east toward the reserve. +y = west-south-west. -y = east-north-east.",
+  "pdf_to_local": "local = ((pt_x - -402.16107)/14.173228346, (pt_y - 252.36176)/14.173228346) for Enfold page 2 (A1.01) at 1:200",
+  "survey_to_local_similarity": "fit from the four boundary corners; survey pt (114.5,528.6),(663.8,669.0),(588.8,962.0),(99.2,836.9) map to the local corners above. Residuals under 5 mm."
+ },
+ "ground_surface": {
+  "description": "Quadratic trend surface fitted to the surveyed 0.25 m contours. RL = c0 + c1*x + c2*y + c3*x^2 + c4*x*y + c5*y^2, metres AHD, x/y in the local frame.",
+  "coefficients": [
+   612.263,
+   -0.04395,
+   0.01003,
+   -0.000256,
+   0.000316,
+   -0.000437
+  ],
+  "rms_residual_m": 0.072,
+  "validated_against": "ten independent spot levels read off the survey; mean error -0.020 m, RMS 0.129 m",
+  "fall": "2.08 m from rear boundary to street, about 1 in 19. Cross-fall about 1 in 132."
+ },
+ "floor_levels_m_AHD": {
+  "house_and_addition_FFL": 611.65,
+  "sunken_lounge_FFL": 611.07,
+  "residence_eave": 613.93,
+  "residence_ridge": 616.06,
+  "addition_eave": 614.17,
+  "garage_eave": 614.3
+ },
+ "buildings_local_m": [
+  {
+   "name": "existing house",
+   "x0": 20.38,
+   "y0": 1.77,
+   "x1": 29.01,
+   "y1": 17.79,
+   "ridge": 616.06,
+   "eave": 613.93
+  },
+  {
+   "name": "east wing",
+   "x0": 25.94,
+   "y0": 1.77,
+   "x1": 33.33,
+   "y1": 8.06,
+   "ridge": 615.2,
+   "eave": 613.5
+  },
+  {
+   "name": "rear addition",
+   "x0": 9.66,
+   "y0": 11.96,
+   "x1": 16.32,
+   "y1": 17.96,
+   "ridge": 614.6,
+   "eave": 614.17
+  },
+  {
+   "name": "link",
+   "x0": 16.32,
+   "y0": 12.51,
+   "x1": 21.25,
+   "y1": 13.88,
+   "ridge": 613.9,
+   "eave": 613.9
+  },
+  {
+   "name": "garage",
+   "x0": 16.32,
+   "y0": 17.34,
+   "x1": 27.91,
+   "y1": 21.21,
+   "ridge": 614.6,
+   "eave": 614.3
+  },
+  {
+   "name": "kitchen addition",
+   "x0": 19.95,
+   "y0": 2.3,
+   "x1": 21.52,
+   "y1": 7.48,
+   "ridge": 614.0,
+   "eave": 614.0
+  }
+ ],
+ "neighbours_local_m": [
+  {
+   "name": "east-north-east neighbour, main, two storey",
+   "x0": 22.0,
+   "y0": -9.2,
+   "x1": 30.53,
+   "y1": -1.5,
+   "ridge": 617.91,
+   "eave": 616.54
+  },
+  {
+   "name": "east-north-east neighbour, wing",
+   "x0": 11.32,
+   "y0": -10.2,
+   "x1": 22.01,
+   "y1": -4.53,
+   "ridge": 617.91,
+   "eave": 616.54
+  },
+  {
+   "name": "west-south-west neighbour, single storey",
+   "x0": 17.63,
+   "y0": 23.5,
+   "x1": 34.33,
+   "y1": 27.7,
+   "ridge": 616.34,
+   "eave": 614.37
+  }
+ ],
+ "fences": {
+  "assumed_height_m": 1.8,
+  "note": "not recorded on the survey; measure and update. Each 300 mm costs the side strip about half an hour of summer sun.",
+  "segments": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     4.343,
+     21.333
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     39.999,
+     0
+    ]
+   ],
+   [
+    [
+     4.343,
+     21.333
+    ],
+    [
+     39.999,
+     21.333
+    ]
+   ]
+  ],
+  "frontage": "no fence to Duffy Street"
+ },
+ "trees": [
+  {
+   "id": 1,
+   "name": "brittle gum, Eucalyptus mannifera x nicholii",
+   "x": 3.94,
+   "y": 9.5,
+   "height_m": 15,
+   "canopy_width_m": 9,
+   "dbh_cm": 54,
+   "protection_zone_radius_m": 6.5,
+   "structural_root_zone_radius_m": 2.8,
+   "status": "Regulated",
+   "canopy_RL": [
+    616.1,
+    627.1
+   ],
+   "light_transmission": 0.4,
+   "note": "trunk is only 1.97 m from the rear boundary, so its structural root zone crosses the boundary by 830 mm. No channel can follow that boundary past it."
+  },
+  {
+   "id": 2,
+   "name": "Manchurian flowering pear, Pyrus ussuriensis",
+   "x": 11.14,
+   "y": 9.61,
+   "height_m": 5,
+   "canopy_width_m": 10,
+   "dbh_cm": 30,
+   "protection_zone_radius_m": 7.0,
+   "structural_root_zone_radius_m": 2.0,
+   "status": "Regulated",
+   "canopy_RL": [
+    613.8,
+    616.8
+   ],
+   "deciduous": true,
+   "note": "RETAIN. The Class P classification and the 20-40 mm movement figure assume it stays. Hand excavation around it is approved."
+  },
+  {
+   "id": 3,
+   "name": "liquidambar, Liquidambar styraciflua",
+   "x": 36.28,
+   "y": 9.19,
+   "height_m": 11,
+   "canopy_width_m": 10,
+   "dbh_cm": 35,
+   "protection_zone_radius_m": 7.0,
+   "structural_root_zone_radius_m": 2.3,
+   "status": "Regulated",
+   "canopy_RL": [
+    613.5,
+    621.5
+   ],
+   "deciduous": true
+  },
+  {
+   "id": 4,
+   "name": "velvet ash street tree, Fraxinus velutina",
+   "x": 43.73,
+   "y": 13.74,
+   "height_m": 11,
+   "canopy_width_m": 10,
+   "dbh_cm": 37,
+   "protection_zone_radius_m": 7.0,
+   "structural_root_zone_radius_m": 2.3,
+   "status": "Public tree",
+   "canopy_RL": [
+    613.0,
+    621.0
+   ],
+   "deciduous": true
+  },
+  {
+   "id": 5,
+   "name": "velvet ash street tree, Fraxinus velutina",
+   "x": 44.34,
+   "y": 4.45,
+   "height_m": 12,
+   "canopy_width_m": 10,
+   "dbh_cm": 36,
+   "protection_zone_radius_m": 7.0,
+   "structural_root_zone_radius_m": 2.3,
+   "status": "Public tree",
+   "canopy_RL": [
+    613.0,
+    622.0
+   ],
+   "deciduous": true
+  },
+  {
+   "id": 6,
+   "name": "Japanese maple, in the courtyard",
+   "x": 18.07,
+   "y": 14.89,
+   "height_m": 4,
+   "canopy_width_m": 4,
+   "protection_zone_radius_m": null,
+   "status": "not protected, well under all thresholds",
+   "canopy_RL": [
+    613.6,
+    616.1
+   ],
+   "deciduous": true,
+   "note": "in poor health, assume it dies. Courtyard light roughly triples when it goes."
+  }
+ ],
+ "design_rainfall_mm_per_h": {
+  "source": "Bureau of Meteorology 2016 IFD, grid cell 35.2625S 149.1375E",
+  "5min_1in10": 122,
+  "5min_1in20": 142,
+  "5min_1in100": 189,
+  "standard": "AS/NZS 3500.3: dwelling site drainage at 5 min duration, 1 in 10 year. Eaves gutters 1 in 20."
+ },
+ "sun_hours": {
+  "model": "includes both neighbours and 1.8 m fences; deciduous canopies bare 1 Jun to 16 Sep (0.72 transmission) and dense otherwise (0.15); the gum modelled as a permanently open canopy at 0.55",
+  "rear_pocket": [
+   7.4,
+   7.3,
+   4.5
+  ],
+  "side_strip_ENE": [
+   8.1,
+   6.5,
+   4.0
+  ],
+  "paved_terrace": [
+   11.0,
+   3.9,
+   0.0
+  ],
+  "under_trees_1_and_2": [
+   2.9,
+   1.9,
+   1.4
+  ],
+  "back_garden_avg": [
+   5.8,
+   4.4,
+   2.2
+  ],
+  "front_garden_avg": [
+   4.3,
+   3.4,
+   2.3
+  ],
+  "order": "[21 Dec, 21 Sep, 21 Jun]",
+  "sky_view_factor": {
+   "courtyard": 0.5,
+   "open_garden": 0.98
+  },
+  "courtyard": [
+   5.7,
+   3.1,
+   0.0
+  ]
+ },
+ "drainage": {
+  "spine": {
+   "route_local": [
+    [
+     1.0,
+     2.5
+    ],
+    [
+     19.3,
+     2.5
+    ],
+    [
+     19.6,
+     1.0
+    ],
+    [
+     37.3,
+     1.0
+    ]
+   ],
+   "size": "DN150",
+   "grade": "1 in 19",
+   "capacity_Ls": 45.2,
+   "design_flow_Ls": 5.32,
+   "outlet_invert": 609.73,
+   "kerb": 609.6
+  },
+  "north_line": {
+   "route_local": [
+    [
+     5.5,
+     20.75
+    ],
+    [
+     9.9,
+     20.9
+    ],
+    [
+     15.8,
+     19.9
+    ],
+    [
+     16.32,
+     19.9
+    ],
+    [
+     27.91,
+     19.9
+    ],
+    [
+     39.3,
+     20.9
+    ]
+   ],
+   "size": "DN100",
+   "grade": "1 in 21",
+   "capacity_Ls": 15.3,
+   "design_flow_Ls": 3.13,
+   "outlet_invert": 610.01,
+   "kerb": 609.85,
+   "sleeve_under_garage": [
+    [
+     16.32,
+     19.9
+    ],
+    [
+     27.91,
+     19.9
+    ]
+   ]
+  },
+  "courtyard_drain": {
+   "channel_local": [
+    [
+     20.1,
+     14.2
+    ],
+    [
+     20.1,
+     17.1
+    ]
+   ],
+   "sleeve": [
+    [
+     19.6,
+     17.34
+    ],
+    [
+     19.6,
+     19.9
+    ]
+   ],
+   "design_flow_Ls": 0.66
+  },
+  "corner_swale": {
+   "route_local": [
+    [
+     4.15,
+     16.6
+    ],
+    [
+     4.9,
+     18.6
+    ],
+    [
+     5.35,
+     20.4
+    ]
+   ],
+   "capacity_Ls": 294,
+   "velocity_ms": 0.78,
+   "note": "the only stretch of rear boundary outside the gum's protection zone, so the only part that can be excavated"
+  },
+  "overland_path": {
+   "corridor": "side strip, y 0.5 to 3.0",
+   "capacity_Ls": 236,
+   "velocity_ms": 0.98,
+   "note": "MUST stay clear and continuous to the street. It is the route if the reserve bank fails."
+  }
+ },
+ "free_to_regrade": {
+  "back_garden_open_m2": 320,
+  "inside_protection_zones_m2": 167,
+  "free_m2": 154,
+  "pockets": "a 4 m strip along the ENE boundary, a pocket at the WSW rear corner, and a 4 m band next to the house. Only 1.3 m2 of the middle is clear."
+ }
+}

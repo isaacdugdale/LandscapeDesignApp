@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>234 Duffy — Landscape Studio</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="234 Duffy">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f5ead8">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/organic-5b8b3e51-8cff-4491-83cb-b7a2b943dfea/styles.css">
+<script src="_ds/organic-5b8b3e51-8cff-4491-83cb-b7a2b943dfea/_ds_bundle.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="234 Duffy">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#f5ead8"/><circle cx="60" cy="52" r="21" fill="#7a8a5e"/><rect x="57" y="52" width="6" height="34" rx="3" fill="#c67139"/><rect x="34" y="86" width="52" height="6" rx="3" fill="#c67139"/></svg></template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="site-data.js"></script>
+<style>
+body{margin:0;background:#e6dcc9;font-family:"Figtree",system-ui,sans-serif}
+*{-webkit-tap-highlight-color:transparent}
+input[type=range]{-webkit-appearance:none;appearance:none;height:26px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:var(--color-neutral-300)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-10px;border-radius:999px;background:var(--color-accent);border:3px solid #fff;box-shadow:var(--shadow-sm)}
+.ls-scroll{overflow:auto;scrollbar-width:thin}
+.ls-scroll::-webkit-scrollbar{width:8px}
+.ls-scroll::-webkit-scrollbar-thumb{background:var(--color-neutral-300);border-radius:999px}
+</style>
+</helmet>
+
+<div style="{{ page }}">
+<div style="{{ bezel }}">
+<div style="position:absolute;inset:0;border-radius:34px;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)"></div>
+<div style="{{ screen }}">
+
+  <sc-if value="{{ mock }}" hint-placeholder-val="{{ true }}">
+  <div style="height:26px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--color-neutral-200);font-size:11.5px;font-weight:600;color:var(--color-neutral-700);letter-spacing:.2px">
+    <span>9:41 Sat 15 Aug</span>
+    <span style="display:flex;gap:9px;align-items:center"><span>Duffy St Wi-Fi</span><span style="opacity:.5">·</span><span>84%</span></span>
+  </div>
+  </sc-if>
+
+  <div style="flex:1;min-height:0;display:flex">
+
+    <div style="flex:0 0 84px;background:var(--color-neutral-200);border-right:1px solid var(--color-divider);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px">
+      <div style="width:38px;height:38px;border-radius:999px;background:var(--color-accent);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Caprasimo';font-size:17px;margin-bottom:10px">234</div>
+      <div onClick="{{ navPlan.go }}" style="{{ navPlan.style }}" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Plan</div>
+      </div>
+      <div onClick="{{ navChecks.go }}" style="{{ navChecks.style }}" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Checks</div>
+        <sc-if value="{{ stopBadge }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;top:5px;right:8px;min-width:18px;height:18px;border-radius:999px;background:var(--color-accent-700);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ stopBadge }}</div>
+        </sc-if>
+      </div>
+      <div onClick="{{ navStages.go }}" style="{{ navStages.style }}" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Stages</div>
+      </div>
+      <div onClick="{{ navAsk.go }}" style="{{ navAsk.style }}" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Ask</div>
+      </div>
+      <div style="flex:1"></div>
+      <div onClick="{{ openSchemes }}" style="width:64px;padding:9px 0;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:var(--color-neutral-700)" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg>
+        <div style="font-size:10.5px;font-weight:600">Schemes</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+      <div style="flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px;border-bottom:1px solid var(--color-divider)">
+        <div style="min-width:0">
+          <div style="font-family:'Caprasimo';font-size:21px;line-height:1.1;color:var(--color-text)">{{ screenTitle }}</div>
+          <div style="font-size:12.5px;color:var(--color-neutral-600);margin-top:2px">{{ screenSub }}</div>
+        </div>
+        <div style="flex:1"></div>
+        <div onClick="{{ openSchemes }}" style="display:flex;align-items:center;gap:9px;padding:7px 8px 7px 14px;border-radius:999px;background:var(--color-neutral-200);cursor:pointer" style-hover="background:var(--color-neutral-300)">
+          <div>
+            <div style="font-size:13.5px;font-weight:600;line-height:1.2">{{ schemeName }}</div>
+            <div style="font-size:11px;color:var(--color-neutral-600)">{{ savedLabel }}</div>
+          </div>
+          <div style="width:26px;height:26px;border-radius:999px;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--color-neutral-700)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+        </div>
+        <div onClick="{{ undo }}" style="padding:9px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:transparent;font-size:13px;font-weight:600;color:var(--color-neutral-700);cursor:pointer" style-hover="background:var(--color-neutral-200)">Undo</div>
+      </div>
+
+      <sc-if value="{{ isPlan }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ planWrap }}">
+
+        <div style="{{ palCol }}">
+          <div style="padding:12px 13px 9px;display:flex;gap:5px">
+            <sc-for list="{{ palTabs }}" as="t" hint-placeholder-count="2">
+              <div onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</div>
+            </sc-for>
+          </div>
+          <div style="padding:0 13px 9px">
+            <input value="{{ q }}" onInput="{{ onQuery }}" placeholder="{{ searchHint }}" style="width:100%;font:inherit;font-size:13px;padding:9px 13px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;color:var(--color-text);outline:none">
+          </div>
+          <sc-if value="{{ isPlants }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:0 13px 9px;display:flex;flex-wrap:wrap;gap:5px">
+              <sc-for list="{{ filtChips }}" as="c" hint-placeholder-count="4">
+                <div onClick="{{ c.go }}" style="{{ c.style }}">{{ c.label }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div class="ls-scroll" style="flex:1;min-height:0;padding:0 9px 12px">
+            <sc-for list="{{ palGroups }}" as="g" hint-placeholder-count="3">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600);margin:11px 0 5px 4px">{{ g.label }}</div>
+              <sc-for list="{{ g.items }}" as="p" hint-placeholder-count="4">
+                <div onClick="{{ p.go }}" style="{{ p.style }}" style-hover="background:var(--color-neutral-200)">
+                  <div style="{{ p.dot }}"></div>
+                  <div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;font-weight:500">{{ p.name }}</div>
+                  <div style="font-size:11px;color:var(--color-neutral-600);white-space:nowrap">{{ p.meta }}</div>
+                </div>
+              </sc-for>
+            </sc-for>
+          </div>
+          <div style="padding:10px 13px;border-top:1px solid var(--color-divider);font-size:11.5px;line-height:1.45;color:var(--color-neutral-600)">{{ palHint }}</div>
+        </div>
+
+        <div style="{{ midWrap }}">
+        <div style="{{ stageCol }}">
+          <div style="position:absolute;top:12px;left:12px;right:12px;z-index:3;display:flex;gap:8px;align-items:flex-start;pointer-events:none">
+            <div style="display:flex;gap:3px;padding:4px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);pointer-events:auto">
+              <sc-for list="{{ modes }}" as="m" hint-placeholder-count="3">
+                <div onClick="{{ m.go }}" style="{{ m.style }}">{{ m.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:3px;padding:4px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);pointer-events:auto">
+              <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+                <div onClick="{{ p.go }}" style="{{ p.style }}">{{ p.label }}</div>
+              </sc-for>
+            </div>
+            <div style="flex:1"></div>
+            <div onClick="{{ toggleLayers }}" style="padding:9px 15px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;pointer-events:auto">Layers</div>
+            <div style="display:flex;flex-direction:column;gap:4px;pointer-events:auto">
+              <div onClick="{{ zoomIn }}" style="width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--color-neutral-700);cursor:pointer">+</div>
+              <div onClick="{{ zoomOut }}" style="width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--color-neutral-700);cursor:pointer">−</div>
+            </div>
+          </div>
+
+          <sc-if value="{{ layersOpen }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;top:58px;right:56px;z-index:5;width:196px;padding:9px;border-radius:20px;background:#fff;box-shadow:var(--shadow-lg)">
+              <sc-for list="{{ layerList }}" as="l" hint-placeholder-count="6">
+                <div onClick="{{ l.go }}" style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:500" style-hover="background:var(--color-neutral-200)">
+                  <div style="{{ l.box }}"></div>{{ l.label }}
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div ref="{{ canvasRef }}" style="flex:1;min-height:0;touch-action:none;cursor:crosshair"></div>
+
+          <div style="position:absolute;left:14px;bottom:14px;z-index:3;padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;pointer-events:none">{{ hud }}</div>
+
+          <sc-if value="{{ armedName }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:50%;transform:translateX(-50%);top:64px;z-index:4;padding:8px 16px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:12.5px;font-weight:600;box-shadow:var(--shadow-md);pointer-events:none">Tap the plan to place {{ armedName }}</div>
+          </sc-if>
+
+          <sc-if value="{{ isSun }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:0 0 auto;padding:12px 18px 14px;background:#fff;border-top:1px solid var(--color-divider);display:flex;gap:20px;align-items:center">
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;color:var(--color-neutral-600);margin-bottom:2px"><span>Date</span><span>{{ dayLabel }}</span></div>
+                <input type="range" min="1" max="365" value="{{ doy }}" onInput="{{ onDay }}" style="width:100%">
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;color:var(--color-neutral-600);margin-bottom:2px"><span>Time</span><span>{{ timeLabel }}</span></div>
+                <input type="range" min="5" max="20" step="0.25" value="{{ hour }}" onInput="{{ onHour }}" style="width:100%">
+              </div>
+              <div style="display:flex;gap:5px">
+                <sc-for list="{{ seasons }}" as="s" hint-placeholder-count="3">
+                  <div onClick="{{ s.go }}" style="{{ s.style }}">{{ s.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isGrow }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:0 0 auto;padding:12px 18px 14px;background:#fff;border-top:1px solid var(--color-divider);display:flex;gap:20px;align-items:center">
+              <div style="flex:1">
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;color:var(--color-neutral-600);margin-bottom:2px"><span>Years after planting</span><span>{{ yearLabel }}</span></div>
+                <input type="range" min="0" max="12" step="1" value="{{ years }}" onInput="{{ onYears }}" style="width:100%">
+              </div>
+              <div style="font-size:12px;color:var(--color-neutral-600);max-width:320px;line-height:1.45">{{ growNote }}</div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div class="ls-scroll" style="{{ inspCol }}">
+          <div class="ls-scroll" style="flex:1 1 300px;min-width:0;max-height:100%;border-radius:20px;background:var(--color-neutral-100);padding:14px">
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600);margin-bottom:7px">{{ selKicker }}</div>
+            <div style="font-family:'Caprasimo';font-size:17px;line-height:1.2;margin-bottom:9px">{{ selName }}</div>
+            <sc-for list="{{ selRows }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--color-divider);font-size:12.5px">
+                <span style="color:var(--color-neutral-600)">{{ r.k }}</span><span style="font-weight:600;font-variant-numeric:tabular-nums;text-align:right">{{ r.v }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ hasSun }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:6px;margin-top:11px">
+                <sc-for list="{{ selSun }}" as="s" hint-placeholder-count="3">
+                  <div style="flex:1;border-radius:14px;background:#fff;padding:8px 6px;text-align:center">
+                    <div style="font-family:'Caprasimo';font-size:16px;color:{{ s.col }}">{{ s.h }}</div>
+                    <div style="font-size:10px;color:var(--color-neutral-600);margin-top:1px">{{ s.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ selVerdict }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ verdictStyle }}">{{ selVerdict }}</div>
+            </sc-if>
+            <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:6px;margin-top:11px;flex-wrap:wrap">
+                <sc-for list="{{ selActions }}" as="a" hint-placeholder-count="3">
+                  <div onClick="{{ a.go }}" style="padding:8px 14px;border-radius:999px;border:1.5px solid var(--color-neutral-300);font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;background:#fff" style-hover="background:var(--color-neutral-200)">{{ a.label }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="flex:1 1 280px;min-width:0;align-self:flex-start;border-radius:20px;background:var(--color-neutral-100);padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600)">Running total</div>
+              <div onClick="{{ goStages }}" style="font-size:11.5px;font-weight:600;color:var(--color-accent-700);cursor:pointer">Stage it →</div>
+            </div>
+            <div style="font-family:'Caprasimo';font-size:28px;line-height:1">{{ costLabel }}</div>
+            <div style="font-size:12px;color:var(--color-neutral-600);margin:3px 0 9px">of $10,000 · materials only, your labour</div>
+            <div style="height:9px;border-radius:999px;background:var(--color-neutral-300);overflow:hidden"><div style="{{ barStyle }}"></div></div>
+            <sc-for list="{{ qtyRows }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--color-divider);font-size:12.5px;margin-top:2px">
+                <span style="color:var(--color-neutral-600)">{{ r.k }}</span><span style="font-weight:600;font-variant-numeric:tabular-nums">{{ r.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div onClick="{{ goIssues }}" style="flex:1 1 240px;min-width:0;align-self:flex-start;border-radius:20px;background:var(--color-accent-100);padding:14px;cursor:pointer" style-hover="background:var(--color-accent-200)">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-accent-700)">What's wrong with this plan</div>
+                <div style="font-size:13px;color:var(--color-neutral-700);margin-top:4px">{{ issueSummary }}</div>
+              </div>
+              <div style="font-family:'Caprasimo';font-size:26px;color:var(--color-accent-700)">{{ issueCount }}</div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isIssues }}" hint-placeholder-val="{{ true }}">
+        <div class="ls-scroll" style="flex:1;min-height:0;padding:18px 26px 26px">
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <sc-for list="{{ issueFilters }}" as="f" hint-placeholder-count="3">
+              <div onClick="{{ f.go }}" style="{{ f.style }}">{{ f.label }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;max-width:900px">
+            <sc-for list="{{ issueList }}" as="i" hint-placeholder-count="5">
+              <div style="border-radius:20px;background:var(--color-neutral-100);padding:16px 18px;display:flex;gap:14px;align-items:flex-start">
+                <div style="{{ i.chip }}">{{ i.sevLabel }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:15px;font-weight:600;margin-bottom:4px">{{ i.title }}</div>
+                  <div style="font-size:13px;line-height:1.55;color:var(--color-neutral-700);text-wrap:pretty">{{ i.body }}</div>
+                </div>
+                <sc-if value="{{ i.hasShow }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ i.show }}" style="flex:0 0 auto;padding:9px 15px;border-radius:999px;background:#fff;border:1.5px solid var(--color-neutral-300);font-size:12.5px;font-weight:600;cursor:pointer;color:var(--color-neutral-700)" style-hover="background:var(--color-neutral-200)">Show me</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ noIssues }}" hint-placeholder-val="{{ true }}">
+            <div style="border-radius:20px;background:var(--color-accent-2-100);padding:22px;max-width:520px;font-size:14px;color:var(--color-accent-2-800)">Nothing is clashing. Every element sits clear of the root zones, the buildings, the boundary and the flow path.</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStages }}" hint-placeholder-val="{{ true }}">
+        <div class="ls-scroll" style="flex:1;min-height:0;padding:18px 26px 26px">
+          <div style="display:flex;gap:14px;align-items:stretch">
+            <sc-for list="{{ stages }}" as="s" hint-placeholder-count="3">
+              <div style="flex:1;min-width:0;border-radius:24px;background:var(--color-neutral-100);padding:16px;display:flex;flex-direction:column">
+                <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600)">{{ s.when }}</div>
+                <div style="font-family:'Caprasimo';font-size:19px;line-height:1.15;margin:4px 0 2px">{{ s.title }}</div>
+                <div style="font-size:12.5px;color:var(--color-neutral-700);line-height:1.5;margin-bottom:10px">{{ s.why }}</div>
+                <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+                  <div style="font-family:'Caprasimo';font-size:23px">{{ s.cost }}</div>
+                  <div style="font-size:12px;color:var(--color-neutral-600)">{{ s.count }}</div>
+                </div>
+                <div style="height:8px;border-radius:999px;background:var(--color-neutral-300);overflow:hidden;margin-bottom:12px"><div style="{{ s.bar }}"></div></div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <sc-for list="{{ s.items }}" as="it" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:14px;background:#fff">
+                      <div style="{{ it.dot }}"></div>
+                      <div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;font-weight:500">{{ it.name }}</div>
+                      <div style="font-size:11.5px;color:var(--color-neutral-600);font-variant-numeric:tabular-nums">{{ it.cost }}</div>
+                      <div onClick="{{ it.move }}" style="width:24px;height:24px;border-radius:999px;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-neutral-700);cursor:pointer">→</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:16px;border-radius:24px;background:var(--color-accent-2-100);padding:18px 20px;max-width:1000px">
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-accent-2-700);margin-bottom:8px">Order that has to hold</div>
+            <sc-for list="{{ sequence }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;gap:11px;padding:6px 0;font-size:13px;line-height:1.5;color:var(--color-accent-2-900)">
+                <div style="flex:0 0 20px;height:20px;border-radius:999px;background:var(--color-accent-2-500);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.n }}</div>
+                <div style="flex:1">{{ s.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAsk }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-height:0;display:flex">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+            <div class="ls-scroll" ref="{{ chatRef }}" style="flex:1;min-height:0;padding:18px 24px">
+              <div style="max-width:680px;display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{ chat }}" as="m" hint-placeholder-count="2">
+                  <div style="{{ m.wrap }}">
+                    <div style="{{ m.bubble }}">{{ m.text }}</div>
+                    <sc-if value="{{ m.change }}" hint-placeholder-val="{{ true }}">
+                      <div style="margin-top:8px;border-radius:18px;background:#fff;border:1.5px dashed var(--color-accent-400);padding:12px 14px;display:flex;gap:12px;align-items:center">
+                        <div style="flex:1">
+                          <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-accent-700);margin-bottom:3px">Suggested change · not applied</div>
+                          <div style="font-size:13px;line-height:1.5">{{ m.change }}</div>
+                        </div>
+                        <div onClick="{{ m.addTodo }}" style="flex:0 0 auto;padding:9px 15px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:12.5px;font-weight:600;cursor:pointer">{{ m.addLabel }}</div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="flex:0 0 auto;padding:12px 24px 18px;border-top:1px solid var(--color-divider)">
+              <div style="display:flex;gap:10px;align-items:center;max-width:760px">
+                <input value="{{ askQ }}" onInput="{{ onAsk }}" onKeyDown="{{ onAskKey }}" placeholder="Ask about the site, the plan, the money…" style="flex:1;font:inherit;font-size:14px;padding:13px 18px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;outline:none;color:var(--color-text)">
+                <div onClick="{{ send }}" style="padding:13px 22px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap">{{ sendLabel }}</div>
+                <div onClick="{{ handoff }}" style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:13.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap" style-hover="background:var(--color-neutral-200)">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m17 8-5-5-5 5"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>
+                  Claude app
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:center;margin-top:9px;max-width:760px">
+                <div style="flex:1;font-size:11.5px;line-height:1.5;color:var(--color-neutral-600)">Answers read the survey, the tree plan, the geotechnical report and your current layout. Nothing here moves anything on the plan — changes are suggested, and you apply them yourself.</div>
+                <div onClick="{{ toggleBrief }}" style="flex:0 0 auto;font-size:11.5px;font-weight:600;color:var(--color-accent-700);cursor:pointer">{{ briefLabel }}</div>
+              </div>
+              <sc-if value="{{ toast }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:10px;display:inline-block;padding:9px 16px;border-radius:999px;background:var(--color-accent-2-100);color:var(--color-accent-2-800);font-size:12.5px;font-weight:600">{{ toast }}</div>
+              </sc-if>
+              <sc-if value="{{ briefOpen }}" hint-placeholder-val="{{ true }}">
+                <div class="ls-scroll" style="margin-top:10px;max-width:760px;max-height:160px;padding:13px 16px;border-radius:18px;background:var(--color-neutral-100);font:12px/1.6 ui-monospace,Menlo,monospace;color:var(--color-neutral-800);white-space:pre-wrap">{{ brief }}</div>
+              </sc-if>
+            </div>
+          </div>
+          <div class="ls-scroll" style="flex:0 0 300px;border-left:1px solid var(--color-divider);padding:16px">
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600);margin-bottom:9px">Worth asking</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="6">
+                <div onClick="{{ s.go }}" style="padding:11px 14px;border-radius:16px;background:var(--color-neutral-100);font-size:12.5px;line-height:1.45;cursor:pointer" style-hover="background:var(--color-neutral-200)">{{ s.text }}</div>
+              </sc-for>
+            </div>
+            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600);margin:18px 0 9px">Your list</div>
+            <sc-if value="{{ hasTodos }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <sc-for list="{{ todos }}" as="t" hint-placeholder-count="2">
+                  <div style="padding:10px 13px;border-radius:14px;background:var(--color-accent-100);font-size:12.5px;line-height:1.45;color:var(--color-accent-900);display:flex;gap:9px">
+                    <div onClick="{{ t.done }}" style="flex:0 0 16px;height:16px;border-radius:999px;border:2.75px solid var(--color-accent-500);cursor:pointer;margin-top:1px"></div>
+                    <div style="flex:1">{{ t.text }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noTodos }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:12.5px;color:var(--color-neutral-600);line-height:1.5">Nothing yet. When an answer suggests a change, add it here and it stays until you have done it.</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;z-index:20;background:rgba(46,43,37,.34);display:flex;align-items:center;justify-content:center">
+      <div onClick="{{ stop }}" style="width:640px;max-height:76%;background:var(--color-bg);border-radius:28px;box-shadow:var(--shadow-lg);padding:22px 24px;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:4px">
+          <div style="font-family:'Caprasimo';font-size:22px">Schemes</div>
+          <div style="flex:1"></div>
+          <div onClick="{{ newScheme }}" style="padding:9px 16px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer">New from base plan</div>
+        </div>
+        <div style="font-size:12.5px;color:var(--color-neutral-600);margin-bottom:14px">Every scheme saves itself as you work. Switching does not lose the one you were in.</div>
+        <div class="ls-scroll" style="flex:1;min-height:0;display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ schemeList }}" as="s" hint-placeholder-count="3">
+            <div onClick="{{ s.open }}" style="{{ s.style }}">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14.5px;font-weight:600">{{ s.name }}</div>
+                <div style="font-size:12px;color:var(--color-neutral-600);margin-top:2px">{{ s.meta }}</div>
+              </div>
+              <div onClick="{{ s.dup }}" style="padding:7px 13px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12px;font-weight:600;color:var(--color-neutral-700);cursor:pointer">Duplicate</div>
+              <sc-if value="{{ s.canDelete }}" hint-placeholder-val="{{ true }}">
+                <div onClick="{{ s.del }}" style="padding:7px 13px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12px;font-weight:600;color:var(--color-accent-700);cursor:pointer">Delete</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</div>
+<sc-if value="{{ mock }}" hint-placeholder-val="{{ true }}">
+<div onClick="{{ rotate }}" style="display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:999px;background:#fff;box-shadow:var(--shadow-sm);font-size:13px;font-weight:600;color:var(--color-neutral-700);cursor:pointer" style-hover="background:var(--color-neutral-200)">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>{{ rotateLabel }}
+</div>
+</sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1434,&quot;height&quot;:1092}}">
+const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
+const SNAP=0.05, BUDGET=10000;
+const COL={
+  paper:'#f9f4ed', ink:'#2e2b25', cont:'#dcd3c4', grid:'#eee7db',
+  exFill:'#dcd3c4', exStroke:'#a19786', prFill:'#eee7db', prStroke:'#82796a',
+  tpz:'#b2622d', srz:'#8c491a', canopy:'#8fa073', water:'#33646b',
+  drive:'#e8e0d0', shade:'#3d472b'
+};
+const PLANTCOL={tree:'#728157',shrub:'#8fa073',groundcover:'#ccdbb2',grass:'#aebf92',other:'#c0b6a5',veggie:'#aebf92'};
+const HARDCOL={
+  'Paving / terrace':['#e4dccb','#a19786'],'Outdoor kitchen':['#d8c3a4','#8c491a'],'Gravel path':['#eee7db','#c0b6a5'],
+  'Sunken firepit':['#f6a06b','#8c491a'],'Firepit terrace':['#e4dccb','#a19786'],'Seat / retaining wall':['#c0b6a5','#645c50'],
+  'Raised veg bed':['#ccdbb2','#56633f'],'Shed':['#dcd3c4','#645c50'],'Water tank':['#cfd9d3','#33646b'],
+  'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Planting mound':['#dcc9a8','#8c491a'],
+  'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50']
+};
+const GROW={groundcover:3,grass:3,veggie:1,shrub:6,other:6,tree:12};
+/* her plant list came out of a spreadsheet, so names arrive half-cased and one is a pasted link */
+function DISP(n){ if(!n) return n;
+  if(n.indexOf('http')===0) return 'Anigozanthos, kangaroo paw';
+  const t=n.replace(/\s+$/,''); return t.charAt(0).toUpperCase()+t.slice(1); }
+const STAGEDEF={1:{title:'Water and earth',when:'0–3 months',why:'Shaping and anything that decides where water goes. Do it first, then let a wet season test it.'},
+ 2:{title:'Living surfaces',when:'3–6 months',why:'Paving, the wall, the kitchen and the lawn platform — the parts you entertain on.'},
+ 3:{title:'Planting and sheds',when:'6–12 months',why:'Plants go in last, once the shaping has settled and you know where the shade falls.'}};
+const SUGG=['Where can I dig without calling the arborist?','Why does the firepit fail the reserve clearance?','What is the sunniest spot left in the back garden?','What does stage one cost if I stop there?','What happens to the lawn if the reserve bank overtops?','How much mulch do I need at 100 mm?','Which plants on my list will not survive a Canberra frost?','Is there anywhere left for a second fruit tree?'];
+
+class Component extends DCLogic {
+  state={ready:false,fill:false,orient:'landscape',toast:'',briefOpen:false,screen:'plan',mode:'plan',items:[],sel:null,uid:1,years:0,doy:355,hour:13,
+    layers:{contour:true,grid:false,bld:true,tpz:true,srz:true,canopy:true,drain:true,labels:true},
+    layersOpen:false,palTab:'plants',q:'',filt:{must:false,edible:false,local:false,hardy:false},armed:null,
+    schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'Drag to pan · pinch or use + to zoom',
+    issueFilter:'all',sunCache:{}};
+
+  componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz); this.wait(); }
+  componentWillUnmount(){ window.removeEventListener('resize',this._rz); }
+  /* Shown inside a device frame while it is being designed; opened on the iPad
+     itself (from the home screen) it fills the screen and follows the device. */
+  measure(){
+    const w=window.innerWidth, h=window.innerHeight;
+    let standalone=false;
+    try{ standalone=navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches; }catch(e){}
+    const touch=(navigator.maxTouchPoints||0)>0;
+    const fill=standalone||(touch&&w<1440&&h<1240);
+    const orient=fill?(w>=h?'landscape':'portrait'):this.state.orient;
+    if(fill!==this.state.fill||orient!==this.state.orient){
+      this.setState({fill:fill,orient:orient},()=>{ if(this.state.ready){ this.view={...this.presetViews().all}; setTimeout(()=>{this.fit();this.draw();},30); } });
+    }
+  }
+  wait(){ if(window.DUFFY){ this.boot(); } else { setTimeout(()=>this.wait(),60); } }
+  boot(){
+    const D=window.DUFFY; this.D=D; this.C=D.TREND; this.YTOP=D.YTOP;
+    this.LIBM={}; D.LIB.forEach(l=>this.LIBM[l[0]]=l);
+    this.PL={}; D.PLANTS.forEach(p=>{ if(!this.PL[p.n]) this.PL[p.n]=p; });
+    this.BLDR=D.BOXH.map(b=>[b[0],b[1],b[2],b[3],b[4]]).concat((D.DRIVE||[]).map(d=>[d[0],d[1],d[2],d[3],d[4]]));
+    this.view={...this.presetViews().all};
+    const st=this.loadStore();
+    if(st){ this.setState({ready:true,...st},()=>{this.fit();this.draw();}); }
+    else{ const items=this.baseItems(); this.setState({ready:true,items:items.items,uid:items.uid,
+        schemes:[{id:'s1',name:'Working scheme',created:Date.now()}],schemeId:'s1',
+        chat:[{who:'app',text:'Ask anything about the block, the rules or your layout. I read the survey, the tree plan, the geotechnical classification and whatever is on the plan right now.'}]},()=>{this.fit();this.draw();this.persist();}); }
+    this.bindCanvas();
+  }
+
+  /* ---------- data helpers ---------- */
+  RL(x,y){const C=this.C;return C[0]+C[1]*x+C[2]*y+C[3]*x*x+C[4]*x*y+C[5]*y*y;}
+  fy(y){return this.YTOP-y;}
+  /* Landscape holds the handbook's framing — reserve left, Duffy Street right,
+     consistent with every other drawing in the set. Portrait turns the plan
+     north-up, because the block is 40 m by 21 m and would otherwise be a stamp
+     in the middle of a tall screen. Geometry keeps the handbook's baked
+     coordinates and is rotated by one group matrix; text is placed in the
+     rotated frame so it stays upright. */
+  rot(){ return this.state.orient==='portrait'; }
+  TX(x,y){ return this.rot()?this.YTOP-y-1:x; }
+  TY(x,y){ return this.rot()?46-x:this.fy(y); }
+  presetViews(){ return this.rot()
+    ? {all:{x:0,y:4.6,w:24,h:42.5},back:{x:0,y:23.5,w:24,h:23},front:{x:0,y:1.4,w:24,h:17}}
+    : {all:{x:-2,y:0.3,w:45,h:24.5},back:{x:-0.8,y:1.9,w:24,h:21.8},front:{x:24.5,y:1.9,w:20,h:21.8}}; }
+  baseItems(){
+    const D=this.D; let uid=1, items=[];
+    D.START.forEach(s=>{const i=this.mk(s[0],s[1],s[2],s[3],s[4],s[5],uid++); if(i)items.push(i);});
+    (D.STARTP||[]).forEach(s=>{const p=D.PLANTS.find(p=>p.id===s[0]); if(p){const i=this.mkPlant(p.n,s[1],s[2],uid++); if(i)items.push(i);}});
+    return {items,uid};
+  }
+  mk(name,x,y,w,h,rot,uid){
+    const l=this.LIBM[name]; if(!l) return null;
+    const c=HARDCOL[name]||['#dcd3c4','#82796a'];
+    const st=l[2]==='dig'?1:(l[2]==='pave'?2:3);
+    return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st};
+  }
+  mkPlant(name,x,y,uid){
+    const p=this.PL[name]; if(!p) return null;
+    return {u:uid,t:'plant',pn:name,n:DISP(p.n),shape:'circ',cat:'light',x:x,y:y,w:p.w/2,h:0,rot:0,cost:p.cost,unit:'item',
+      fill:PLANTCOL[p.g]||'#8fa073',stroke:'#56633f',g:p.g,ht:p.h,tender:p.tender,st:3};
+  }
+  /* ---------- solar ---------- */
+  sunpos(doy,hh){
+    const g=2*Math.PI/365*(doy-1+(hh-12)/24);
+    const eqt=229.18*(0.000075+0.001868*Math.cos(g)-0.032077*Math.sin(g)-0.014615*Math.cos(2*g)-0.040849*Math.sin(2*g));
+    const dec=0.006918-0.399912*Math.cos(g)+0.070257*Math.sin(g)-0.006758*Math.cos(2*g)+0.000907*Math.sin(2*g)-0.002697*Math.cos(3*g)+0.00148*Math.sin(3*g);
+    const tst=hh*60+eqt+4*SITE.lon-60*SITE.tz, ha=(tst/4-180)*Math.PI/180, la=SITE.lat*Math.PI/180;
+    const alt=Math.asin(Math.sin(la)*Math.sin(dec)+Math.cos(la)*Math.cos(dec)*Math.cos(ha));
+    const az=Math.atan2(-Math.sin(ha)*Math.cos(dec),Math.cos(la)*Math.sin(dec)-Math.sin(la)*Math.cos(dec)*Math.cos(ha));
+    return {alt:alt*180/Math.PI,az:(az*180/Math.PI+360)%360};
+  }
+  trans(t,doy){ return t[6]>0?t[6]:((doy>=152&&doy<=259)?0.72:0.15); }
+  blockTop(b){ return b[6]+(b[5]-b[6])*0.5; }
+  sunlit(px,py,pz,alt,az,doy){
+    const D=this.D;
+    if(alt<=3) return 0;
+    const th=(SITE.nb-az)*Math.PI/180, ca=Math.cos(alt*Math.PI/180), sa=Math.sin(alt*Math.PI/180);
+    const dx=Math.cos(th)*ca, dy=Math.sin(th)*ca, dz=sa;
+    for(const f of D.FEN){
+      const ex=f[2]-f[0], ey=f[3]-f[1], nx=ey, ny=-ex, den=nx*dx+ny*dy;
+      if(Math.abs(den)<1e-9) continue;
+      const t=(nx*(f[0]-px)+ny*(f[1]-py))/den; if(t<=0.05||t>80) continue;
+      const X=px+dx*t, Y=py+dy*t, sp=((X-f[0])*ex+(Y-f[1])*ey)/(ex*ex+ey*ey);
+      if(sp<0||sp>1) continue;
+      if(pz+dz*t<this.RL(X,Y)+1.8) return 0;
+    }
+    const BX=D.BOXH.concat(D.NBR); let fr=1;
+    for(let t=0.3;t<60;t+=0.45){
+      const X=px+dx*t, Y=py+dy*t, Z=pz+dz*t;
+      for(const b of BX) if(X>=b[1]&&X<=b[3]&&Y>=b[2]&&Y<=b[4]&&Z<this.blockTop(b)) return 0;
+      for(const tr of D.STREE){ const ax=X-tr[1], ay=Y-tr[2];
+        if(ax*ax+ay*ay<=tr[3]*tr[3]&&Z>=tr[4]&&Z<=tr[5]){ fr*=this.trans(tr,doy); if(fr<0.05) return 0; } }
+    }
+    return fr;
+  }
+  sunHours(x,y,doy,ht){
+    const key=x.toFixed(1)+','+y.toFixed(1)+','+doy+','+(ht||0.9).toFixed(1);
+    if(this._sc&&this._sc[key]!=null) return this._sc[key];
+    const z=this.RL(x,y)+(ht||0.9); let h=0;
+    for(let t=5;t<=20.001;t+=0.3333){ const s=this.sunpos(doy,t); if(s.alt>3) h+=this.sunlit(x,y,z,s.alt,s.az,doy)*0.3333; }
+    this._sc=this._sc||{}; this._sc[key]=h; return h;
+  }
+  /* ---------- geometry ---------- */
+  corners(it){ if(it.shape==='circ') return null;
+    const cx=it.x+it.w/2, cy=it.y+it.h/2, a=(it.rot||0)*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
+    return [[-it.w/2,-it.h/2],[it.w/2,-it.h/2],[it.w/2,it.h/2],[-it.w/2,it.h/2]].map(p=>[cx+p[0]*ca-p[1]*sa,cy+p[0]*sa+p[1]*ca]); }
+  centre(it){ return it.shape==='circ'?[it.x,it.y]:[it.x+it.w/2,it.y+it.h/2]; }
+  samples(it,n){ n=n||6; const o=[];
+    if(it.shape==='circ'){ o.push([it.x,it.y]);
+      for(let i=0;i<16;i++){const a=i/16*Math.PI*2;o.push([it.x+it.w*Math.cos(a),it.y+it.w*Math.sin(a)]);} return o; }
+    const cs=this.corners(it);
+    for(let i=0;i<=n;i++) for(let j=0;j<=n;j++){ const u=i/n,v=j/n;
+      const a=[cs[0][0]+(cs[1][0]-cs[0][0])*u,cs[0][1]+(cs[1][1]-cs[0][1])*u];
+      const b=[cs[3][0]+(cs[2][0]-cs[3][0])*u,cs[3][1]+(cs[2][1]-cs[3][1])*u];
+      o.push([a[0]+(b[0]-a[0])*v,a[1]+(b[1]-a[1])*v]); }
+    return o; }
+  area(it){ return it.shape==='circ'?Math.PI*it.w*it.w:it.w*it.h; }
+  inPoly(p,poly){ let c=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];
+    if(((yi>p[1])!=(yj>p[1]))&&(p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi))c=!c;} return c; }
+  checks(it){
+    const D=this.D, pts=this.samples(it), tpz=new Set(), srz=new Set(), bld=new Set(); let out=false;
+    const BOUND=[[0,0],[39.999,0],[39.999,21.333],[4.343,21.333]];
+    for(const p of pts){
+      for(const t of D.TREES){ if(!t.ctrl) continue;
+        const d2=(p[0]-t.x)**2+(p[1]-t.y)**2;
+        if(d2<=t.srz*t.srz)srz.add(t.id); else if(d2<=t.ctrl*t.ctrl)tpz.add(t.id); }
+      for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) bld.add(b[0]);
+      if(!this.inPoly(p,BOUND)) out=true;
+    }
+    const m=[]; let lvl='g';
+    if(srz.size){ const z='tree '+[...srz].join(', ');
+      if(it.cat==='dig'||it.cat==='pave'){ m.push('In the structural root zone of '+z+'. Nothing may be excavated, paved or compacted here, ever.'); lvl='r'; }
+      else { m.push('In the structural root zone of '+z+'. Mulch and hand planting only.'); if(lvl==='g')lvl='a'; } }
+    if(bld.size){ m.push('Overlaps the '+[...bld].join(', ')+'.'); lvl='r'; }
+    if(out){ if(it.t==='plant'){ m.push('Its mature canopy will overhang the boundary. Fine if you prune it.'); if(lvl==='g')lvl='a'; }
+      else { m.push('Crosses the boundary.'); lvl='r'; } }
+    if(tpz.size){ const z='tree '+[...tpz].join(', ');
+      if(it.cat==='dig'){ m.push('Digging inside the protection zone of '+z+'. Hand or hydro dig only, arborist supervising, no roots over 30 mm, and it must be added to the approved scope.'); if(lvl!=='r')lvl='a'; }
+      else if(it.cat==='pave'){ m.push('Paving inside the protection zone of '+z+'. Build above existing grade on a cellular geotextile or mulch and board base, no excavation or compaction.'); if(lvl==='g')lvl='a'; }
+      else { m.push('Inside the protection zone of '+z+'. Fine as it sits on the ground. Hand-dig planting holes only.'); if(lvl==='g')lvl='a'; } }
+    if(!m.length) m.push('Clear of everything.');
+    return {lvl:lvl,msg:m.join(' '),srz:srz,tpz:tpz,bld:bld,out:out};
+  }
+  cutfill(it){ const pts=this.samples(it,5), c=this.centre(it), target=this.RL(c[0],c[1]);
+    let cut=0,fill=0,mx=0,mn=0;
+    for(const p of pts){ const d=this.RL(p[0],p[1])-target; if(d>0){cut+=d;if(d>mx)mx=d;} else {fill-=d;if(-d>mn)mn=-d;} }
+    const n=pts.length, a=this.area(it);
+    return {cutV:cut/n*a,fillV:fill/n*a,maxCut:mx,maxFill:mn}; }
+  growR(it,years){ if(it.t!=='plant') return it.w;
+    const t=GROW[it.g]||6, f=Math.max(0.18,Math.min(1,0.18+0.82*Math.pow(Math.min(1,years/t),0.7)));
+    return it.w*f; }
+  /* ---------- store ---------- */
+  key(){ return 'duffy-studio-v1'; }
+  persist(){ try{
+    const s=this.state, all=JSON.parse(localStorage.getItem(this.key())||'{}');
+    all.schemes=all.schemes||{};
+    all.schemes[s.schemeId]={name:(s.schemes.find(x=>x.id===s.schemeId)||{}).name,items:s.items,uid:s.uid,updated:Date.now()};
+    all.index=s.schemes; all.activeId=s.schemeId; all.todos=s.todos;
+    localStorage.setItem(this.key(),JSON.stringify(all));
+    this.setState({savedAt:Date.now()});
+  }catch(e){} }
+  loadStore(){ try{
+    const all=JSON.parse(localStorage.getItem(this.key())||'null');
+    if(!all||!all.index||!all.activeId) return null;
+    const cur=all.schemes[all.activeId]; if(!cur||!cur.items) return null;
+    return {items:cur.items,uid:cur.uid||cur.items.length+1,schemes:all.index,schemeId:all.activeId,todos:all.todos||[],
+      chat:[{who:'app',text:'Ask anything about the block, the rules or your layout. I read the survey, the tree plan, the geotechnical classification and whatever is on the plan right now.'}]};
+  }catch(e){ return null; } }
+  push(){ this.hist=this.hist||[]; this.hist.push(JSON.stringify(this.state.items)); if(this.hist.length>50)this.hist.shift(); }
+  commit(items,sel){ this.setState({items:items,sel:sel===undefined?this.state.sel:sel},()=>{this.draw();this.persist();}); }
+
+  /* ---------- canvas ---------- */
+  bindCanvas(){
+    const el=this.canvas; if(!el||el._bound) return; el._bound=true;
+    const toM=ev=>{ const r=el.getBoundingClientRect(), v=this.view;
+      const a=v.x+(ev.clientX-r.left)/r.width*v.w, b=v.y+(ev.clientY-r.top)/r.height*v.h;
+      return this.rot()?[46-b,this.YTOP-1-a]:[a,this.YTOP-b]; };
+    const snap=v=>Math.round(v/SNAP)*SNAP;
+    el.addEventListener('pointerdown',ev=>{
+      const m=toM(ev), s=this.state;
+      if(s.armed){ this.push(); const it=this.mkPlant(s.armed,snap(m[0]),snap(m[1]),s.uid);
+        if(it){ const items=s.items.concat([it]); this.setState({uid:s.uid+1,armed:ev.shiftKey?s.armed:null});
+          this.commit(items,it.u); } return; }
+      const h=ev.target.closest('.hS,.hT,.hR');
+      if(h&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel); this.push();
+        this.drag={mode:h.classList.contains('hS')?'size':h.classList.contains('hT')?'rot':'rad',it:it,m0:m,o:{x:it.x,y:it.y,w:it.w,h:it.h,rot:it.rot||0}};
+        el.setPointerCapture(ev.pointerId); return; }
+      const t=ev.target.closest('.mv');
+      if(t){ const it=s.items.find(i=>i.u===+t.dataset.u); this.push();
+        this.drag={mode:'move',it:it,m0:m,o:{x:it.x,y:it.y}}; el.setPointerCapture(ev.pointerId);
+        this.setState({sel:it.u},()=>this.draw()); return; }
+      const tr=ev.target.closest('.thit');
+      if(tr){ this.setState({sel:'tree'+tr.dataset.t},()=>this.draw()); return; }
+      this.pan={vx:this.view.x,vy:this.view.y,cx:ev.clientX,cy:ev.clientY};
+      el.setPointerCapture(ev.pointerId); this.setState({sel:null},()=>this.draw());
+    });
+    el.addEventListener('pointermove',ev=>{
+      const m=toM(ev);
+      const hud='x '+m[0].toFixed(2)+'  y '+m[1].toFixed(2)+' m · ground '+this.RL(m[0],m[1]).toFixed(2)+' m AHD';
+      if(this.hudEl) this.hudEl.textContent=hud;
+      if(this.drag){ const it=this.drag.it, dx=m[0]-this.drag.m0[0], dy=m[1]-this.drag.m0[1], o=this.drag.o;
+        if(this.drag.mode==='move'){ it.x=snap(o.x+dx); it.y=snap(o.y+dy); }
+        else if(this.drag.mode==='rad'){ it.w=Math.max(0.15,snap(Math.hypot(m[0]-it.x,m[1]-it.y))); }
+        else if(this.drag.mode==='size'){ it.w=Math.max(0.3,snap(o.w+dx)); it.h=Math.max(0.3,snap(o.h+dy)); }
+        else if(this.drag.mode==='rot'){ const c=this.centre(it); it.rot=Math.round((Math.atan2(m[0]-c[0],m[1]-c[1])*180/Math.PI)/5)*5; }
+        this.draw(); return; }
+      if(this.pan){ const r=el.getBoundingClientRect();
+        this.view.x=this.pan.vx-(ev.clientX-this.pan.cx)/r.width*this.view.w;
+        this.view.y=this.pan.vy-(ev.clientY-this.pan.cy)/r.height*this.view.h; this.draw(); }
+    });
+    const end=()=>{ if(this.drag){ this.drag=null; this.forceUpdate(); this.draw(); this.persist(); } this.pan=null; };
+    el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+    el.addEventListener('wheel',ev=>{ ev.preventDefault();
+      const r=el.getBoundingClientRect(), fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
+      const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h, k=ev.deltaY>0?1.1:1/1.1;
+      this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
+      this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); },{passive:false});
+  }
+  fit(keep){ const el=this.canvas; if(!el) return; const r=el.getBoundingClientRect();
+    const a=r.width>0?r.height/r.width:0.9; const h=this.view.w*a;
+    if(h<this.view.h){ const cx=this.view.x+this.view.w/2; this.view.w=this.view.h/a; this.view.x=cx-this.view.w/2; }
+    else { const cy=this.view.y+this.view.h/2; this.view.h=h; this.view.y=cy-this.view.h/2; }
+    const b=this.rot()?{x0:1.17,x1:22.5,y0:6,y1:46}:{x0:0,x1:40,y0:2.17,y1:23.5};
+    if(this.view.w>=b.x1-b.x0) this.view.x=(b.x0+b.x1)/2-this.view.w/2;
+    if(this.view.h>=b.y1-b.y0) this.view.y=(b.y0+b.y1)/2-this.view.h/2; }
+  zoom(k){ const cx=this.view.x+this.view.w/2, cy=this.view.y+this.view.h/2;
+    this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(); this.view.x=cx-this.view.w/2; this.view.y=cy-this.view.h/2; this.draw(); }
+  itemSvg(it,isSel,years){
+    const bad=this.checks(it).lvl==='r', r=this.growR(it,years);
+    const stroke=bad?'#a8332a':(isSel?COL.tpz:it.stroke), sw=(isSel||bad)?3:1.3;
+    const st='fill="'+it.fill+'" fill-opacity="'+(it.t==='plant'?0.62:0.92)+'" stroke="'+stroke+'" stroke-width="'+sw+'" vector-effect="non-scaling-stroke"';
+    if(it.shape==='circ'){
+      let s='<circle class="mv" data-u="'+it.u+'" cx="'+it.x+'" cy="'+this.fy(it.y)+'" r="'+r+'" '+st+'/>';
+      if(it.t==='plant') s+='<circle cx="'+it.x+'" cy="'+this.fy(it.y)+'" r="0.09" fill="#56633f"/>';
+      return s;
+    }
+    const c=this.centre(it);
+    return '<g transform="rotate('+(-(it.rot||0))+' '+c[0]+' '+this.fy(c[1])+')"><rect class="mv" data-u="'+it.u+'" x="'+it.x+'" y="'+this.fy(it.y+it.h)+'" width="'+it.w+'" height="'+it.h+'" rx="'+(it.cat==='soft'?0.3:0.12)+'" '+st+'/></g>';
+  }
+  handles(it){ if(!it) return '';
+    const c=this.centre(it);
+    const dot=(x,y,cls,f)=>'<circle class="'+cls+'" cx="'+x+'" cy="'+this.fy(y)+'" r="0.34" fill="'+f+'" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>';
+    if(it.shape==='circ') return dot(it.x+it.w,it.y,'hR',COL.tpz);
+    const cs=this.corners(it), p=cs[2], a=(it.rot||0)*Math.PI/180;
+    const rx=c[0]-Math.sin(a)*(it.h/2+0.9), ry=c[1]+Math.cos(a)*(it.h/2+0.9);
+    return dot(p[0],p[1],'hS',COL.tpz)
+      +'<line x1="'+c[0]+'" y1="'+this.fy(c[1])+'" x2="'+rx+'" y2="'+this.fy(ry)+'" stroke="'+COL.tpz+'" stroke-width="1.2" vector-effect="non-scaling-stroke"/>'
+      +dot(rx,ry,'hT','#fff');
+  }
+  hull(pts){ pts=pts.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+    const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]); const lo=[],up=[];
+    for(const p of pts){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p);}
+    for(let i=pts.length-1;i>=0;i--){const p=pts[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p);}
+    lo.pop();up.pop();return lo.concat(up); }
+  shadows(){ const D=this.D, s=this.sunpos(this.state.doy,this.state.hour); if(s.alt<=0) return '';
+    const vec=h=>{const th=(SITE.nb-s.az)*Math.PI/180,d=h/Math.tan(s.alt*Math.PI/180);return [-Math.cos(th)*d,-Math.sin(th)*d];};
+    let g='';
+    for(const b of D.BOXH.concat(D.NBR)){
+      const h=this.blockTop(b)-this.RL((b[1]+b[3])/2,(b[2]+b[4])/2), v=vec(h);
+      const cs=[[b[1],b[2]],[b[3],b[2]],[b[3],b[4]],[b[1],b[4]]];
+      g+='<path fill="'+COL.shade+'" fill-opacity="0.3" d="'+this.hull(cs.concat(cs.map(p=>[p[0]+v[0],p[1]+v[1]]))).map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+this.fy(p[1]).toFixed(2)).join('')+'Z"/>';
+    }
+    for(const f of D.FEN){ const v=vec(1.8);
+      const q=[[f[0],f[1]],[f[2],f[3]],[f[2]+v[0],f[3]+v[1]],[f[0]+v[0],f[1]+v[1]]];
+      g+='<path fill="'+COL.shade+'" fill-opacity="0.22" d="'+q.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+this.fy(p[1]).toFixed(2)).join('')+'Z"/>'; }
+    for(const tr of D.STREE){ const h=(tr[4]+tr[5])/2-this.RL(tr[1],tr[2]), v=vec(h), op=(1-this.trans(tr,this.state.doy))*0.34;
+      g+='<circle fill="'+COL.shade+'" fill-opacity="'+op.toFixed(3)+'" cx="'+(tr[1]+v[0]).toFixed(2)+'" cy="'+this.fy(tr[2]+v[1]).toFixed(2)+'" r="'+tr[3]+'"/>'; }
+    return g;
+  }
+  draw(){
+    const el=this.canvas; if(!el||!this.D) return;
+    const D=this.D, s=this.state, L=s.layers, v=this.view;
+    const nss='vector-effect="non-scaling-stroke"';
+    let g='';
+    if(L.grid){ /* one line per metre across whatever is in view, in the drawing's own frame */
+      const bx0=this.rot()?46-(v.y+v.h):v.x, bx1=this.rot()?46-v.y:v.x+v.w;
+      const by0=this.rot()?v.x+1:v.y, by1=this.rot()?v.x+v.w+1:v.y+v.h;
+      let p='';
+      for(let x=Math.ceil(bx0);x<=Math.floor(bx1);x++) p+='M'+x+' '+by0.toFixed(2)+'V'+by1.toFixed(2);
+      for(let y=Math.ceil(by0);y<=Math.floor(by1);y++) p+='M'+bx0.toFixed(2)+' '+y+'H'+bx1.toFixed(2);
+      g+='<path d="'+p+'" fill="none" stroke="'+COL.grid+'" stroke-width="1" '+nss+'/>'; }
+    if(L.contour) g+='<g fill="none" stroke="'+COL.cont+'" stroke-width="1" '+nss+'>'+D.CONT.map(d=>'<path d="'+d+'"/>').join('')+'</g>';
+    if(L.drain){
+      const P=D.DRAIN, line=(pts,st)=>'<path d="'+pts.map((p,i)=>(i?'L':'M')+p[0]+' '+this.fy(p[1])).join('')+'" '+st+'/>';
+      g+=line(P.overland,'fill="none" stroke="'+COL.water+'" stroke-width="11" opacity="0.16" '+nss);
+      g+=line(P.swale,'fill="none" stroke="'+COL.water+'" stroke-width="5" opacity="0.45" '+nss);
+      g+=line(P.berm,'fill="none" stroke="'+COL.tpz+'" stroke-width="4" stroke-dasharray="5 3" opacity="0.6" '+nss);
+      g+=line(P.sleeve,'fill="none" stroke="'+COL.water+'" stroke-width="7" opacity="0.22" '+nss);
+      g+=line(P.spine,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
+      g+=line(P.north,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
+      g+=line(P.court,'fill="none" stroke="'+COL.water+'" stroke-width="2.2" stroke-dasharray="6 4" '+nss);
+      g+=P.pits.map(p=>'<circle cx="'+p[1]+'" cy="'+this.fy(p[2])+'" r="0.3" fill="'+COL.water+'" stroke="#fff" stroke-width="1.4" '+nss+'/>').join('');
+    }
+    if(L.tpz) g+=D.TREES.map(t=>t.ctrl?'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.ctrl+'" fill="'+COL.tpz+'" fill-opacity="0.07" stroke="'+COL.tpz+'" stroke-width="1.1" stroke-dasharray="7 4" '+nss+'/>':'').join('');
+    if(L.srz) g+=D.TREES.map(t=>'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.srz+'" fill="'+COL.srz+'" fill-opacity="0.26"/>').join('');
+    g+=(D.DRIVE||[]).map(d=>'<rect x="'+d[1]+'" y="'+this.fy(d[4])+'" width="'+(d[3]-d[1])+'" height="'+(d[4]-d[2])+'" fill="'+COL.drive+'" stroke="'+COL.exStroke+'" stroke-width="1" stroke-dasharray="5 3" '+nss+'/>').join('');
+    const hard=s.items.filter(i=>i.t!=='plant'), plants=s.items.filter(i=>i.t==='plant');
+    g+=hard.map(it=>this.itemSvg(it,it.u===s.sel,s.years)).join('');
+    g+=plants.map(it=>this.itemSvg(it,it.u===s.sel,s.years)).join('');
+    if(L.bld){
+      g+=D.BLDS.map(b=>'<path d="'+b.d+'" fill="'+(b.k==='existing'?COL.exFill:COL.prFill)+'" stroke="'+(b.k==='existing'?COL.exStroke:COL.prStroke)+'" stroke-width="1" '+(b.k==='existing'?'':'stroke-dasharray="4 3" ')+nss+'/>').join('');
+    }
+    if(s.mode==='sun') g+=this.shadows();
+    if(L.canopy) g+=D.TREES.map(t=>'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.canopy+'" fill="none" stroke="'+COL.canopy+'" stroke-width="1.4" stroke-dasharray="4 3" '+nss+'/>').join('');
+    g+='<path d="'+D.BNDP+'" fill="none" stroke="'+COL.ink+'" stroke-width="2.2" '+nss+'/>';
+    g+=D.TREES.map(t=>'<circle class="thit" data-t="'+t.id+'" cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="0.55" fill="'+COL.tpz+'" stroke="#fff" stroke-width="1.8" '+nss+'/>').join('');
+    const selItem=s.items.find(i=>i.u===s.sel);
+    if(selItem) g+=this.handles(selItem);
+    /* text is sized in metres, so hold it at a constant pixel size as the view zooms */
+    const pxw=Math.max(320,el.clientWidth||900), mpp=v.w/pxw;
+    const F=n=>(n*mpp).toFixed(3), lh=13*mpp;
+    let tx='';
+    if(L.labels){
+      const placed=[];
+      for(const it of s.items){
+        if(it.t==='plant'&&this.growR(it,s.years)<0.55) continue;
+        const c=this.centre(it); const px=this.TX(c[0],c[1]); let py=this.TY(c[0],c[1])+lh*0.35;
+        let gd=0; const wide=Math.max(1.2,it.n.length*mpp*6);
+        while(placed.some(q=>Math.abs(q.x-px)<(wide+q.w)/2&&Math.abs(q.y-py)<lh)&&gd<12){py+=lh;gd++;}
+        placed.push({x:px,y:py,w:wide});
+        tx+='<text x="'+px.toFixed(2)+'" y="'+py.toFixed(2)+'" font-size="'+F(11)+'" text-anchor="middle" fill="#474238" paint-order="stroke" stroke="'+COL.paper+'" stroke-width="'+F(3.2)+'" stroke-linejoin="round">'+it.n.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</text>';
+      }
+    }
+    tx+=D.TREES.map(t=>'<text x="'+this.TX(t.x,t.y).toFixed(2)+'" y="'+(this.TY(t.x,t.y)+5*mpp).toFixed(2)+'" font-size="'+F(13)+'" font-weight="600" text-anchor="middle" fill="#fff" pointer-events="none">'+t.id+'</text>').join('');
+    if(this.rot()){
+      tx+='<text x="'+(v.x+v.w/2)+'" y="'+(v.y+18*mpp)+'" font-size="'+F(12)+'" text-anchor="middle" fill="#82796a">Duffy Street ↑ north-north-west</text>';
+      tx+='<text x="'+(v.x+v.w/2)+'" y="'+(v.y+v.h-10*mpp)+'" font-size="'+F(12)+'" text-anchor="middle" fill="#82796a">Mount Ainslie reserve ↓ south-south-east</text>';
+    } else {
+      tx+='<text x="'+(v.x+14*mpp)+'" y="'+(v.y+v.h-12*mpp)+'" font-size="'+F(12)+'" fill="#82796a">← Mount Ainslie reserve, south-south-east</text>';
+      tx+='<text x="'+(v.x+v.w-14*mpp)+'" y="'+(v.y+v.h-12*mpp)+'" font-size="'+F(12)+'" text-anchor="end" fill="#82796a">Duffy Street, north-north-west →</text>';
+    }
+    el.innerHTML='<svg width="100%" height="100%" viewBox="'+v.x+' '+v.y+' '+v.w+' '+v.h+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
+      +'<rect x="'+(v.x-5)+'" y="'+(v.y-5)+'" width="'+(v.w+10)+'" height="'+(v.h+10)+'" fill="'+COL.paper+'"/>'
+      +(this.rot()?'<g transform="matrix(0 -1 1 0 -1 46)">'+g+'</g>':g)+tx+'</svg>';
+  }
+  /* ---------- derived ---------- */
+  quantities(){ let pave=0,soft=0,lin=0,plants=0,cost=0,mulch=0; const byg={};
+    for(const it of this.state.items){ const a=this.area(it);
+      if(it.t==='plant'){plants++;cost+=it.cost;byg[it.g]=(byg[it.g]||0)+1;}
+      else if(it.unit==='m2'){ if(it.cat==='soft'){soft+=a; if(it.n.indexOf('Mulch')>=0)mulch+=a*0.1;} else pave+=a; cost+=a*it.cost; }
+      else if(it.unit==='lin'){ const L=Math.max(it.w,it.h); lin+=L; cost+=L*it.cost; }
+      else cost+=it.cost; }
+    return {pave,soft,lin,plants,cost,mulch,byg}; }
+  issues(){
+    const s=this.state, out=[];
+    for(const it of s.items){
+      const ck=this.checks(it), digs=(it.cat==='dig'||it.cat==='pave');
+      if(ck.lvl==='r') out.push({sev:'stop',u:it.u,title:it.n,body:ck.msg});
+      else if(ck.lvl==='a'&&digs) out.push({sev:'care',u:it.u,title:it.n,body:ck.msg});
+      if(it.cat==='dig'||it.cat==='pave'){ const cf=this.cutfill(it);
+        if(cf.maxCut>0.5||cf.maxFill>0.4) out.push({sev:'stop',u:it.u,title:it.n+' — cut and fill',
+          body:'Levelling it needs '+(cf.maxCut*1000).toFixed(0)+' mm of cut and '+(cf.maxFill*1000).toFixed(0)+' mm of fill. Over the 500 mm cut or 400 mm fill limit, which triggers a site reclassification.'}); }
+      if(it.t==='plant'&&it.tender) out.push({sev:'care',u:it.u,title:it.n,body:'Frost tender in Canberra. It will need a warm wall, a pot that can move, or replacing with something hardy.'});
+      if(it.t==='plant'&&ck.out) out.push({sev:'care',u:it.u,title:it.n+' overhangs the boundary',body:'Its mature canopy crosses the line. Fine if you are happy to prune it, worth knowing before it is in the ground.'});
+      if(it.n==='Sunken firepit'){ const d=it.x-it.w;
+        if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
+          body:'The ACT rule is three metres of clearance on the reserve side. Moving it about '+Math.max(0.5,3-d).toFixed(1)+' m toward the street fixes that, but pushes it toward the gum\u2019s protection zone.'}); }
+      const inCorridor=this.samples(it,4).some(p=>p[1]>=0.5&&p[1]<=3.0);
+      if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
+        body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. Anything here needs a formed route around it along the fence — a drainage change, not yet priced.'});
+    }
+    const q=this.quantities();
+    if(q.cost>BUDGET) out.push({sev:'care',title:'Over the ten thousand',body:'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+', which is $'+Math.round(q.cost-BUDGET).toLocaleString()+' past the budget. Staging it is the answer, not cutting it.'});
+    (this.state.todos||[]).forEach((t,i)=>out.push({sev:'note',title:'From a conversation',body:t}));
+    const order={stop:0,care:1,note:2};
+    return out.sort((a,b)=>order[a.sev]-order[b.sev]);
+  }
+  /* ---------- ask ---------- */
+  factSheet(){
+    const q=this.quantities(), iss=this.issues();
+    const items=this.state.items.map(i=>i.n+' at ('+i.x.toFixed(1)+','+i.y.toFixed(1)+')'+(i.t==='plant'?'':' '+i.w.toFixed(1)+'x'+i.h.toFixed(1)+'m')).join('; ');
+    return ['SITE 234 Duffy Street, Ainslie ACT. Block 14 Section 105, 807 m2, backs onto Mount Ainslie reserve.',
+    'Orientation: Duffy Street is north-north-west, the reserve south-south-east. Local frame: +x runs from the reserve toward the street, +y west-south-west. x=0 is the rear (reserve) boundary.',
+    'The block falls 2.08 m from the reserve to the street at about 1 in 19, so all water moves one way, toward the house then the street.',
+    'Tree protection zones cover 52% of the open back garden (167 of 320 m2); only 154 m2 is free to re-grade, in a 4 m strip along the east-north-east boundary, a pocket at the west-south-west rear corner and a 4 m band next to the house.',
+    'Soil: 100 mm of loose silty sand over clayey sand and sandy clay, refusal at 1.0-1.1 m; free-draining sand where she gardens, reactive clay where the house sits. Class P site because of the trees; the 20-40 mm movement figure assumes the pear stays.',
+    'The walking path behind the rear fence sits on a raised man-made bank that holds hillside water back. It protects the block most of the time but concentrates risk into a rarer, larger event. The overland flow corridor along the side boundary (y 0.5-3.0) must stay clear and continuous to the street; capacity 236 L/s.',
+    'Trees: 1 brittle gum (trunk 1.97 m from the rear boundary, structural root zone crosses it, so no channel can follow that boundary past it), 2 Manchurian pear (RETAIN, hand excavation approved), 3 liquidambar, 4 and 5 velvet ash street trees (public).',
+    'Sun hours [21 Dec, 21 Sep, 21 Jun]: rear pocket 7.4/7.3/4.5, east-north-east side strip 8.1/6.5/4.0, paved terrace 11.0/3.9/0.0, under trees 1 and 2 2.9/1.9/1.4, back garden average 5.8/4.4/2.2, front garden average 4.3/3.4/2.3, courtyard 5.7/3.1/0.0.',
+    'Drainage: DN150 spine at 1 in 19, capacity 45.2 L/s against 5.32 design flow; DN100 north line sleeved under the garage; corner swale is the only stretch of rear boundary outside the gum protection zone.',
+    'Cut over 500 mm or fill over 400 mm triggers a site reclassification.',
+    'The block is inside the ACT mapped bushfire prone area. Bushfire construction compliance is already dealt with and the certifier is satisfied; do not reopen it. Landscape only: the ACT rule is three metres clearance to the reserve for a firepit.',
+    'Budget about $10,000 over 6-12 months, staged, her own labour, hand-dug. A contractor does the stormwater.',
+    'Decisions made: keep the pear; no pond (snakes); the area off the house is paved with an outdoor kitchen, not a deck; lawn beats vegetables (toddler); vegetables become planters on the paving; natives only from here; front garden gets mounds and two fruit trees only, quince and pomegranate; the courtyard maple is gone; the driveway takes the sunniest front ground so nothing goes there.',
+    'CURRENT LAYOUT: '+items,
+    'CURRENT TOTAL: $'+Math.round(q.cost).toLocaleString()+' of $10,000. '+q.plants+' plants, '+q.pave.toFixed(0)+' m2 paving, '+q.soft.toFixed(0)+' m2 soft surface, '+q.mulch.toFixed(1)+' m3 mulch at 100 mm.',
+    'LIVE PROBLEM LIST: '+(iss.length?iss.map(i=>i.sev+': '+i.title+' — '+i.body).join(' | '):'nothing clashing.')].join('\n');
+  }
+  async ask(text){
+    if(!text||this.state.busy) return;
+    const chat=this.state.chat.concat([{who:'me',text:text},{who:'app',text:'…',pending:true}]);
+    this.setState({chat:chat,askQ:'',busy:true},()=>this.scrollChat());
+    let answer='', change=null;
+    const sys='You are the site knowledge inside a landscape design app for one specific block. Answer only from the FACTS below plus the current layout. Plain language, no jargon without a gloss, concise, no preamble, no lists unless the answer is genuinely a list. Never invent a number: if a figure is not in the facts, say what you would need to measure. Do not write about how the answer was reached and do not reference earlier versions of the plan. Do not reopen bushfire construction compliance. If a change to the plan would follow, put it on a final line beginning "CHANGE: " as one short imperative sentence. Never claim to have changed anything yourself.\n\nFACTS\n'+this.factSheet();
+    try{
+      const msgs=this.state.chat.filter(m=>!m.pending&&m.who!=='sys').slice(-6).map(m=>({role:m.who==='me'?'user':'assistant',content:m.text}));
+      msgs.push({role:'user',content:text});
+      answer=await window.claude.complete({system:sys,messages:msgs,max_tokens:600,model:'claude-sonnet-4-5'});
+    }catch(e){ answer=this.fallback(text); }
+    const mIdx=answer.indexOf('CHANGE:');
+    if(mIdx>=0){ change=answer.slice(mIdx+7).trim(); answer=answer.slice(0,mIdx).trim(); }
+    const out=this.state.chat.slice(0,-1).concat([{who:'app',text:answer,change:change}]);
+    this.setState({chat:out,busy:false},()=>this.scrollChat());
+  }
+  fallback(t){
+    const q=this.quantities(), s=t.toLowerCase();
+    if(s.includes('dig')) return 'Only 154 m² of the open back garden is outside a protection zone: a 4 m strip along the east-north-east boundary, a pocket at the west-south-west rear corner, and a 4 m band next to the house. Everything else needs the arborist, hand digging and no roots over 30 mm.';
+    if(s.includes('firepit')) return 'As drawn the firepit sits '+((this.state.items.find(i=>i.n==='Sunken firepit')||{x:3,w:0.85}).x-0.85).toFixed(1)+' m from the reserve boundary. The ACT rule is three metres. Moving it toward the street fixes it until you reach the gum\u2019s protection zone.';
+    if(s.includes('mulch')) return 'At 100 mm you need '+q.mulch.toFixed(1)+' m³ for the mulched beds as drawn. Coarse 25 mm chip, not fine or shredded, so it knits together on the slope.';
+    if(s.includes('cost')||s.includes('budget')||s.includes('stage')) return 'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+' of the $10,000, materials only with your labour, and it excludes the stormwater contractor.';
+    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 11 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 8.1 hours in summer, 6.5 at the equinox, 4.0 in midwinter. Under trees 1 and 2 it is 2.9 hours even in summer.';
+    return 'The site knowledge is here but the answering model is unavailable in this preview. The figures behind every screen are the same ones in the handbook: 807 m², a 2.08 m fall to the street, 52% of the open back garden inside protection zones, and $'+Math.round(q.cost).toLocaleString()+' spent of $10,000.';
+  }
+  scrollChat(){ const el=this.chatEl; if(el) el.scrollTop=el.scrollHeight; }
+  /* Hand the question to the Claude app on the iPad, carrying the site brief with
+     it, so the answer is grounded in the same facts the app computes from. */
+  brief(q){ const t=(this.state.askQ||q||'').trim();
+    return '234 Duffy Street, Ainslie — landscape design.\n'
+      +(t?'Question: '+t+'\n':'')
+      +'\nAnswer from the following and nothing else. Plain language, concise, no jargon without a gloss. Do not invent numbers; if a figure is not here, say what needs measuring. Bushfire construction compliance is settled — do not reopen it.\n\n'+this.factSheet(); }
+  toast(m){ this.setState({toast:m}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),5000); }
+  async handoff(){
+    const text=this.brief();
+    try{ if(navigator.share){ await navigator.share({title:'234 Duffy Street landscape',text:text}); this.toast('Shared — pick Claude from the sheet'); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+    try{ await navigator.clipboard.writeText(text); this.toast('Brief copied. Open Claude and paste it in.'); }
+    catch(e){ this.setState({briefOpen:true}); this.toast('Copy blocked here — the brief is below, select and copy it.'); return; }
+    if(this.state.fill){ setTimeout(()=>{ try{ window.location.href='claude://'; }catch(e){} },400); }
+  }
+
+  /* ---------- render ---------- */
+  renderVals(){
+    const s=this.state, self=this;
+    if(!s.ready||!this.D){
+      const blank={go:()=>{},style:'width:66px;padding:11px 0;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--color-neutral-700)'};
+      return {ready:false,screenTitle:'Landscape studio',screenSub:'Loading the survey…',schemeName:'—',savedLabel:'',
+        mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
+        palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
+        selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
+        canvasRef:el=>{this.canvas=el;},isPlan:true,hud:'',palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
+        bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
+        screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
+        planWrap:'flex:1;min-height:0;display:flex',palCol:'flex:0 0 238px;display:flex;flex-direction:column;min-height:0',
+        stageCol:'flex:1;min-width:0;display:flex;flex-direction:column;background:var(--color-neutral-100);position:relative',
+        inspCol:'flex:0 0 318px;padding:14px;display:flex;flex-direction:column;gap:12px',
+        modes:[],presets:[],palTabs:[],filtChips:[],layerList:[],selSun:[],selActions:[],issueList:[],stages:[],sequence:[],chat:[],suggestions:[],todos:[],schemeList:[]};
+    }
+    const D=this.D, q=this.quantities(), iss=this.issues(), stops=iss.filter(i=>i.sev==='stop').length;
+    const pill=(on,label,go)=>({label:label,go:go,style:'padding:8px 15px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;'+(on?'background:var(--color-accent);color:#fff':'background:transparent;color:var(--color-neutral-700)')});
+    const chip=(on,label,go)=>({label:label,go:go,style:'padding:6px 12px;border-radius:999px;font-size:11.5px;font-weight:600;cursor:pointer;border:1.5px solid '+(on?'var(--color-accent)':'var(--color-neutral-300)')+';'+(on?'background:var(--color-accent-200);color:var(--color-accent-800)':'background:transparent;color:var(--color-neutral-700)')});
+
+    const navItem=id=>({go:()=>this.setState({screen:id},()=>{if(id==='plan'){this.fit();this.draw();}}),
+      style:'position:relative;width:66px;padding:11px 0;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;'+(s.screen===id?'background:#fff;color:var(--color-accent-700);box-shadow:var(--shadow-sm)':'color:var(--color-neutral-700)')});
+
+    const titles={plan:['The plan','Drag anything. Everything to the right recomputes from the survey, not from a guess.'],
+      issues:['Checks','What is wrong with the layout as it stands, worst first.'],
+      stages:['Stages','What gets built when, and what each stage costs.'],
+      ask:['Ask','Questions answered from the site data and your current layout.']};
+
+    const sel=s.items.find(i=>i.u===s.sel);
+    const treeSel=typeof s.sel==='string'&&s.sel.indexOf('tree')===0?D.TREES.find(t=>t.id==s.sel.slice(4)):null;
+    let selKicker='Nothing selected', selName='Tap something on the plan', selRows=[], selSun=[], selVerdict='', vcol='', selActions=[];
+    if(treeSel){
+      selKicker='Protected tree '+treeSel.id; selName=treeSel.cn;
+      selRows=[{k:'Species',v:treeSel.sp},{k:'Status',v:treeSel.st},{k:'Height',v:treeSel.h+' m'},{k:'Canopy',v:treeSel.w+' m'},
+        {k:'Protection zone',v:treeSel.ctrl.toFixed(1)+' m radius'},{k:'Root zone',v:treeSel.srz+' m radius'}];
+      selVerdict=treeSel.id===2?'Retained. The Class P classification and the movement figure assume it stays, and hand excavation around it is approved.':
+        (treeSel.id===1?'Its trunk is 1.97 m from the rear boundary and its root zone crosses it, so no channel can follow that boundary past it.':'Regulated. Work inside the protection zone needs the arborist named on the plan.');
+      vcol='var(--color-accent-2-800);background:var(--color-accent-2-100)';
+    } else if(sel){
+      const c=this.centre(sel), ck=this.checks(sel);
+      selKicker=sel.t==='plant'?'Plant':'Hard element'; selName=sel.n;
+      selRows=[{k:'Size',v:(sel.shape==='circ'?(2*sel.w).toFixed(2)+' m across':sel.w.toFixed(2)+' × '+sel.h.toFixed(2)+' m')+' · '+this.area(sel).toFixed(1)+' m²'},
+        {k:'Ground level',v:this.RL(c[0],c[1]).toFixed(2)+' m AHD'},
+        {k:'From the reserve',v:(sel.x-(sel.shape==='circ'?sel.w:0)).toFixed(1)+' m'}];
+      if(sel.t==='plant'){ const p=this.PL[sel.pn]||{w:sel.w*2,h:sel.ht};
+        selRows.push({k:'Mature size',v:p.w+' m wide, '+p.h+' m tall'+(sel.tender?' · frost tender':'')}); }
+      else if(sel.cat==='dig'||sel.cat==='pave'){ const cf=this.cutfill(sel);
+        selRows.push({k:'Cut to level it',v:cf.cutV.toFixed(1)+' m³, max '+(cf.maxCut*1000).toFixed(0)+' mm'});
+        selRows.push({k:'Fill to level it',v:cf.fillV.toFixed(1)+' m³, max '+(cf.maxFill*1000).toFixed(0)+' mm'}); }
+      const hrs=[355,264,172].map(d=>this.sunHours(c[0],c[1],d,sel.t==='plant'?Math.min(1.5,sel.ht/2):0.9));
+      selSun=[{h:hrs[0].toFixed(1)+' h',label:'21 Dec',col:'var(--color-accent-700)'},{h:hrs[1].toFixed(1)+' h',label:'21 Sep',col:'var(--color-accent-700)'},{h:hrs[2].toFixed(1)+' h',label:'21 Jun',col:'var(--color-neutral-700)'}];
+      selVerdict=ck.msg;
+      vcol=ck.lvl==='r'?'#7a1f18;background:#f8e0dc':(ck.lvl==='a'?'var(--color-accent-800);background:var(--color-accent-100)':'var(--color-accent-2-800);background:var(--color-accent-2-100)');
+      selActions=[{label:'Duplicate',go:()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);}},
+        {label:'Delete',go:()=>{this.push();this.commit(s.items.filter(i=>i.u!==sel.u),null);}}];
+      if(sel.shape!=='circ') selActions.push({label:'Rotate 90°',go:()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}});
+    }
+
+    const palGroups=[];
+    if(s.palTab==='plants'){
+      const groups=[['tree','Trees'],['shrub','Shrubs'],['groundcover','Groundcovers'],['grass','Grasses and sedges'],['other','Feature plants'],['veggie','Vegetables']];
+      for(const [g,label] of groups){
+        let list=D.PLANTS.filter(p=>p.g===g);
+        if(s.filt.must) list=list.filter(p=>p.imp==='1');
+        if(s.filt.edible) list=list.filter(p=>p.edible);
+        if(s.filt.local) list=list.filter(p=>p.local);
+        if(s.filt.hardy) list=list.filter(p=>!p.tender);
+        if(s.q) list=list.filter(p=>p.n.toLowerCase().indexOf(s.q.toLowerCase())>=0);
+        if(!list.length) continue;
+        palGroups.push({label:label+' · '+list.length,items:list.map(p=>{
+          const on=s.armed===p.n, d=Math.max(9,Math.min(22,p.w*7));
+          return {name:DISP(p.n),meta:p.w+' m'+(p.tender?' · frost':''),
+            dot:'flex:0 0 auto;width:'+d+'px;height:'+d+'px;border-radius:999px;background:'+(PLANTCOL[p.g]||'#8fa073')+';border:1.5px solid #56633f',
+            style:'display:flex;gap:9px;align-items:center;padding:7px 8px;border-radius:14px;cursor:pointer;min-height:38px;'+(on?'background:var(--color-accent-200);box-shadow:inset 0 0 0 1.5px var(--color-accent)':''),
+            go:()=>this.setState({armed:on?null:p.n})};})});
+      }
+    } else {
+      let list=D.LIB.map(l=>l[0]);
+      if(s.q) list=list.filter(n=>n.toLowerCase().indexOf(s.q.toLowerCase())>=0);
+      palGroups.push({label:'Hard elements · '+list.length,items:list.map(n=>{
+        const l=this.LIBM[n], c=HARDCOL[n]||['#dcd3c4','#82796a'];
+        return {name:n,meta:l[6]==='m2'?'$'+l[5]+'/m²':(l[6]==='lin'?'$'+l[5]+'/m':'$'+l[5]),
+          dot:'flex:0 0 auto;width:18px;height:18px;border-radius:'+(l[1]==='circ'?'999px':'6px')+';background:'+c[0]+';border:1.5px solid '+c[1],
+          style:'display:flex;gap:9px;align-items:center;padding:8px;border-radius:14px;cursor:pointer;min-height:40px',
+          go:()=>{ this.push(); const cx=this.view.x+this.view.w/2, cy=this.YTOP-(this.view.y+this.view.h/2);
+            const it=this.mk(n,Math.round((cx-l[3]/2)/SNAP)*SNAP,Math.round((cy-(l[1]==='circ'?0:l[4]/2))/SNAP)*SNAP,l[3],l[4],0,s.uid);
+            this.setState({uid:s.uid+1,armed:null}); this.commit(s.items.concat([it]),it.u); }};})});
+    }
+
+    const layerDefs=[['contour','Contours'],['grid','1 m grid'],['bld','Buildings'],['canopy','Canopies'],['tpz','Protection zones'],['srz','Root zones'],['drain','Water'],['labels','Labels']];
+    const layerList=layerDefs.map(([k,label])=>({label:label,
+      box:'flex:0 0 18px;height:18px;border-radius:6px;border:2.75px solid '+(s.layers[k]?'var(--color-accent)':'var(--color-neutral-400)')+';background:'+(s.layers[k]?'var(--color-accent)':'transparent'),
+      go:()=>{const L={...s.layers};L[k]=!L[k];this.setState({layers:L},()=>this.draw());}}));
+
+    const dstr=d=>{const dt=new Date(2026,0,1);dt.setDate(d);return dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'});};
+    const tstr=h=>{const m=Math.round(h*60),hh=Math.floor(m/60),mm=m%60;return (hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;};
+    const sp=this.sunpos(s.doy,s.hour);
+
+    const issueList=iss.filter(i=>s.issueFilter==='all'||i.sev===s.issueFilter).map(i=>({
+      title:i.title+(i.u!=null&&s.items.find(x=>x.u===i.u)?' · '+(s.items.find(x=>x.u===i.u).x).toFixed(0)+' m from the reserve':''),body:i.body,sevLabel:i.sev==='stop'?'Stop':(i.sev==='care'?'Care':'Note'),hasShow:i.u!=null,
+      chip:'flex:0 0 auto;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;'+
+        (i.sev==='stop'?'background:#f8e0dc;color:#7a1f18':(i.sev==='care'?'background:var(--color-accent-200);color:var(--color-accent-800)':'background:var(--color-neutral-200);color:var(--color-neutral-700)')),
+      show:()=>{ this.view={x:Math.max(-3,(s.items.find(x=>x.u===i.u)||{x:10}).x-9),y:2,w:20,h:13};
+        this.setState({screen:'plan',sel:i.u},()=>{this.fit();this.draw();}); }}));
+
+    const stages=[1,2,3].map(n=>{
+      const list=s.items.filter(i=>(i.st||3)===n);
+      const cost=list.reduce((a,i)=>a+(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?Math.max(i.w,i.h)*i.cost:i.cost)),0);
+      return {when:STAGEDEF[n].when,title:STAGEDEF[n].title,why:STAGEDEF[n].why,
+        cost:'$'+Math.round(cost).toLocaleString(),count:list.length+' items',
+        bar:'height:100%;width:'+Math.min(100,cost/BUDGET*100*2.2)+'%;background:'+(n===1?'var(--color-accent)':(n===2?'var(--color-accent-2-500)':'var(--color-neutral-500)')),
+        items:list.map(i=>({name:i.n,cost:'$'+Math.round(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?Math.max(i.w,i.h)*i.cost:i.cost)).toLocaleString(),
+          dot:'flex:0 0 12px;height:12px;border-radius:'+(i.shape==='circ'?'999px':'4px')+';background:'+i.fill+';border:1.5px solid '+i.stroke,
+          move:()=>{ this.push(); const items=s.items.map(x=>x.u===i.u?{...x,st:(x.st||3)%3+1}:x); this.commit(items); }}))};
+    });
+    const sequence=[{n:'1',text:'Shape the corner swale, build the bund, then mulch — and let a full wet season pass before planting around them, so the shaping can be corrected while it is still easy.'},
+      {n:'2',text:'The stormwater contractor lays the two lines and the garage sleeve before any paving goes over them.'},
+      {n:'3',text:'The seat wall on the paving\u2019s uphill edge goes in before the raised lawn behind it, because the wall retains it.'},
+      {n:'4',text:'Plants last. Nothing goes in the ground until you have watched where the shade actually falls for a season.'}];
+
+    const chat=s.chat.map((m,idx)=>({text:m.text,change:m.change||'',
+      addLabel:(s.todos||[]).indexOf(m.change)>=0?'On your list':'Add to list',
+      addTodo:()=>{ if(!m.change||(s.todos||[]).indexOf(m.change)>=0) return; this.setState({todos:(s.todos||[]).concat([m.change])},()=>this.persist()); },
+      wrap:'display:flex;flex-direction:column;'+(m.who==='me'?'align-items:flex-end':'align-items:flex-start'),
+      bubble:'max-width:88%;padding:13px 17px;border-radius:20px;font-size:14px;line-height:1.6;white-space:pre-wrap;text-wrap:pretty;'+
+        (m.who==='me'?'background:var(--color-accent);color:#fff;border-bottom-right-radius:6px':'background:var(--color-neutral-100);color:var(--color-text);border-bottom-left-radius:6px')}));
+
+    const schemeList=s.schemes.map(sc=>({name:sc.name,canDelete:s.schemes.length>1,
+      meta:sc.id===s.schemeId?'Open now · $'+Math.round(q.cost).toLocaleString()+' · '+s.items.length+' elements':'Saved scheme',
+      style:'display:flex;gap:13px;align-items:center;padding:11px;border-radius:20px;cursor:pointer;background:'+(sc.id===s.schemeId?'var(--color-accent-100)':'var(--color-neutral-100)')+';box-shadow:'+(sc.id===s.schemeId?'inset 0 0 0 1.5px var(--color-accent)':'none'),
+      open:()=>this.switchScheme(sc.id),
+      dup:ev=>{ if(ev&&ev.stopPropagation)ev.stopPropagation(); this.dupScheme(sc.id); },
+      del:ev=>{ if(ev&&ev.stopPropagation)ev.stopPropagation(); this.delScheme(sc.id); }}));
+
+    return {
+      ready:true,
+      screenTitle:titles[s.screen][0], screenSub:titles[s.screen][1],
+      navPlan:navItem('plan'), navChecks:navItem('issues'), navStages:navItem('stages'), navAsk:navItem('ask'),
+      stopBadge:stops?String(stops):'', isPlan:s.screen==='plan', isIssues:s.screen==='issues', isStages:s.screen==='stages', isAsk:s.screen==='ask',
+      schemeName:(s.schemes.find(x=>x.id===s.schemeId)||{name:'Working scheme'}).name,
+      savedLabel:s.savedAt?'Saved '+new Date(s.savedAt).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}):'Saving as you work',
+      openSchemes:()=>this.setState({sheetOpen:true}), closeSheet:()=>this.setState({sheetOpen:false}),
+      stop:ev=>{if(ev&&ev.stopPropagation)ev.stopPropagation();}, sheetOpen:s.sheetOpen, schemeList:schemeList,
+      newScheme:()=>this.newScheme(),
+      undo:()=>{ if(!this.hist||!this.hist.length) return; const items=JSON.parse(this.hist.pop()); this.commit(items,null); },
+      canvasRef:el=>{ this.canvas=el; if(el){ this.bindCanvas(); if(!el._first){el._first=true; setTimeout(()=>{this.fit();this.draw();},0);} } },
+      chatRef:el=>{ this.chatEl=el; },
+      hud:s.hud, modes:[pill(s.mode==='plan','Plan',()=>this.setState({mode:'plan'},()=>this.draw())),
+        pill(s.mode==='sun','Sun',()=>this.setState({mode:'sun'},()=>this.draw())),
+        pill(s.mode==='grow','Growth',()=>this.setState({mode:'grow'},()=>this.draw()))],
+      isSun:s.mode==='sun', isGrow:s.mode==='grow',
+      dayLabel:dstr(s.doy)+' · sun '+sp.alt.toFixed(0)+'° up, bearing '+sp.az.toFixed(0)+'°',
+      timeLabel:tstr(s.hour)+' AEST ('+tstr(s.hour+1)+' in daylight saving)',
+      doy:s.doy, hour:s.hour, years:s.years, yearLabel:s.years===0?'Just planted':'Year '+s.years,
+      growNote:s.years===0?'Circles are the size the plants go in at. Drag the slider to see what they become.':'Circles are mature spread reached on this timeline: groundcovers by year 3, shrubs by 6, trees by 12. Overlap here is crowding later.',
+      onDay:ev=>this.setState({doy:+ev.target.value},()=>this.draw()),
+      onHour:ev=>this.setState({hour:+ev.target.value},()=>this.draw()),
+      onYears:ev=>this.setState({years:+ev.target.value},()=>this.draw()),
+      seasons:[pill(s.doy===355,'Summer',()=>this.setState({doy:355},()=>this.draw())),pill(s.doy===264,'Equinox',()=>this.setState({doy:264},()=>this.draw())),pill(s.doy===172,'Winter',()=>this.setState({doy:172},()=>this.draw()))],
+      toggleLayers:()=>this.setState({layersOpen:!s.layersOpen}), layersOpen:s.layersOpen, layerList:layerList,
+      zoomIn:()=>this.zoom(1/1.35), zoomOut:()=>this.zoom(1.35),
+      presets:[['all','Block'],['back','Back'],['front','Front']].map(([k,label])=>pill(false,label,()=>{
+        this.view={...this.presetViews()[k]}; this.fit(); this.draw(); })),
+      rotate:()=>{ const o=s.orient==='landscape'?'portrait':'landscape';
+        this.setState({orient:o},()=>{ this.view={...this.presetViews()[o==='portrait'?'all':'back']}; setTimeout(()=>{this.fit();this.draw();},30); }); },
+      rotateLabel:s.orient==='landscape'?'Turn the iPad upright':'Turn the iPad on its side',
+      mock:!s.fill,
+      page:s.fill?'width:100vw;height:100vh;background:var(--color-bg);overflow:hidden'
+        :'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
+      bezel:s.fill?'width:100%;height:100%;position:relative'
+        :'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);box-shadow:0 30px 70px rgba(46,43,37,.42),inset 0 0 0 2px rgba(255,255,255,.07);'+
+        (s.orient==='landscape'?'width:1366px;height:1024px':'width:1024px;height:1366px'),
+      screen:'overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative;'+
+        (s.fill?'width:100%;height:100%':'border-radius:23px;'+(s.orient==='landscape'?'width:1340px;height:998px':'width:998px;height:1340px')),
+      planWrap:'flex:1;min-height:0;display:flex',
+      palCol:'flex:0 0 238px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;min-height:0',
+      midWrap:'flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;overflow:auto',
+      stageCol:'flex:1 1 auto;min-height:420px;display:flex;flex-direction:column;background:var(--color-neutral-100);position:relative',
+      inspCol:'flex:0 0 auto;'+(s.orient==='landscape'?'height:302px':'height:360px')+';border-top:1px solid var(--color-divider);padding:14px;display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start',
+      palTabs:[pill(s.palTab==='plants','Plants',()=>this.setState({palTab:'plants',q:''})),pill(s.palTab==='hard','Elements',()=>this.setState({palTab:'hard',q:''}))],
+      isPlants:s.palTab==='plants', q:s.q, onQuery:ev=>this.setState({q:ev.target.value}),
+      searchHint:s.palTab==='plants'?'Search 82 plants':'Search elements',
+      filtChips:[chip(s.filt.must,'Must have',()=>this.setState({filt:{...s.filt,must:!s.filt.must}})),
+        chip(s.filt.edible,'Edible',()=>this.setState({filt:{...s.filt,edible:!s.filt.edible}})),
+        chip(s.filt.local,'Local',()=>this.setState({filt:{...s.filt,local:!s.filt.local}})),
+        chip(s.filt.hardy,'Frost hardy',()=>this.setState({filt:{...s.filt,hardy:!s.filt.hardy}}))],
+      palGroups:palGroups, armedName:s.armed||'',
+      palHint:s.palTab==='plants'?'Tap a plant, then tap the plan. Circles are mature spread, so overlap means crowding.':'Tap an element to drop it in the middle of the view, then drag it where it goes.',
+      selKicker:selKicker, selName:selName, selRows:selRows, selSun:selSun, hasSun:selSun.length>0, hasSel:!!sel,
+      selVerdict:selVerdict, selActions:selActions,
+      verdictStyle:'margin-top:11px;padding:11px 13px;border-radius:14px;font-size:12.5px;line-height:1.55;text-wrap:pretty;color:'+vcol,
+      costLabel:'$'+Math.round(q.cost).toLocaleString(),
+      barStyle:'height:100%;width:'+Math.min(100,q.cost/BUDGET*100)+'%;background:'+(q.cost>BUDGET?'#a8332a':'var(--color-accent-2-500)'),
+      qtyRows:[{k:'Paving and terrace',v:q.pave.toFixed(1)+' m²'},{k:'Soft surfaces',v:q.soft.toFixed(1)+' m²'},
+        {k:'Walls and edges',v:q.lin.toFixed(1)+' m'},{k:'Mulch at 100 mm',v:q.mulch.toFixed(1)+' m³'},{k:'Plants',v:String(q.plants)}],
+      issueCount:String(iss.length), issueSummary:stops?stops+(stops===1?' hard clash':' hard clashes')+' and '+(iss.length-stops)+' to watch':(iss.length?'Nothing hard, '+iss.length+' to watch':'Nothing clashing'),
+      goIssues:()=>this.setState({screen:'issues'}), goStages:()=>this.setState({screen:'stages'}),
+      issueFilters:[pill(s.issueFilter==='all','Everything',()=>this.setState({issueFilter:'all'})),
+        pill(s.issueFilter==='stop','Stop',()=>this.setState({issueFilter:'stop'})),
+        pill(s.issueFilter==='care','Care',()=>this.setState({issueFilter:'care'}))],
+      issueList:issueList, noIssues:issueList.length===0,
+      stages:stages, sequence:sequence,
+      chat:chat, askQ:s.askQ, onAsk:ev=>this.setState({askQ:ev.target.value}),
+      onAskKey:ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); this.ask(this.state.askQ.trim()); } },
+      send:()=>this.ask(s.askQ.trim()), sendLabel:s.busy?'Thinking…':'Ask',
+      handoff:()=>this.handoff(), toast:s.toast||'',
+      toggleBrief:()=>this.setState({briefOpen:!s.briefOpen}), briefOpen:!!s.briefOpen,
+      briefLabel:s.briefOpen?'Hide what gets sent':'See what gets sent',
+      brief:s.briefOpen?this.brief():'',
+      suggestions:SUGG.map(t=>({text:t,go:()=>this.ask(t)})),
+      todos:(s.todos||[]).map((t,i)=>({text:t,done:()=>this.setState({todos:s.todos.filter((x,j)=>j!==i)},()=>this.persist())})),
+      hasTodos:(s.todos||[]).length>0, noTodos:(s.todos||[]).length===0
+    };
+  }
+  switchScheme(id){ if(id===this.state.schemeId){ this.setState({sheetOpen:false}); return; }
+    this.persist();
+    try{ const all=JSON.parse(localStorage.getItem(this.key())||'{}'); const sc=(all.schemes||{})[id];
+      if(sc&&sc.items){ this.setState({schemeId:id,items:sc.items,uid:sc.uid||sc.items.length+1,sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); return; } }catch(e){}
+    const b=this.baseItems(); this.setState({schemeId:id,items:b.items,uid:b.uid,sel:null,sheetOpen:false},()=>{this.draw();this.persist();});
+  }
+  newScheme(){ const id='s'+Date.now(), b=this.baseItems();
+    this.persist();
+    this.setState({schemes:this.state.schemes.concat([{id:id,name:'Scheme '+(this.state.schemes.length+1),created:Date.now()}]),
+      schemeId:id,items:b.items,uid:b.uid,sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
+  dupScheme(id){ const src=this.state.schemeId===id?this.state.items:(()=>{try{return (JSON.parse(localStorage.getItem(this.key())||'{}').schemes||{})[id].items;}catch(e){return this.state.items;}})();
+    const nid='s'+Date.now(), name=(this.state.schemes.find(x=>x.id===id)||{name:'Scheme'}).name+' copy';
+    this.persist();
+    this.setState({schemes:this.state.schemes.concat([{id:nid,name:name,created:Date.now()}]),schemeId:nid,
+      items:JSON.parse(JSON.stringify(src)),sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
+  delScheme(id){ const rest=this.state.schemes.filter(x=>x.id!==id); if(!rest.length) return;
+    if(id===this.state.schemeId){ this.setState({schemes:rest},()=>this.switchScheme(rest[0].id)); }
+    else this.setState({schemes:rest},()=>this.persist()); }
+}
+
+</script>
+</body>
+</html>
