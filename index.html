@@ -11,7 +11,26 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<script>
+/* Serve React from this repo instead of unpkg.com, so the app opens with no
+   network. The runtime checks __resources before reaching for a CDN. The two
+   files in vendor/ are the same bytes unpkg served — they match the runtime's
+   published SRI hashes. */
+window.__resources={
+  "https://unpkg.com/react@18.3.1/umd/react.production.min.js":"vendor/react.production.min.js",
+  "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"vendor/react-dom.production.min.js"
+};
+</script>
 <script src="./support.js"></script>
+<script>
+/* Caches the app on first visit so it opens later with no signal. Only works
+   over https (or localhost); on a file:// copy it is skipped. */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
 </head>
 <body>
 <x-dc>
@@ -23,8 +42,7 @@
 <meta name="apple-mobile-web-app-title" content="234 Duffy">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#f5ead8"/><circle cx="60" cy="52" r="21" fill="#7a8a5e"/><rect x="57" y="52" width="6" height="34" rx="3" fill="#c67139"/><rect x="34" y="86" width="52" height="6" rx="3" fill="#c67139"/></svg></template>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/fonts.css">
 <script src="site-data.js"></script>
 <style>
 body{margin:0;background:#e6dcc9;font-family:"Figtree",system-ui,sans-serif}
@@ -167,7 +185,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 
           <div ref="{{ canvasRef }}" style="flex:1;min-height:0;touch-action:none;cursor:crosshair"></div>
 
-          <div style="position:absolute;left:14px;bottom:14px;z-index:3;padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;pointer-events:none">{{ hud }}</div>
+          <sc-if value="{{ hud }}" hint-placeholder-val="{{ false }}">
+            <div ref="{{ hudRef }}" style="position:absolute;left:14px;bottom:14px;z-index:3;padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);font-size:12px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;pointer-events:none">{{ hud }}</div>
+          </sc-if>
 
           <sc-if value="{{ armedName }}" hint-placeholder-val="{{ true }}">
             <div style="position:absolute;left:50%;transform:translateX(-50%);top:64px;z-index:4;padding:8px 16px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:12.5px;font-weight:600;box-shadow:var(--shadow-md);pointer-events:none">Tap the plan to place {{ armedName }}</div>
@@ -361,9 +381,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
                 <div style="flex:1;font-size:11.5px;line-height:1.5;color:var(--color-neutral-600)">Answers read the survey, the tree plan, the geotechnical report and your current layout. Nothing here moves anything on the plan — changes are suggested, and you apply them yourself.</div>
                 <div onClick="{{ toggleBrief }}" style="flex:0 0 auto;font-size:11.5px;font-weight:600;color:var(--color-accent-700);cursor:pointer">{{ briefLabel }}</div>
               </div>
-              <sc-if value="{{ toast }}" hint-placeholder-val="{{ true }}">
-                <div style="margin-top:10px;display:inline-block;padding:9px 16px;border-radius:999px;background:var(--color-accent-2-100);color:var(--color-accent-2-800);font-size:12.5px;font-weight:600">{{ toast }}</div>
-              </sc-if>
               <sc-if value="{{ briefOpen }}" hint-placeholder-val="{{ true }}">
                 <div class="ls-scroll" style="margin-top:10px;max-width:760px;max-height:160px;padding:13px 16px;border-radius:18px;background:var(--color-neutral-100);font:12px/1.6 ui-monospace,Menlo,monospace;color:var(--color-neutral-800);white-space:pre-wrap">{{ brief }}</div>
               </sc-if>
@@ -397,6 +414,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
     </div>
   </div>
 
+  <!-- Above every screen and above the sheet: backing up and restoring happen
+       from the Schemes sheet, and their answer has to be visible there. -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:26px;z-index:30;padding:11px 20px;border-radius:999px;background:var(--color-accent-2-100);color:var(--color-accent-2-800);font-size:12.5px;font-weight:600;box-shadow:var(--shadow-md);pointer-events:none;max-width:80%;text-align:center">{{ toast }}</div>
+  </sc-if>
+
   <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ true }}">
     <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;z-index:20;background:rgba(46,43,37,.34);display:flex;align-items:center;justify-content:center">
       <div onClick="{{ stop }}" style="width:640px;max-height:76%;background:var(--color-bg);border-radius:28px;box-shadow:var(--shadow-lg);padding:22px 24px;display:flex;flex-direction:column">
@@ -419,6 +442,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
               </sc-if>
             </div>
           </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--color-divider)">
+          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45">Schemes are kept on this iPad only. Back them up to a file to move them to another device, or to keep them if this app is removed.</div>
+          <div onClick="{{ backup }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Back up</div>
+          <div onClick="{{ restore }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Restore</div>
         </div>
       </div>
     </div>
@@ -465,7 +493,7 @@ class Component extends DCLogic {
   state={ready:false,fill:false,orient:'landscape',toast:'',briefOpen:false,screen:'plan',mode:'plan',items:[],sel:null,uid:1,years:0,doy:355,hour:13,
     layers:{contour:true,grid:false,bld:true,tpz:true,srz:true,canopy:true,drain:true,labels:true},
     layersOpen:false,palTab:'plants',q:'',filt:{must:false,edible:false,local:false,hardy:false},armed:null,
-    schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'Drag to pan · pinch or use + to zoom',
+    schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',
     issueFilter:'all',sunCache:{}};
 
   componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz); this.wait(); }
@@ -648,7 +676,29 @@ class Component extends DCLogic {
       const a=v.x+(ev.clientX-r.left)/r.width*v.w, b=v.y+(ev.clientY-r.top)/r.height*v.h;
       return this.rot()?[46-b,this.YTOP-1-a]:[a,this.YTOP-b]; };
     const snap=v=>Math.round(v/SNAP)*SNAP;
+
+    /* Every finger currently on the canvas. Two of them pinch and pan together;
+       the readout only appears while something is actually touching, so it never
+       sits over the plan at rest. */
+    const pts=new Map();
+    const mid=()=>{ const a=[...pts.values()], r=el.getBoundingClientRect();
+      return {d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)||1,
+        fx:((a[0].x+a[1].x)/2-r.left)/r.width, fy:((a[0].y+a[1].y)/2-r.top)/r.height}; };
+    const stopDrag=()=>{ if(this.drag){ this.drag=null; this.forceUpdate(); this.draw(); this.persist(); } };
+    /* Anchors the ground under the midpoint, so the plan tracks the fingers
+       rather than drifting: the pinch zooms and the midpoint carries it. */
+    const startGesture=()=>{ const g=mid();
+      this.gest={d0:g.d, w0:this.view.w,
+        ux:this.view.x+g.fx*this.view.w, uy:this.view.y+g.fy*this.view.h};
+      this.pan=null; stopDrag(); };
+    const showHud=t=>{ if(this._hudOn){ if(this.hudEl) this.hudEl.textContent=t; }
+      else { this._hudOn=true; this.setState({hud:t}); } };
+    const hideHud=()=>{ if(this._hudOn){ this._hudOn=false; this.setState({hud:''}); } };
+
     el.addEventListener('pointerdown',ev=>{
+      pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+      if(pts.size===2){ startGesture(); return; }
+      if(pts.size>2) return;
       const m=toM(ev), s=this.state;
       if(s.armed){ this.push(); const it=this.mkPlant(s.armed,snap(m[0]),snap(m[1]),s.uid);
         if(it){ const items=s.items.concat([it]); this.setState({uid:s.uid+1,armed:ev.shiftKey?s.armed:null});
@@ -667,9 +717,15 @@ class Component extends DCLogic {
       el.setPointerCapture(ev.pointerId); this.setState({sel:null},()=>this.draw());
     });
     el.addEventListener('pointermove',ev=>{
+      if(pts.has(ev.pointerId)) pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+      if(pts.size>=2&&this.gest){
+        const g=mid(), z=this.gest;
+        this.view.w=Math.min(90,Math.max(5,z.w0*z.d0/g.d)); this.fit(true);
+        this.view.x=z.ux-g.fx*this.view.w; this.view.y=z.uy-g.fy*this.view.h;
+        this.draw(); return; }
       const m=toM(ev);
-      const hud='x '+m[0].toFixed(2)+'  y '+m[1].toFixed(2)+' m · ground '+this.RL(m[0],m[1]).toFixed(2)+' m AHD';
-      if(this.hudEl) this.hudEl.textContent=hud;
+      if(pts.size||ev.pointerType==='mouse')
+        showHud('x '+m[0].toFixed(2)+'  y '+m[1].toFixed(2)+' m · ground '+this.RL(m[0],m[1]).toFixed(2)+' m AHD');
       if(this.drag){ const it=this.drag.it, dx=m[0]-this.drag.m0[0], dy=m[1]-this.drag.m0[1], o=this.drag.o;
         if(this.drag.mode==='move'){ it.x=snap(o.x+dx); it.y=snap(o.y+dy); }
         else if(this.drag.mode==='rad'){ it.w=Math.max(0.15,snap(Math.hypot(m[0]-it.x,m[1]-it.y))); }
@@ -680,23 +736,34 @@ class Component extends DCLogic {
         this.view.x=this.pan.vx-(ev.clientX-this.pan.cx)/r.width*this.view.w;
         this.view.y=this.pan.vy-(ev.clientY-this.pan.cy)/r.height*this.view.h; this.draw(); }
     });
-    const end=()=>{ if(this.drag){ this.drag=null; this.forceUpdate(); this.draw(); this.persist(); } this.pan=null; };
+    /* Lifting one finger of a pinch must not resume a pan from the other, or the
+       plan jumps; the gesture only ends once, when the last finger goes. */
+    const end=ev=>{ if(ev&&ev.pointerId!=null) pts.delete(ev.pointerId);
+      if(pts.size<2) this.gest=null;
+      if(pts.size){ this.pan=null; return; }
+      stopDrag(); this.pan=null;
+      if(!ev||ev.pointerType!=='mouse') hideHud(); };
     el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+    el.addEventListener('pointerleave',ev=>{ if(ev.pointerType==='mouse') hideHud(); });
     el.addEventListener('wheel',ev=>{ ev.preventDefault();
       const r=el.getBoundingClientRect(), fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
       const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h, k=ev.deltaY>0?1.1:1/1.1;
       this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
       this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); },{passive:false});
   }
-  fit(keep){ const el=this.canvas; if(!el) return; const r=el.getBoundingClientRect();
+  /* Zooming sets the width and the height follows it. A preset or a resize
+     instead has a rectangle it must show, so there the view widens when the
+     canvas is too flat to cover it — which is why zooming has to say so: left
+     to cover, it pulls every zoom-in straight back out to the old height. */
+  fit(zoomed){ const el=this.canvas; if(!el) return; const r=el.getBoundingClientRect();
     const a=r.width>0?r.height/r.width:0.9; const h=this.view.w*a;
-    if(h<this.view.h){ const cx=this.view.x+this.view.w/2; this.view.w=this.view.h/a; this.view.x=cx-this.view.w/2; }
+    if(!zoomed&&h<this.view.h){ const cx=this.view.x+this.view.w/2; this.view.w=this.view.h/a; this.view.x=cx-this.view.w/2; }
     else { const cy=this.view.y+this.view.h/2; this.view.h=h; this.view.y=cy-this.view.h/2; }
     const b=this.rot()?{x0:1.17,x1:22.5,y0:6,y1:46}:{x0:0,x1:40,y0:2.17,y1:23.5};
     if(this.view.w>=b.x1-b.x0) this.view.x=(b.x0+b.x1)/2-this.view.w/2;
     if(this.view.h>=b.y1-b.y0) this.view.y=(b.y0+b.y1)/2-this.view.h/2; }
   zoom(k){ const cx=this.view.x+this.view.w/2, cy=this.view.y+this.view.h/2;
-    this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(); this.view.x=cx-this.view.w/2; this.view.y=cy-this.view.h/2; this.draw(); }
+    this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true); this.view.x=cx-this.view.w/2; this.view.y=cy-this.view.h/2; this.draw(); }
   itemSvg(it,isSel,years){
     const bad=this.checks(it).lvl==='r', r=this.growR(it,years);
     const stroke=bad?'#a8332a':(isSel?COL.tpz:it.stroke), sw=(isSel||bad)?3:1.3;
@@ -803,7 +870,10 @@ class Component extends DCLogic {
     }
     el.innerHTML='<svg width="100%" height="100%" viewBox="'+v.x+' '+v.y+' '+v.w+' '+v.h+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
       +'<rect x="'+(v.x-5)+'" y="'+(v.y-5)+'" width="'+(v.w+10)+'" height="'+(v.h+10)+'" fill="'+COL.paper+'"/>'
-      +(this.rot()?'<g transform="matrix(0 -1 1 0 -1 46)">'+g+'</g>':g)+tx+'</svg>';
+      /* Labels sit over the things they name, so they must not take the touch:
+         tapping a bed's name has to reach the bed, not land on the text. */
+      +(this.rot()?'<g transform="matrix(0 -1 1 0 -1 46)">'+g+'</g>':g)
+      +'<g pointer-events="none">'+tx+'</g></svg>';
   }
   /* ---------- derived ---------- */
   quantities(){ let pave=0,soft=0,lin=0,plants=0,cost=0,mulch=0; const byg={};
@@ -908,7 +978,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        canvasRef:el=>{this.canvas=el;},isPlan:true,hud:'',palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},isPlan:true,hud:'',palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1045,7 +1115,9 @@ class Component extends DCLogic {
       openSchemes:()=>this.setState({sheetOpen:true}), closeSheet:()=>this.setState({sheetOpen:false}),
       stop:ev=>{if(ev&&ev.stopPropagation)ev.stopPropagation();}, sheetOpen:s.sheetOpen, schemeList:schemeList,
       newScheme:()=>this.newScheme(),
+      backup:()=>this.backup(), restore:()=>this.restore(),
       undo:()=>{ if(!this.hist||!this.hist.length) return; const items=JSON.parse(this.hist.pop()); this.commit(items,null); },
+      hudRef:el=>{ this.hudEl=el; },
       canvasRef:el=>{ this.canvas=el; if(el){ this.bindCanvas(); if(!el._first){el._first=true; setTimeout(()=>{this.fit();this.draw();},0);} } },
       chatRef:el=>{ this.chatEl=el; },
       hud:s.hud, modes:[pill(s.mode==='plan','Plan',()=>this.setState({mode:'plan'},()=>this.draw())),
@@ -1133,6 +1205,66 @@ class Component extends DCLogic {
   delScheme(id){ const rest=this.state.schemes.filter(x=>x.id!==id); if(!rest.length) return;
     if(id===this.state.schemeId){ this.setState({schemes:rest},()=>this.switchScheme(rest[0].id)); }
     else this.setState({schemes:rest},()=>this.persist()); }
+
+  /* ---------- backup ----------
+     Schemes live in this browser on this device. These two carry them out to a
+     file and back in, so a scheme can reach another iPad, and so deleting the
+     home-screen icon is not the end of the work. */
+  stamp(){ const d=new Date(), p=n=>String(n).padStart(2,'0');
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+  backupData(){ this.persist();
+    const all=JSON.parse(localStorage.getItem(this.key())||'{}');
+    return JSON.stringify({app:'234-duffy-studio',version:1,exported:Date.now(),
+      index:all.index||this.state.schemes,schemes:all.schemes||{},todos:all.todos||[]},null,1); }
+  async backup(){
+    const name='234-duffy-schemes-'+this.stamp()+'.json', text=this.backupData();
+    /* The share sheet is the only route to Files or AirDrop from a home-screen
+       app on iOS; a download link there goes nowhere. */
+    try{ if(navigator.canShare){ const f=new File([text],name,{type:'application/json'});
+      if(navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:'234 Duffy schemes'});
+        this.toast('Saved — pick Files or AirDrop from the sheet'); return; } } }
+    catch(e){ if(e&&e.name==='AbortError') return; }
+    try{ const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));
+      const a=document.createElement('a'); a.href=url; a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+      this.toast('Saved to your downloads as '+name); return; }catch(e){}
+    try{ await navigator.clipboard.writeText(text); this.toast('Backup copied to the clipboard — paste it into a note.'); }
+    catch(e){ this.toast('Could not save the backup on this device.'); }
+  }
+  restore(){
+    const inp=document.createElement('input');
+    inp.type='file'; inp.accept='application/json,.json';
+    inp.onchange=()=>{ const f=inp.files&&inp.files[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=()=>{ try{ this.merge(JSON.parse(String(r.result))); }
+        catch(e){ this.toast('That file is not a 234 Duffy backup.'); } };
+      r.onerror=()=>this.toast('That file could not be read.');
+      r.readAsText(f); };
+    inp.click();
+  }
+  /* Adds what is in the file. Nothing already on this device is overwritten:
+     an incoming scheme whose id is taken comes in under a fresh id. */
+  merge(data){
+    if(!data||data.app!=='234-duffy-studio'||!data.index||!data.schemes){ this.toast('That file is not a 234 Duffy backup.'); return; }
+    this.persist();
+    const all=JSON.parse(localStorage.getItem(this.key())||'{}');
+    all.schemes=all.schemes||{}; all.index=all.index||this.state.schemes.slice();
+    const taken=new Set(all.index.map(x=>x.id));
+    let n=0;
+    (data.index||[]).forEach((meta,i)=>{
+      const sc=data.schemes[meta.id]; if(!sc||!sc.items) return;
+      const id=taken.has(meta.id)?'s'+Date.now()+'x'+i:meta.id;
+      const name=taken.has(meta.id)?meta.name+' (imported)':meta.name;
+      taken.add(id);
+      all.index=all.index.concat([{id:id,name:name,created:meta.created||Date.now()}]);
+      all.schemes[id]={name:name,items:sc.items,uid:sc.uid||sc.items.length+1,updated:sc.updated||Date.now()};
+      n++;
+    });
+    if(!n){ this.toast('That backup had no schemes in it.'); return; }
+    localStorage.setItem(this.key(),JSON.stringify(all));
+    this.setState({schemes:all.index},()=>this.toast(n===1?'1 scheme added.':n+' schemes added.'));
+  }
 }
 
 </script>
