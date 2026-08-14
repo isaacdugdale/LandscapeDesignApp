@@ -26,6 +26,15 @@ window.__resources={
 /* Caches the app on first visit so it opens later with no signal. Only works
    over https (or localhost); on a file:// copy it is skipped. */
 if('serviceWorker' in navigator){
+  /* Was there already a worker when this page loaded? If so, a later change of
+     controller means a newer version has taken over, and the page is still
+     showing the old files — so reload once, and the home-screen app picks up a
+     published change on the first open rather than the second. Guarded because
+     the very first registration also changes the controller. */
+  var had=!!navigator.serviceWorker.controller, reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(had&&!reloaded){ reloaded=true; location.reload(); }
+  });
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
@@ -44,6 +53,7 @@ if('serviceWorker' in navigator){
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="20" fill="#f5ead8"/><circle cx="60" cy="52" r="21" fill="#7a8a5e"/><rect x="57" y="52" width="6" height="34" rx="3" fill="#c67139"/><rect x="34" y="86" width="52" height="6" rx="3" fill="#c67139"/></svg></template>
 <link rel="stylesheet" href="vendor/fonts.css">
 <script src="site-data.js"></script>
+<script src="handbook.js"></script>
 <style>
 body{margin:0;background:#e6dcc9;font-family:"Figtree",system-ui,sans-serif}
 *{-webkit-tap-highlight-color:transparent}
@@ -53,6 +63,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 .ls-scroll{overflow:auto;scrollbar-width:thin}
 .ls-scroll::-webkit-scrollbar{width:8px}
 .ls-scroll::-webkit-scrollbar-thumb{background:var(--color-neutral-300);border-radius:999px}
+.ls-scroll-x{scrollbar-width:thin}
+.ls-scroll-x::-webkit-scrollbar{height:8px}
+.ls-scroll-x::-webkit-scrollbar-thumb{background:var(--color-neutral-300);border-radius:999px}
 </style>
 </helmet>
 
@@ -86,6 +99,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
       <div onClick="{{ navStages.go }}" style="{{ navStages.style }}" style-hover="background:var(--color-neutral-300)">
         <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
         <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Stages</div>
+      </div>
+      <div onClick="{{ navSite.go }}" style="{{ navSite.style }}" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Site</div>
+      </div>
+      <div onClick="{{ navWorks.go }}" style="{{ navWorks.style }}" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 8.7 8.7 21.3a2.4 2.4 0 0 1-3.4 0l-2.6-2.6a2.4 2.4 0 0 1 0-3.4L15.3 2.7a2.4 2.4 0 0 1 3.4 0l2.6 2.6a2.4 2.4 0 0 1 0 3.4Z"></path><path d="m7.5 10.5 2 2"></path><path d="m10.5 7.5 2 2"></path><path d="m13.5 4.5 2 2"></path><path d="m4.5 13.5 2 2"></path></svg>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Works</div>
+      </div>
+      <div onClick="{{ navRisks.go }}" style="{{ navRisks.style }}" style-hover="background:var(--color-neutral-300)">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>
+        <div style="font-size:10.5px;font-weight:600;letter-spacing:.2px">Risks</div>
       </div>
       <div onClick="{{ navAsk.go }}" style="{{ navAsk.style }}" style-hover="background:var(--color-neutral-300)">
         <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
@@ -309,6 +334,78 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
         </div>
       </sc-if>
 
+      <!-- Site, Works and Risks all render the same way: a row of sections, then
+           whatever blocks that section holds. Content lives in handbook.js. -->
+      <sc-if value="{{ isRef }}" hint-placeholder-val="{{ false }}">
+        <div class="ls-scroll" style="flex:1;min-height:0;padding:18px 26px 40px">
+          <sc-if value="{{ hasRefTabs }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+              <sc-for list="{{ refTabs }}" as="t" hint-placeholder-count="4">
+                <div onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div style="max-width:820px">
+            <sc-for list="{{ refBlocks }}" as="b" hint-placeholder-count="5">
+
+              <sc-if value="{{ b.isH }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'Caprasimo';font-size:17px;color:var(--color-text);margin:26px 0 9px">{{ b.x }}</div>
+              </sc-if>
+
+              <sc-if value="{{ b.isP }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:14px;line-height:1.65;color:var(--color-neutral-800);margin-bottom:13px;text-wrap:pretty">{{ b.x }}</div>
+              </sc-if>
+
+              <sc-if value="{{ b.isNote }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13.5px;line-height:1.6;color:var(--color-accent-2-800);background:var(--color-accent-2-100);border-radius:16px;padding:14px 17px;margin:4px 0 15px;text-wrap:pretty">{{ b.x }}</div>
+              </sc-if>
+
+              <sc-if value="{{ b.isUl }}" hint-placeholder-val="{{ false }}">
+                <div style="margin:2px 0 14px;display:flex;flex-direction:column;gap:9px">
+                  <sc-for list="{{ b.items }}" as="li" hint-placeholder-count="2">
+                    <div style="display:flex;gap:10px;align-items:flex-start">
+                      <div style="flex:0 0 auto;width:5px;height:5px;border-radius:999px;background:var(--color-accent);margin-top:8px"></div>
+                      <div style="flex:1;font-size:14px;line-height:1.62;color:var(--color-neutral-800);text-wrap:pretty">{{ li.x }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ b.isKv }}" hint-placeholder-val="{{ false }}">
+                <div style="margin:2px 0 16px;border-radius:16px;background:var(--color-neutral-100);overflow:hidden">
+                  <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="3">
+                    <div style="{{ r.style }}">
+                      <div style="flex:1;font-size:13px;font-weight:600;color:var(--color-neutral-700)">{{ r.k }}</div>
+                      <div style="flex:1.5;font-size:13px;line-height:1.5;color:var(--color-neutral-800)">{{ r.v }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ b.isTbl }}" hint-placeholder-val="{{ false }}">
+                <div class="ls-scroll-x" style="margin:2px 0 16px;border-radius:16px;background:var(--color-neutral-100);overflow-x:auto">
+                  <div style="min-width:520px">
+                    <div style="display:flex;gap:12px;padding:11px 15px 9px;border-bottom:1.5px solid var(--color-neutral-300)">
+                      <sc-for list="{{ b.head }}" as="c" hint-placeholder-count="3">
+                        <div style="{{ c.style }}">{{ c.x }}</div>
+                      </sc-for>
+                    </div>
+                    <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="3">
+                      <div style="{{ r.style }}">
+                        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="3">
+                          <div style="{{ c.style }}">{{ c.x }}</div>
+                        </sc-for>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
       <sc-if value="{{ isStages }}" hint-placeholder-val="{{ true }}">
         <div class="ls-scroll" style="flex:1;min-height:0;padding:18px 26px 26px">
           <div style="display:flex;gap:14px;align-items:stretch">
@@ -493,7 +590,7 @@ class Component extends DCLogic {
   state={ready:false,fill:false,orient:'landscape',toast:'',briefOpen:false,screen:'plan',mode:'plan',items:[],sel:null,uid:1,years:0,doy:355,hour:13,
     layers:{contour:true,grid:false,bld:true,tpz:true,srz:true,canopy:true,drain:true,labels:true},
     layersOpen:false,palTab:'plants',q:'',filt:{must:false,edible:false,local:false,hardy:false},armed:null,
-    schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',
+    schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',refSec:{},
     issueFilter:'all',sunCache:{}};
 
   componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz); this.wait(); }
@@ -950,7 +1047,7 @@ class Component extends DCLogic {
     if(s.includes('firepit')) return 'As drawn the firepit sits '+((this.state.items.find(i=>i.n==='Sunken firepit')||{x:3,w:0.85}).x-0.85).toFixed(1)+' m from the reserve boundary. The ACT rule is three metres. Moving it toward the street fixes it until you reach the gum\u2019s protection zone.';
     if(s.includes('mulch')) return 'At 100 mm you need '+q.mulch.toFixed(1)+' m³ for the mulched beds as drawn. Coarse 25 mm chip, not fine or shredded, so it knits together on the slope.';
     if(s.includes('cost')||s.includes('budget')||s.includes('stage')) return 'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+' of the $10,000, materials only with your labour, and it excludes the stormwater contractor.';
-    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 11 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 8.1 hours in summer, 6.5 at the equinox, 4.0 in midwinter. Under trees 1 and 2 it is 2.9 hours even in summer.';
+    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 10.6 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 7.9 hours in summer, 6.5 at the equinox, 3.8 in midwinter. Under trees 1 and 2 it is 3.8 hours even in summer. The full table is on the Site screen, under Sun.';
     return 'The site knowledge is here but the answering model is unavailable in this preview. The figures behind every screen are the same ones in the handbook: 807 m², a 2.08 m fall to the street, 52% of the open back garden inside protection zones, and $'+Math.round(q.cost).toLocaleString()+' spent of $10,000.';
   }
   scrollChat(){ const el=this.chatEl; if(el) el.scrollTop=el.scrollHeight; }
@@ -997,7 +1094,35 @@ class Component extends DCLogic {
     const titles={plan:['The plan','Drag anything. Everything to the right recomputes from the survey, not from a guess.'],
       issues:['Checks','What is wrong with the layout as it stands, worst first.'],
       stages:['Stages','What gets built when, and what each stage costs.'],
-      ask:['Ask','Questions answered from the site data and your current layout.']};
+      ask:['Ask','Questions answered from the site data and your current layout.'],
+      site:['Site','The block itself: levels, soil, sun, water and the trees.'],
+      works:['Works','How the garden gets built, and the constraints that shape it.'],
+      risks:['Risks','What could go wrong here, and what stops each one.']};
+
+    /* Site, Works and Risks are the handbook: reference the plan cannot compute.
+       Each group keeps its own open section, so switching away and back returns
+       you to where you were reading. */
+    const HB=window.HANDBOOK||[];
+    const refGroup=['site','works','risks'].indexOf(s.screen)>=0?s.screen:null;
+    const refSecs=refGroup?HB.filter(x=>x.group===refGroup):[];
+    const refSec=refSecs.find(x=>x.id===(s.refSec||{})[refGroup])||refSecs[0]||null;
+    const cell=(w,head)=>'flex:'+w+';min-width:0;font-size:'+(head?'11.5px':'13px')
+      +';line-height:1.5;'+(head?'font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--color-neutral-600)':'color:var(--color-neutral-800)');
+    const stripe=i=>'display:flex;gap:12px;padding:10px 15px;align-items:flex-start;'
+      +(i%2?'background:rgba(255,255,255,.55)':'');
+    const refBlocks=refSec?refSec.blocks.map(b=>{
+      const k=b[0], plain=k==='p'||k==='h'||k==='note';
+      const w=b[2]||[];
+      return {
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl',
+        x:plain?b[1]:'',
+        items:k==='ul'?b[1].map(t=>({x:t})):[],
+        head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
+        rows:k==='kv'?b[1].map((r,i)=>({k:r[0],v:r[1],style:stripe(i)}))
+            :k==='tbl'?b[1].slice(1).map((r,i)=>({style:stripe(i+1),cells:r.map((c,j)=>({x:c,style:cell(w[j]||1,false)}))}))
+            :[]
+      };
+    }):[];
 
     const sel=s.items.find(i=>i.u===s.sel);
     const treeSel=typeof s.sel==='string'&&s.sel.indexOf('tree')===0?D.TREES.find(t=>t.id==s.sel.slice(4)):null;
@@ -1107,8 +1232,12 @@ class Component extends DCLogic {
 
     return {
       ready:true,
-      screenTitle:titles[s.screen][0], screenSub:titles[s.screen][1],
+      screenTitle:refSec?refSec.title:titles[s.screen][0], screenSub:refSec?refSec.sub:titles[s.screen][1],
       navPlan:navItem('plan'), navChecks:navItem('issues'), navStages:navItem('stages'), navAsk:navItem('ask'),
+      navSite:navItem('site'), navWorks:navItem('works'), navRisks:navItem('risks'),
+      isRef:!!refSec, hasRefTabs:refSecs.length>1, refBlocks:refBlocks,
+      refTabs:refSecs.map(x=>pill(refSec&&x.id===refSec.id,x.nav,
+        ()=>this.setState({refSec:Object.assign({},this.state.refSec,{[refGroup]:x.id})}))),
       stopBadge:stops?String(stops):'', isPlan:s.screen==='plan', isIssues:s.screen==='issues', isStages:s.screen==='stages', isAsk:s.screen==='ask',
       schemeName:(s.schemes.find(x=>x.id===s.schemeId)||{name:'Working scheme'}).name,
       savedLabel:s.savedAt?'Saved '+new Date(s.savedAt).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}):'Saving as you work',
