@@ -7,8 +7,11 @@ in the browser on the device.
 ## Publishing it
 
 GitHub Pages: **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**.
-After a minute the app is at `https://isaacdugdale.github.io/landscapedesign/`.
+After a minute the app is at `https://isaacdugdale.github.io/LandscapeDesignApp/`.
 On the iPad open that URL in Safari, then **Share → Add to Home Screen**.
+
+The app files must sit at the repository root — `index.html` next to `README.md` —
+because Pages only serves from `/` or `/docs`.
 
 ## Files
 
