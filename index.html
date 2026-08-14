@@ -149,22 +149,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
       <div style="{{ planWrap }}">
 
         <div style="{{ palCol }}">
-          <div style="padding:12px 13px 9px;display:flex;gap:5px">
+          <div style="padding:11px 10px 8px;display:flex;gap:5px">
             <sc-for list="{{ palTabs }}" as="t" hint-placeholder-count="2">
               <div onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</div>
             </sc-for>
           </div>
-          <div style="padding:0 13px 9px">
+          <div style="padding:0 10px 8px">
             <input value="{{ q }}" onInput="{{ onQuery }}" placeholder="{{ searchHint }}" style="width:100%;font:inherit;font-size:13px;padding:9px 13px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;color:var(--color-text);outline:none">
           </div>
           <sc-if value="{{ isPlants }}" hint-placeholder-val="{{ true }}">
-            <div style="padding:0 13px 9px;display:flex;flex-wrap:wrap;gap:5px">
+            <div style="padding:0 10px 8px;display:flex;flex-wrap:wrap;gap:5px">
               <sc-for list="{{ filtChips }}" as="c" hint-placeholder-count="4">
                 <div onClick="{{ c.go }}" style="{{ c.style }}">{{ c.label }}</div>
               </sc-for>
             </div>
           </sc-if>
-          <div class="ls-scroll" style="flex:1;min-height:0;padding:0 9px 12px">
+          <div class="ls-scroll" style="flex:1;min-height:0;padding:0 7px 10px">
             <sc-for list="{{ palGroups }}" as="g" hint-placeholder-count="3">
               <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600);margin:11px 0 5px 4px">{{ g.label }}</div>
               <sc-for list="{{ g.items }}" as="p" hint-placeholder-count="4">
@@ -176,7 +176,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
               </sc-for>
             </sc-for>
           </div>
-          <div style="padding:10px 13px;border-top:1px solid var(--color-divider);font-size:11.5px;line-height:1.45;color:var(--color-neutral-600)">{{ palHint }}</div>
+          <div style="padding:9px 11px;border-top:1px solid var(--color-divider);font-size:11px;line-height:1.4;color:var(--color-neutral-600)">{{ palHint }}</div>
         </div>
 
         <div style="{{ midWrap }}">
@@ -258,7 +258,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
         </div>
 
         <div class="ls-scroll" style="{{ inspCol }}">
-          <div class="ls-scroll" style="flex:1 1 300px;min-width:0;max-height:100%;border-radius:20px;background:var(--color-neutral-100);padding:14px">
+          <div class="ls-scroll" style="flex:1 1 290px;min-width:0;max-height:100%;border-radius:18px;background:var(--color-neutral-100);padding:12px 13px">
             <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600);margin-bottom:7px">{{ selKicker }}</div>
             <div style="font-family:'Caprasimo';font-size:17px;line-height:1.2;margin-bottom:9px">{{ selName }}</div>
             <sc-for list="{{ selRows }}" as="r" hint-placeholder-count="4">
@@ -288,7 +288,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
             </sc-if>
           </div>
 
-          <div style="flex:1 1 280px;min-width:0;align-self:flex-start;border-radius:20px;background:var(--color-neutral-100);padding:14px">
+          <div style="flex:1 1 272px;min-width:0;align-self:flex-start;border-radius:18px;background:var(--color-neutral-100);padding:12px 13px">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px">
               <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600)">Running total</div>
               <div onClick="{{ goStages }}" style="font-size:11.5px;font-weight:600;color:var(--color-accent-700);cursor:pointer">Stage it →</div>
@@ -303,7 +303,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
             </sc-for>
           </div>
 
-          <div onClick="{{ goIssues }}" style="flex:1 1 240px;min-width:0;align-self:flex-start;border-radius:20px;background:var(--color-accent-100);padding:14px;cursor:pointer" style-hover="background:var(--color-accent-200)">
+          <div onClick="{{ goIssues }}" style="flex:1 1 232px;min-width:0;align-self:flex-start;border-radius:18px;background:var(--color-accent-100);padding:12px 13px;cursor:pointer" style-hover="background:var(--color-accent-200)">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
                 <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-accent-700)">What's wrong with this plan</div>
@@ -1094,9 +1094,9 @@ class Component extends DCLogic {
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
-        planWrap:'flex:1;min-height:0;display:flex',palCol:'flex:0 0 238px;display:flex;flex-direction:column;min-height:0',
+        planWrap:'flex:1;min-height:0;display:flex',palCol:'flex:0 0 202px;display:flex;flex-direction:column;min-height:0',
         stageCol:'flex:1;min-width:0;display:flex;flex-direction:column;background:var(--color-neutral-100);position:relative',
-        inspCol:'flex:0 0 318px;padding:14px;display:flex;flex-direction:column;gap:12px',
+        inspCol:'flex:0 0 238px;padding:12px;display:flex;flex-direction:column;gap:11px',
         modes:[],presets:[],palTabs:[],filtChips:[],layerList:[],selSun:[],selActions:[],issueList:[],stages:[],sequence:[],chat:[],suggestions:[],todos:[],schemeList:[]};
     }
     const D=this.D, q=this.quantities(), iss=this.issues(), stops=iss.filter(i=>i.sev==='stop').length;
@@ -1302,10 +1302,10 @@ class Component extends DCLogic {
       isExpanded:expanded, notExpanded:!expanded,
       expandLabel:expanded?'Back to the full screen':'Expand the plan',
       toggleExpand:()=>this.setState({expand:!expanded},()=>{ this.fit(true); this.draw(); setTimeout(()=>{this.fit(true);this.draw();},60); }),
-      palCol:'flex:0 0 238px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;min-height:0'+(expanded?';display:none':''),
+      palCol:'flex:0 0 202px;width:202px;min-width:0;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;min-height:0'+(expanded?';display:none':''),
       midWrap:'flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;overflow:auto',
       stageCol:'flex:1 1 auto;min-height:420px;display:flex;flex-direction:column;background:var(--color-neutral-100);position:relative',
-      inspCol:'flex:0 0 auto;'+(s.orient==='landscape'?'height:302px':'height:360px')+';border-top:1px solid var(--color-divider);padding:14px;display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start'+(expanded?';display:none':''),
+      inspCol:'flex:0 0 auto;'+(s.orient==='landscape'?'height:268px':'height:322px')+';border-top:1px solid var(--color-divider);padding:12px;display:flex;flex-wrap:wrap;gap:11px;align-content:flex-start'+(expanded?';display:none':''),
       palTabs:[pill(s.palTab==='plants','Plants',()=>this.setState({palTab:'plants',q:''})),pill(s.palTab==='hard','Elements',()=>this.setState({palTab:'hard',q:''}))],
       isPlants:s.palTab==='plants', q:s.q, onQuery:ev=>this.setState({q:ev.target.value}),
       searchHint:s.palTab==='plants'?'Search 82 plants':'Search elements',
