@@ -54,6 +54,8 @@ if('serviceWorker' in navigator){
 <link rel="stylesheet" href="vendor/fonts.css">
 <script src="site-data.js"></script>
 <script src="handbook.js"></script>
+<script src="bloom.js"></script>
+<script src="printsheet.js"></script>
 <style>
 body{margin:0;background:#e6dcc9;font-family:"Figtree",system-ui,sans-serif}
 *{-webkit-tap-highlight-color:transparent}
@@ -83,7 +85,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 
   <div style="flex:1;min-height:0;display:flex">
 
-    <div style="flex:0 0 84px;background:var(--color-neutral-200);border-right:1px solid var(--color-divider);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px">
+    <div style="{{ sideCol }}">
       <div style="width:38px;height:38px;border-radius:999px;background:var(--color-accent);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Caprasimo';font-size:17px;margin-bottom:10px">234</div>
       <div onClick="{{ navPlan.go }}" style="{{ navPlan.style }}" style-hover="background:var(--color-neutral-300)">
         <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>
@@ -125,7 +127,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 
     <div style="flex:1;min-width:0;display:flex;flex-direction:column">
 
-      <div style="flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px;border-bottom:1px solid var(--color-divider)">
+      <div style="{{ headRow }}">
         <div style="min-width:0">
           <div style="font-family:'Caprasimo';font-size:21px;line-height:1.1;color:var(--color-text)">{{ screenTitle }}</div>
           <div style="font-size:12.5px;color:var(--color-neutral-600);margin-top:2px">{{ screenSub }}</div>
@@ -140,7 +142,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
           </div>
         </div>
-        <div onClick="{{ undo }}" style="padding:9px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:transparent;font-size:13px;font-weight:600;color:var(--color-neutral-700);cursor:pointer" style-hover="background:var(--color-neutral-200)">Undo</div>
+        <div onClick="{{ printSet }}" style="display:flex;align-items:center;gap:7px;padding:9px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:transparent;font-size:13px;font-weight:600;color:var(--color-neutral-700);cursor:pointer" style-hover="background:var(--color-neutral-200)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg>Print</div><div onClick="{{ undo }}" style="padding:9px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:transparent;font-size:13px;font-weight:600;color:var(--color-neutral-700);cursor:pointer" style-hover="background:var(--color-neutral-200)">Undo</div>
       </div>
 
       <sc-if value="{{ isPlan }}" hint-placeholder-val="{{ true }}">
@@ -192,6 +194,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
             </div>
             <div style="flex:1"></div>
             <div onClick="{{ toggleLayers }}" style="padding:9px 15px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;pointer-events:auto">Layers</div>
+            <div onClick="{{ toggleExpand }}" title="{{ expandLabel }}" style="width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--color-neutral-700);cursor:pointer;pointer-events:auto">
+              <sc-if value="{{ isExpanded }}" hint-placeholder-val="{{ false }}">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v6H3"></path><path d="M21 9h-6V3"></path><path d="M15 21v-6h6"></path><path d="M3 15h6v6"></path></svg>
+              </sc-if>
+              <sc-if value="{{ notExpanded }}" hint-placeholder-val="{{ true }}">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V3h6"></path><path d="M21 9V3h-6"></path><path d="M3 15v6h6"></path><path d="M21 15v6h-6"></path></svg>
+              </sc-if>
+            </div>
             <div style="display:flex;flex-direction:column;gap:4px;pointer-events:auto">
               <div onClick="{{ zoomIn }}" style="width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--color-neutral-700);cursor:pointer">+</div>
               <div onClick="{{ zoomOut }}" style="width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,.93);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--color-neutral-700);cursor:pointer">−</div>
@@ -561,6 +571,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1434,&quot;height&quot;:1092}}">
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
+/* the printed sheets are a separate file and need the block's bearing to point north */
+window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
 const COL={
   paper:'#f9f4ed', ink:'#2e2b25', cont:'#dcd3c4', grid:'#eee7db',
@@ -590,7 +602,7 @@ class Component extends DCLogic {
   state={ready:false,fill:false,orient:'landscape',toast:'',briefOpen:false,screen:'plan',mode:'plan',items:[],sel:null,uid:1,years:0,doy:355,hour:13,
     layers:{contour:true,grid:false,bld:true,tpz:true,srz:true,canopy:true,drain:true,labels:true},
     layersOpen:false,palTab:'plants',q:'',filt:{must:false,edible:false,local:false,hardy:false},armed:null,
-    schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',refSec:{},
+    schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',refSec:{},expand:false,
     issueFilter:'all',sunCache:{}};
 
   componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz); this.wait(); }
@@ -915,7 +927,10 @@ class Component extends DCLogic {
       for(let x=Math.ceil(bx0);x<=Math.floor(bx1);x++) p+='M'+x+' '+by0.toFixed(2)+'V'+by1.toFixed(2);
       for(let y=Math.ceil(by0);y<=Math.floor(by1);y++) p+='M'+bx0.toFixed(2)+' '+y+'H'+bx1.toFixed(2);
       g+='<path d="'+p+'" fill="none" stroke="'+COL.grid+'" stroke-width="1" '+nss+'/>'; }
-    if(L.contour) g+='<g fill="none" stroke="'+COL.cont+'" stroke-width="1" '+nss+'>'+D.CONT.map(d=>'<path d="'+d+'"/>').join('')+'</g>';
+    /* vector-effect is not inherited, so it has to sit on each path: on the group
+       it did nothing and the contours were stroked a metre wide. Hairlines, as a
+       topographic map draws them. */
+    if(L.contour) g+='<g fill="none" stroke="'+COL.cont+'">'+D.CONT.map(d=>'<path d="'+d+'" stroke-width="0.75" '+nss+'/>').join('')+'</g>';
     if(L.drain){
       const P=D.DRAIN, line=(pts,st)=>'<path d="'+pts.map((p,i)=>(i?'L':'M')+p[0]+' '+this.fy(p[1])).join('')+'" '+st+'/>';
       g+=line(P.overland,'fill="none" stroke="'+COL.water+'" stroke-width="11" opacity="0.16" '+nss);
@@ -1075,7 +1090,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},isPlan:true,hud:'',palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1124,6 +1139,7 @@ class Component extends DCLogic {
       };
     }):[];
 
+    const expanded=!!s.expand&&s.screen==='plan';
     const sel=s.items.find(i=>i.u===s.sel);
     const treeSel=typeof s.sel==='string'&&s.sel.indexOf('tree')===0?D.TREES.find(t=>t.id==s.sel.slice(4)):null;
     let selKicker='Nothing selected', selName='Tap something on the plan', selRows=[], selSun=[], selVerdict='', vcol='', selActions=[];
@@ -1235,6 +1251,7 @@ class Component extends DCLogic {
       screenTitle:refSec?refSec.title:titles[s.screen][0], screenSub:refSec?refSec.sub:titles[s.screen][1],
       navPlan:navItem('plan'), navChecks:navItem('issues'), navStages:navItem('stages'), navAsk:navItem('ask'),
       navSite:navItem('site'), navWorks:navItem('works'), navRisks:navItem('risks'),
+      printSet:()=>this.printSet(),
       isRef:!!refSec, hasRefTabs:refSecs.length>1, refBlocks:refBlocks,
       refTabs:refSecs.map(x=>pill(refSec&&x.id===refSec.id,x.nav,
         ()=>this.setState({refSec:Object.assign({},this.state.refSec,{[refGroup]:x.id})}))),
@@ -1277,10 +1294,18 @@ class Component extends DCLogic {
       screen:'overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative;'+
         (s.fill?'width:100%;height:100%':'border-radius:23px;'+(s.orient==='landscape'?'width:1340px;height:998px':'width:998px;height:1340px')),
       planWrap:'flex:1;min-height:0;display:flex',
-      palCol:'flex:0 0 238px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;min-height:0',
+      /* Focus mode: once the palette has done its job, the plan is the only
+         thing worth the screen. The sidebar, the header, the palette and the
+         inspector all step out; the canvas controls stay, so there is a way back. */
+      sideCol:'flex:0 0 84px;background:var(--color-neutral-200);border-right:1px solid var(--color-divider);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px'+(expanded?';display:none':''),
+      headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px;border-bottom:1px solid var(--color-divider)'+(expanded?';display:none':''),
+      isExpanded:expanded, notExpanded:!expanded,
+      expandLabel:expanded?'Back to the full screen':'Expand the plan',
+      toggleExpand:()=>this.setState({expand:!expanded},()=>{ this.fit(true); this.draw(); setTimeout(()=>{this.fit(true);this.draw();},60); }),
+      palCol:'flex:0 0 238px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;min-height:0'+(expanded?';display:none':''),
       midWrap:'flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;overflow:auto',
       stageCol:'flex:1 1 auto;min-height:420px;display:flex;flex-direction:column;background:var(--color-neutral-100);position:relative',
-      inspCol:'flex:0 0 auto;'+(s.orient==='landscape'?'height:302px':'height:360px')+';border-top:1px solid var(--color-divider);padding:14px;display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start',
+      inspCol:'flex:0 0 auto;'+(s.orient==='landscape'?'height:302px':'height:360px')+';border-top:1px solid var(--color-divider);padding:14px;display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start'+(expanded?';display:none':''),
       palTabs:[pill(s.palTab==='plants','Plants',()=>this.setState({palTab:'plants',q:''})),pill(s.palTab==='hard','Elements',()=>this.setState({palTab:'hard',q:''}))],
       isPlants:s.palTab==='plants', q:s.q, onQuery:ev=>this.setState({q:ev.target.value}),
       searchHint:s.palTab==='plants'?'Search 82 plants':'Search elements',
@@ -1360,6 +1385,14 @@ class Component extends DCLogic {
       this.toast('Saved to your downloads as '+name); return; }catch(e){}
     try{ await navigator.clipboard.writeText(text); this.toast('Backup copied to the clipboard — paste it into a note.'); }
     catch(e){ this.toast('Could not save the backup on this device.'); }
+  }
+  /* The printable set. Persist first so the sheets are built from what is
+     actually saved, not from an edit still sitting in memory. */
+  printSet(){
+    this.persist();
+    if(!window.PRINTSHEET){ this.toast('The print sheets could not be loaded.'); return; }
+    try{ window.PRINTSHEET.open(this,this._paper||'A3'); }
+    catch(e){ this.toast('Could not build the printable set.'); }
   }
   restore(){
     const inp=document.createElement('input');
