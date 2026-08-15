@@ -162,6 +162,12 @@ window.HANDBOOK = [
   ['note','Levels come from a surface fitted to the surveyed 0.25 m contours, checked against ten independent spot levels: mean error −20 mm, RMS 129 mm. Sound for grades, feasibility and design decisions, not for setting out. Use a level on site before digging a trench or pouring an apron.']
 ]},
 
+/* ---------------------------------------------------------- earthworks --- */
+{id:'earthworks', group:'works', nav:'Earthworks', title:'Earthworks and levels', sub:'What can be dug, what cannot, and to what depth', blocks:[
+  ['p','This is the first thing the garden needs from anyone with a machine, and it is built from whatever is on the plan right now. The same two sheets print from the button at the bottom — hand those over and keep the rest of the set.'],
+  ['earth','']
+]},
+
 /* ------------------------------------------------------------ drainage --- */
 {id:'drainage', group:'works', nav:'Drainage', title:'Drainage design', sub:'The two lines, the numbers, and the route out', blocks:[
   ['p','The block falls 2.08 m from the rear boundary to the street at about 1 in 19, so there is ample fall. The constraint is that the back garden is ringed by the protection zones of trees 1 and 2 where no trenching is allowed, and the addition, link and garage together enclose the rear pocket. There is no buried route from the back garden to the street that avoids both a protection zone and a building.'],

@@ -60,13 +60,16 @@ there and every screen follows.
   offers *Save to Files* as a PDF. A4 and A3, both landscape; the plan takes the largest
   standard scale that fits (1:125 on A3, 1:200 on A4) and says which. The drawing is
   vector, so it stays sharp at any size and a ruler on the paper reads true.
-- **Print → Earthworks only** is the two sheets you hand to whoever brings the digger:
-  a setout drawing with the no-dig zones loud, existing levels on a 4 m grid and every
-  excavation keyed and colour-coded by what may touch it; then a schedule of volumes,
+- **Works → Earthworks** is the first thing this design needs in the real world: a
+  setout drawing with the no-dig zones loud, existing levels on a 4 m grid and every
+  excavation keyed and colour-coded by what may touch it, then a schedule of volumes,
   depths and method, the rules that bind the machine, and what to confirm before it
-  arrives. Method comes from the same protection-zone test the Checks screen runs, so
-  the sheet cannot disagree with the app. Levels are indicative — the fitted surface has
-  an RMS of 129 mm — and the sheet says so at the top rather than in the fine print.
+  arrives. A button at the foot of it prints the same content as two sheets to hand
+  over; **Print → Earthworks only** is the same thing from the print dialog. The screen
+  and the sheets are built from one set of functions, so they cannot quote different
+  numbers, and method comes from the same protection-zone test the Checks screen runs.
+  Levels are indicative — the fitted surface has an RMS of 129 mm — and that is a red
+  strip at the top, not fine print.
 - The bloom calendar plots mature height against month, the bar's thickness being the
   plant's mature spread and its colour the flower's own. Flowering months and colours
   live in `bloom.js` and are the one part of the app that is judgement rather than
