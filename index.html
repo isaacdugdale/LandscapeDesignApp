@@ -68,6 +68,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 .ls-scroll-x{scrollbar-width:thin}
 .ls-scroll-x::-webkit-scrollbar{height:8px}
 .ls-scroll-x::-webkit-scrollbar-thumb{background:var(--color-neutral-300);border-radius:999px}
+/* The earthworks view is built by printsheet.js in the same markup the printed
+   sheets use, so it needs those class names sized for a screen rather than mm. */
+.ps-screen{font-size:14px;line-height:1.6;color:var(--color-neutral-800)}
+.ps-screen .ps-warn{background:#f8e6df;color:#7a1f18;border-radius:14px;padding:13px 16px;font-size:13.5px;line-height:1.5;margin-bottom:16px}
+.ps-screen-plan{border:1px solid var(--color-divider);border-radius:16px;overflow:hidden;background:#fff}
+.ps-screen-legend{display:grid;grid-template-columns:1fr 1fr;gap:6px 22px;margin:12px 0 22px}
+.ps-screen .ps-lg{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--color-neutral-600)}
+.ps-screen .ps-sw{width:24px;height:4px;flex:0 0 24px;border-radius:2px}
+.ps-screen .ps-kdot{height:16px;width:16px;flex:0 0 16px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ps-screen .ps-h3{font-family:'Caprasimo';font-size:17px;font-weight:400;margin:26px 0 10px}
+.ps-screen .ps-tbl{width:100%;border-collapse:collapse;margin-bottom:6px}
+.ps-screen .ps-tbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--color-neutral-600);font-weight:700;border-bottom:1.5px solid var(--color-text);padding:0 8px 6px 0}
+.ps-screen .ps-tbl td{padding:7px 8px 7px 0;border-bottom:1px solid var(--color-divider);vertical-align:top;font-size:13px}
+.ps-screen .ps-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ps-screen .ps-no{font-variant-numeric:tabular-nums;color:var(--color-neutral-600)}
+.ps-screen .ps-tot td{font-weight:700;border-bottom:1.5px solid var(--color-text)}
+.ps-screen .ps-mut{color:var(--color-neutral-600)}
+.ps-screen .ps-fine{font-size:12px;color:var(--color-neutral-600);line-height:1.5;margin:8px 0 0}
+.ps-screen .ps-ul{margin:0;padding-left:18px}.ps-screen .ps-ul li{margin-bottom:7px}
+.ps-screen .ps-no-dig td{background:#fbecea}.ps-screen .ps-no-dig b{color:#a8332a}
+.ps-screen .ps-hand td{background:#fbf1e7}.ps-screen .ps-hand b{color:#8c491a}
+.ps-print-btn{appearance:none;margin:26px 0 4px;padding:11px 20px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font:600 13.5px Figtree,system-ui;color:var(--color-neutral-700);cursor:pointer}
+.ps-print-btn:hover{background:var(--color-neutral-200)}
 </style>
 </helmet>
 
@@ -409,6 +432,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 
               <sc-if value="{{ b.isBloom }}" hint-placeholder-val="{{ false }}">
                 <div ref="{{ bloomRef }}" style="margin:6px 0 18px"></div>
+              </sc-if>
+
+              <sc-if value="{{ b.isEarth }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ earthRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
 
               <sc-if value="{{ b.isTbl }}" hint-placeholder-val="{{ false }}">
@@ -1113,7 +1140,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1152,7 +1179,7 @@ class Component extends DCLogic {
       const k=b[0], plain=k==='p'||k==='h'||k==='note';
       const w=b[2]||[];
       return {
-        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom',
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth',
         x:plain?b[1]:'',
         items:k==='ul'?b[1].map(t=>({x:t})):[],
         head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
@@ -1284,6 +1311,11 @@ class Component extends DCLogic {
       printSet:()=>this.printSet(),
       clearSel:()=>this.setState({sel:null},()=>this.draw()),
       isRef:!!refSec, hasRefTabs:refSecs.length>1, refBlocks:refBlocks,
+      earthRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ el.innerHTML=window.PRINTSHEET.earthView(this);
+          const btn=el.querySelector('[data-earth-print]');
+          if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','earth'); };
+        }catch(e){ el.textContent=''; } },
       bloomRef:el=>{ if(!el||!window.PRINTSHEET) return;
         try{ const c=window.PRINTSHEET.bloomChart(this);
           el.innerHTML=c.empty

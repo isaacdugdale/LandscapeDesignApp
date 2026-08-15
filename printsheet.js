@@ -432,66 +432,57 @@ window.PRINTSHEET = (function () {
       + '<div class="ps-s">' + esc(sub) + '</div></div><div class="ps-r">' + right + '</div></div>';
   }
 
-  /* The two sheets the digger gets. Deliberately separable from the design set:
-     you hand these over and keep the rest. */
-  function earthSheets(app, P, size, stamp, scheme) {
-    var draw = earthSvg(app, P), rows = earthRows(app);
-    var totCut = 0, totFill = 0, totDig = 0;
-    rows.forEach(function (r) { totCut += r.cut; totFill += r.fill; totDig += r.digV; });
-    var net = totCut + totDig - totFill;
+  /* The excavation schedule, shared by the printed sheet and the Works screen so
+     the two can never quote different volumes. */
+  var WARN = '<b>Levels are indicative, not setting-out.</b> They come from a surface fitted to the 0.25 m contour survey \u2014 mean error \u221220 mm, RMS 129 mm. Establish a benchmark on site and confirm every level with a level before cutting. Nothing here overrides the tree management plan.';
 
-    var legend = [
-      ['#8c491a', 'solid', 'Structural root zone — no excavation, not even by hand'],
-      ['#b2622d', 'dash', 'Tree protection zone — hand or hydro dig, arborist present'],
-      ['#33646b', 'solid', 'Corner swale — the one part of the rear boundary that can be cut'],
-      ['#b2622d', 'solid', 'Diversion bund — built up in mulch, never dug'],
+  function earthLegend() {
+    return [
+      ['#8c491a', 'solid', 'Structural root zone \u2014 no excavation, not even by hand'],
+      ['#b2622d', 'dash', 'Tree protection zone \u2014 hand or hydro dig, arborist present'],
+      ['#33646b', 'solid', 'Corner swale \u2014 the one part of the rear boundary that can be cut'],
+      ['#b2622d', 'solid', 'Diversion bund \u2014 built up in mulch, never dug'],
       ['level', 'level', 'Existing surface level, m AHD, on a 4 m grid'],
       ['key', 'key', 'Excavation, numbered in the schedule']
     ].map(function (l) {
-      var sw = l[1] === 'level' ? '<span class="ps-sw" style="background:none;color:' + MUT + ';font-size:2.3mm;height:auto">·611.52</span>'
+      var sw = l[1] === 'level' ? '<span class="ps-sw" style="background:none;color:' + MUT + ';font-size:2.3mm;height:auto">\u00b7611.52</span>'
         : l[1] === 'key' ? '<span class="ps-sw ps-kdot" style="background:#fff;border:0.2mm solid #33646b;color:#33646b">4</span>'
         : l[1] === 'dash' ? '<span class="ps-sw" style="border-top:0.6mm dashed ' + l[0] + '"></span>'
         : '<span class="ps-sw" style="background:' + l[0] + '"></span>';
       return '<div class="ps-lg">' + sw + '<span>' + esc(l[2]) + '</span></div>';
     }).join('');
+  }
 
-    var h = '<section class="ps-sheet ps-earth">'
-      + sheetHead(P, 'Earthworks and levels', 'What can be dug, what cannot, and to what depth — ' + scheme, stamp)
-      + '<div class="ps-warn"><b>Levels are indicative, not setting-out.</b> They come from a surface fitted to the 0.25 m contour survey — mean error −20 mm, RMS 129 mm. Establish a benchmark on site and confirm every level with a level before cutting. Nothing on this sheet overrides the tree management plan.</div>'
-      + '<div class="ps-plan">' + draw.svg + '</div>'
-      + '<div class="ps-foot"><div class="ps-legend">' + legend + '</div>'
-      + '<div class="ps-scalebar">' + scaleBar(draw.scale)
-      + '<div class="ps-note" style="max-width:96mm">Scale 1:' + draw.scale + ' at ' + size
-      + '. Access is the existing crossover at the north-east corner and the driveway; there is no other way in for a machine.</div></div>'
-      + '<div class="ps-north">' + northArrow(app) + '<div class="ps-nlab">Duffy Street is<br>north-north-west</div></div>'
-      + '</div></section>';
-
+  function earthTable(app) {
+    var rows = earthRows(app);
+    var totCut = 0, totFill = 0, totDig = 0;
+    rows.forEach(function (r) { totCut += r.cut; totFill += r.fill; totDig += r.digV; });
+    var net = totCut + totDig - totFill;
     var rowHtml = rows.map(function (r) {
       var cls = r.meth.rank === 0 ? 'ps-no-dig' : r.meth.rank === 1 ? 'ps-hand' : '';
       return '<tr class="' + cls + '"><td class="ps-no">' + r.no + '</td><td>' + esc(r.name) + '</td><td>' + esc(r.size) + '</td>'
         + '<td class="ps-num">' + r.rl.toFixed(2) + '</td>'
-        + '<td class="ps-num">' + (r.depth ? Math.round(r.depth * 1000) : '—') + '</td>'
-        + '<td class="ps-num">' + (r.cut + r.digV >= 0.05 ? n1(r.cut + r.digV) : '—') + '</td>'
-        + '<td class="ps-num">' + (r.fill >= 0.05 ? n1(r.fill) : '—') + '</td>'
+        + '<td class="ps-num">' + (r.depth ? Math.round(r.depth * 1000) : '\u2014') + '</td>'
+        + '<td class="ps-num">' + (r.cut + r.digV >= 0.05 ? n1(r.cut + r.digV) : '\u2014') + '</td>'
+        + '<td class="ps-num">' + (r.fill >= 0.05 ? n1(r.fill) : '\u2014') + '</td>'
         + '<td class="ps-num">' + Math.round(Math.max(r.maxCut, r.maxFill) + r.depth * 1000) + '</td>'
         + '<td><b>' + esc(r.meth.m) + '</b><br><span class="ps-mut">' + esc(r.meth.why) + '</span></td></tr>';
     }).join('');
-
-    h += '<section class="ps-sheet ps-earth">'
-      + sheetHead(P, 'Earthworks schedule', 'Volumes, depths and method, by the numbers on the drawing — ' + scheme, stamp)
-      + '<div class="ps-cols ps-cols-earth">'
-      + '<div><h3 class="ps-h3">Excavations and levelling</h3>'
-      + '<table class="ps-tbl"><thead><tr><th>No.</th><th>Item</th><th>Size</th><th class="ps-num">Existing RL</th><th class="ps-num">Dig mm</th><th class="ps-num">Cut m³</th><th class="ps-num">Fill m³</th><th class="ps-num">Total mm</th><th>Method</th></tr></thead>'
+    return '<h3 class="ps-h3">Excavations and levelling</h3>'
+      + '<table class="ps-tbl"><thead><tr><th>No.</th><th>Item</th><th>Size</th><th class="ps-num">Existing RL</th><th class="ps-num">Dig mm</th><th class="ps-num">Cut m\u00b3</th><th class="ps-num">Fill m\u00b3</th><th class="ps-num">Total mm</th><th>Method</th></tr></thead>'
       + '<tbody>' + (rowHtml || '<tr><td colspan="9" class="ps-mut">Nothing on the plan needs excavating.</td></tr>') + '</tbody></table>'
       + '<table class="ps-tbl"><tbody>'
-      + '<tr><td>Total cut</td><td class="ps-num">' + n1(totCut) + ' m³</td></tr>'
-      + '<tr><td>Total fill</td><td class="ps-num">' + n1(totFill) + ' m³</td></tr>'
-      + '<tr class="ps-tot"><td>' + (net >= 0 ? 'Net to cart away' : 'Net to import') + '</td><td class="ps-num">' + n1(Math.abs(net)) + ' m³</td></tr>'
+      + '<tr><td>Total cut</td><td class="ps-num">' + n1(totCut + totDig) + ' m\u00b3</td></tr>'
+      + '<tr><td>Total fill</td><td class="ps-num">' + n1(totFill) + ' m\u00b3</td></tr>'
+      + '<tr class="ps-tot"><td>' + (net >= 0 ? 'Net to cart away' : 'Net to import') + '</td><td class="ps-num">' + n1(Math.abs(net)) + ' m\u00b3</td></tr>'
       + '</tbody></table>'
-      + '<p class="ps-fine"><b>Dig mm</b> is depth below finished level where a document states one — only the firepit does, at 450 mm, which is also what keeps it under the 500 mm that would force a site reclassification. Everything else is levelling of the existing surface across the item’s own footprint, from the fitted surface. Anything needing a depth decided on site is left blank rather than guessed. Bulking is not allowed for: loose spoil carts at roughly 1.25 times these figures.</p>'
+      + '<p class="ps-fine"><b>Dig mm</b> is depth below finished level where a document states one \u2014 only the firepit does, at 450 mm, which is also what keeps it under the 500 mm that would force a site reclassification. Everything else is levelling of the existing surface across the item\u2019s own footprint, from the fitted surface. Anything needing a depth decided on site is left blank rather than guessed. Bulking is not allowed for: loose spoil carts at roughly 1.25 times these figures.</p>';
+  }
+
+  function earthNotes() {
       + '</div>'
 
-      + '<div><h3 class="ps-h3">Shaping along the rear boundary</h3>'
+    return '<h3 class="ps-h3">Shaping along the rear boundary</h3>'
       + '<table class="ps-tbl"><tbody>'
       + '<tr><td>Corner swale, position</td><td>western 4 m of the rear boundary, 0.8–1.2 m inside the fence</td></tr>'
       + '<tr><td>Cross-section</td><td>about 2 m wide, 250 mm deep, batters around 1 in 6</td></tr>'
@@ -515,7 +506,33 @@ window.PRINTSHEET = (function () {
       + '<li>Protection zone fencing up, and the arborist booked for anything inside one.</li>'
       + '<li>Service locations — dial before you dig — and the garage slab sleeves cast before the slab goes down.</li>'
       + '<li>Where spoil is stockpiled and where it goes.</li>'
-      + '</ul></div></div></section>';
+      + '</ul>';
+  }
+
+  /* The two sheets the digger gets. Deliberately separable from the design set:
+     you hand these over and keep the rest. */
+  function earthSheets(app, P, size, stamp, scheme) {
+    var draw = earthSvg(app, P);
+
+    var legend = earthLegend();
+
+    var h = '<section class="ps-sheet ps-earth">'
+      + sheetHead(P, 'Earthworks and levels', 'What can be dug, what cannot, and to what depth — ' + scheme, stamp)
+      + '<div class="ps-warn">' + WARN + '</div>'
+      + '<div class="ps-plan">' + draw.svg + '</div>'
+      + '<div class="ps-foot"><div class="ps-legend">' + legend + '</div>'
+      + '<div class="ps-scalebar">' + scaleBar(draw.scale)
+      + '<div class="ps-note" style="max-width:96mm">Scale 1:' + draw.scale + ' at ' + size
+      + '. Access is the existing crossover at the north-east corner and the driveway; there is no other way in for a machine.</div></div>'
+      + '<div class="ps-north">' + northArrow(app) + '<div class="ps-nlab">Duffy Street is<br>north-north-west</div></div>'
+      + '</div></section>';
+
+    h += '<section class="ps-sheet ps-earth">'
+      + sheetHead(P, 'Earthworks schedule', 'Volumes, depths and method, by the numbers on the drawing \u2014 ' + scheme, stamp)
+      + '<div class="ps-cols ps-cols-earth">'
+      + '<div>' + earthTable(app) + '</div>'
+      + '<div>' + earthNotes() + '</div>'
+      + '</div></section>';
     return h;
   }
 
@@ -740,5 +757,20 @@ window.PRINTSHEET = (function () {
       foliage: (r.foliage || []).map(function (x) { return x.name; })};
   }
 
-  return {open: open, close: close, build: build, bloomChart: bloomChart};
+  /* Everything the two printed sheets carry, laid out for a screen, so the
+     Works tab can show it without anyone opening a print dialog. */
+  function earthView(app) {
+    var P = {w: 250, h: 150, m: 0, head: 0, foot: 0};
+    var draw = earthSvg(app, P);
+    return '<div class="ps-screen">'
+      + '<div class="ps-warn">' + WARN + '</div>'
+      + '<div class="ps-screen-plan">' + draw.svg.replace('<svg ', '<svg style="width:100%;height:auto;display:block" ') + '</div>'
+      + '<div class="ps-screen-legend">' + earthLegend() + '</div>'
+      + earthTable(app)
+      + earthNotes()
+      + '<button data-earth-print="1" class="ps-print-btn">Print these two sheets</button>'
+      + '</div>';
+  }
+
+  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView};
 })();
