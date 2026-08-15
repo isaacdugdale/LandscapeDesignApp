@@ -242,6 +242,10 @@ window.HANDBOOK = [
     ['Front: structural and screening','Shadiest half of the block, 4.6 h summer down to 2.2 h in winter. Sun-lovers in the canopy gaps, shade-tolerant natives beneath. Screening at 1.5 to 2.5 m. Plant through mulch, never excavate.']
   ],[1,2.2]],
 
+  ['h','When it flowers'],
+  ['p','Every plant on the plan, by mature height and flowering month. The bar’s thickness is the plant’s mature spread and its colour is the flower’s own. It updates as you plant.'],
+  ['bloom',''],
+
   ['h','The paved apron, and the first three metres'],
   ['p','A 900 mm band of paving right around the house, sloping away at 1 in 60 or better. No beds, no plants, no irrigation, no taps inside it. This is the buffer that keeps building moisture stable and stops splash and soil contact with the walls.'],
   ['p','From the apron out to about three metres you are still in the ground that affects the footings. Dry-tolerant groundcovers and low grasses here — Scleranthus, Dichondra, Poa, Lomandra — which take a dry summer without help. If you run drip, run it on a tap you turn off, not a timer. Avoid aggressive root systems and anything you will feel obliged to water twice a week.'],

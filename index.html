@@ -407,6 +407,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
                 </div>
               </sc-if>
 
+              <sc-if value="{{ b.isBloom }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ bloomRef }}" style="margin:6px 0 18px"></div>
+              </sc-if>
+
               <sc-if value="{{ b.isTbl }}" hint-placeholder-val="{{ false }}">
                 <div class="ls-scroll-x" style="margin:2px 0 16px;border-radius:16px;background:var(--color-neutral-100);overflow-x:auto">
                   <div style="min-width:520px">
@@ -1109,7 +1113,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1148,7 +1152,7 @@ class Component extends DCLogic {
       const k=b[0], plain=k==='p'||k==='h'||k==='note';
       const w=b[2]||[];
       return {
-        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl',
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom',
         x:plain?b[1]:'',
         items:k==='ul'?b[1].map(t=>({x:t})):[],
         head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
@@ -1280,6 +1284,13 @@ class Component extends DCLogic {
       printSet:()=>this.printSet(),
       clearSel:()=>this.setState({sel:null},()=>this.draw()),
       isRef:!!refSec, hasRefTabs:refSecs.length>1, refBlocks:refBlocks,
+      bloomRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ const c=window.PRINTSHEET.bloomChart(this);
+          el.innerHTML=c.empty
+            ? '<div style="padding:18px 0;color:var(--color-neutral-600);font-size:14px">Nothing flowering on the plan yet. Add plants and this fills in.</div>'
+            : c.svg.replace('<svg ','<svg style="width:100%;height:auto;display:block" ')
+              +(c.foliage.length?'<div style="font-size:12.5px;color:var(--color-neutral-600);margin-top:8px">Grown for foliage, so not charted: '+c.foliage.join(', ')+'.</div>':'');
+        }catch(e){ el.textContent=''; } },
       refTabs:refSecs.map(x=>pill(refSec&&x.id===refSec.id,x.nav,
         ()=>this.setState({refSec:Object.assign({},this.state.refSec,{[refGroup]:x.id})}))),
       stopBadge:stops?String(stops):'', isPlan:s.screen==='plan', isIssues:s.screen==='issues', isStages:s.screen==='stages', isAsk:s.screen==='ask',
@@ -1418,7 +1429,7 @@ class Component extends DCLogic {
   printSet(){
     this.persist();
     if(!window.PRINTSHEET){ this.toast('The print sheets could not be loaded.'); return; }
-    try{ window.PRINTSHEET.open(this,this._paper||'A3'); }
+    try{ window.PRINTSHEET.open(this,this._paper||'A3','all'); }
     catch(e){ this.toast('Could not build the printable set.'); }
   }
   restore(){
