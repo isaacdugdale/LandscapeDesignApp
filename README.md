@@ -65,6 +65,10 @@ there and every screen follows.
   live in `bloom.js` and are the one part of the app that is judgement rather than
   survey — correct anything you disagree with. Plants grown for foliage are named under
   the chart rather than silently dropped.
+- Selecting anything on the plan floats a bar over the drawing with its name, **Copy**,
+  **Rotate 90°** on rectangles, and **Delete**. The inspector carries the same actions
+  from the same definition; the bar exists because the inspector is a scroll away in
+  normal mode and hidden in focus mode, which is when you are actually moving things.
 - The **expand** button on the plan (with the zoom controls) drops the sidebar, header,
   palette and inspector so the drawing has the whole screen. It is for once the palette
   has done its job and you are only moving things around.

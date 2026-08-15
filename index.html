@@ -208,6 +208,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
             </div>
           </div>
 
+          <!-- The same actions the inspector carries, floated over the plan: the
+               inspector is a scroll away in normal mode and gone in focus mode,
+               which is exactly when you are moving things about. -->
+          <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:16px;z-index:4;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 14px;border-radius:999px;background:rgba(255,255,255,.96);box-shadow:var(--shadow-md)">
+              <div style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);margin-right:2px">{{ selName }}</div>
+              <sc-for list="{{ selActions }}" as="a" hint-placeholder-count="3">
+                <div onClick="{{ a.go }}" style="{{ a.style }}">{{ a.label }}</div>
+              </sc-for>
+              <div onClick="{{ clearSel }}" title="Deselect" style="width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--color-neutral-600);cursor:pointer" style-hover="background:var(--color-neutral-200)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </div>
+            </div>
+          </sc-if>
+
           <sc-if value="{{ layersOpen }}" hint-placeholder-val="{{ true }}">
             <div style="position:absolute;top:58px;right:56px;z-index:5;width:196px;padding:9px;border-radius:20px;background:#fff;box-shadow:var(--shadow-lg)">
               <sc-for list="{{ layerList }}" as="l" hint-placeholder-count="6">
@@ -282,7 +297,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
             <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;gap:6px;margin-top:11px;flex-wrap:wrap">
                 <sc-for list="{{ selActions }}" as="a" hint-placeholder-count="3">
-                  <div onClick="{{ a.go }}" style="padding:8px 14px;border-radius:999px;border:1.5px solid var(--color-neutral-300);font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;background:#fff" style-hover="background:var(--color-neutral-200)">{{ a.label }}</div>
+                  <div onClick="{{ a.go }}" style="{{ a.style }}" style-hover="background:var(--color-neutral-200)">{{ a.label }}</div>
                 </sc-for>
               </div>
             </sc-if>
@@ -1169,9 +1184,16 @@ class Component extends DCLogic {
       selSun=[{h:hrs[0].toFixed(1)+' h',label:'21 Dec',col:'var(--color-accent-700)'},{h:hrs[1].toFixed(1)+' h',label:'21 Sep',col:'var(--color-accent-700)'},{h:hrs[2].toFixed(1)+' h',label:'21 Jun',col:'var(--color-neutral-700)'}];
       selVerdict=ck.msg;
       vcol=ck.lvl==='r'?'#7a1f18;background:#f8e0dc':(ck.lvl==='a'?'var(--color-accent-800);background:var(--color-accent-100)':'var(--color-accent-2-800);background:var(--color-accent-2-100)');
-      selActions=[{label:'Duplicate',go:()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);}},
-        {label:'Delete',go:()=>{this.push();this.commit(s.items.filter(i=>i.u!==sel.u),null);}}];
-      if(sel.shape!=='circ') selActions.push({label:'Rotate 90°',go:()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}});
+      /* One definition, drawn both in the inspector and on the floating bar over
+         the plan. Delete carries the accent so it is not fired by accident. */
+      const act=(label,go,danger)=>({label:label,go:go,
+        style:'padding:7px 13px;border-radius:999px;border:1.5px solid '+(danger?'var(--color-accent-300)':'var(--color-neutral-300)')
+          +';font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;white-space:nowrap;color:'
+          +(danger?'var(--color-accent-700)':'var(--color-neutral-700)')});
+      selActions=[
+        act('Copy',()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);})];
+      if(sel.shape!=='circ') selActions.push(act('Rotate 90°',()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}));
+      selActions.push(act('Delete',()=>{this.push();this.commit(s.items.filter(i=>i.u!==sel.u),null);},true));
     }
 
     const palGroups=[];
@@ -1256,6 +1278,7 @@ class Component extends DCLogic {
       navPlan:navItem('plan'), navChecks:navItem('issues'), navStages:navItem('stages'), navAsk:navItem('ask'),
       navSite:navItem('site'), navWorks:navItem('works'), navRisks:navItem('risks'),
       printSet:()=>this.printSet(),
+      clearSel:()=>this.setState({sel:null},()=>this.draw()),
       isRef:!!refSec, hasRefTabs:refSecs.length>1, refBlocks:refBlocks,
       refTabs:refSecs.map(x=>pill(refSec&&x.id===refSec.id,x.nav,
         ()=>this.setState({refSec:Object.assign({},this.state.refSec,{[refGroup]:x.id})}))),
