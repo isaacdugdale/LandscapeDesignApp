@@ -948,10 +948,14 @@ class Component extends DCLogic {
     const hard=s.items.filter(i=>i.t!=='plant'), plants=s.items.filter(i=>i.t==='plant');
     g+=hard.map(it=>this.itemSvg(it,it.u===s.sel,s.years)).join('');
     g+=plants.map(it=>this.itemSvg(it,it.u===s.sel,s.years)).join('');
+    /* Shadow before building. A cast shadow includes the footprint that threw it,
+       so drawing it over the house turned the house into a grey blob and there
+       was nothing left that read as "the house casts this". Under the building,
+       the shadow lies on the ground where you need to see it. */
+    if(s.mode==='sun') g+=this.shadows();
     if(L.bld){
       g+=D.BLDS.map(b=>'<path d="'+b.d+'" fill="'+(b.k==='existing'?COL.exFill:COL.prFill)+'" stroke="'+(b.k==='existing'?COL.exStroke:COL.prStroke)+'" stroke-width="1" '+(b.k==='existing'?'':'stroke-dasharray="4 3" ')+nss+'/>').join('');
     }
-    if(s.mode==='sun') g+=this.shadows();
     if(L.canopy) g+=D.TREES.map(t=>'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.canopy+'" fill="none" stroke="'+COL.canopy+'" stroke-width="1.4" stroke-dasharray="4 3" '+nss+'/>').join('');
     g+='<path d="'+D.BNDP+'" fill="none" stroke="'+COL.ink+'" stroke-width="2.2" '+nss+'/>';
     g+=D.TREES.map(t=>'<circle class="thit" data-t="'+t.id+'" cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="0.55" fill="'+COL.tpz+'" stroke="#fff" stroke-width="1.8" '+nss+'/>').join('');
