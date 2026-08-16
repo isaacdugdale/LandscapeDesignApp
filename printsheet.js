@@ -90,6 +90,7 @@ window.PRINTSHEET = (function () {
     var soft = items.filter(function (i) { return i.t === 'plant'; });
     var shape = function (it, fillOp) {
       var st = 'fill="' + it.fill + '" fill-opacity="' + fillOp + '" stroke="' + it.stroke + '" stroke-width="' + L(0.28) + '"';
+      if (app.isRun && app.isRun(it)) return '<path d="' + app.polyD(app.runPoly(it)) + '" stroke-linejoin="round" ' + st + '/>';
       if (it.shape === 'circ') return '<circle cx="' + it.x + '" cy="' + app.fy(it.y) + '" r="' + app.growR(it, s.years) + '" ' + st + '/>';
       var cx = it.x + it.w / 2, cy = it.y + it.h / 2;
       return '<rect x="' + (-it.w / 2) + '" y="' + (-it.h / 2) + '" width="' + it.w + '" height="' + it.h + '" ' + st
@@ -207,7 +208,8 @@ window.PRINTSHEET = (function () {
         var it = k.it, cf = app.cutfill(it), c = app.centre(it), meth = digMethod(app, it);
         var depth = DIG_DEPTH[it.n] || 0;
         return {no: k.no, name: it.n, it: it,
-          size: it.shape === 'circ' ? n1(it.w * 2) + ' m dia' : n1(it.w) + ' × ' + n1(it.h) + ' m',
+          size: app.isRun && app.isRun(it) ? n1(app.runLen(it)) + ' m × ' + n1(it.w) + ' m'
+            : it.shape === 'circ' ? n1(it.w * 2) + ' m dia' : n1(it.w) + ' × ' + n1(it.h) + ' m',
           area: app.area(it), rl: app.RL(c[0], c[1]),
           cut: cf.cutV, fill: cf.fillV, maxCut: cf.maxCut * 1000, maxFill: cf.maxFill * 1000,
           depth: depth, digV: depth * app.area(it),
@@ -272,7 +274,8 @@ window.PRINTSHEET = (function () {
     earthRows(app).forEach(function (r) {
       var it = r.it, col = r.meth.rank === 0 ? '#a8332a' : r.meth.rank === 1 ? '#b2622d' : '#33646b';
       var st = 'fill="' + col + '" fill-opacity="0.16" stroke="' + col + '" stroke-width="' + L(0.55) + '"';
-      if (it.shape === 'circ') g += '<circle cx="' + it.x + '" cy="' + app.fy(it.y) + '" r="' + it.w + '" ' + st + '/>';
+      if (app.isRun && app.isRun(it)) g += '<path d="' + app.polyD(app.runPoly(it)) + '" stroke-linejoin="round" ' + st + '/>';
+      else if (it.shape === 'circ') g += '<circle cx="' + it.x + '" cy="' + app.fy(it.y) + '" r="' + it.w + '" ' + st + '/>';
       else {
         var cx = it.x + it.w / 2, cy = it.y + it.h / 2;
         g += '<rect x="' + (-it.w / 2) + '" y="' + (-it.h / 2) + '" width="' + it.w + '" height="' + it.h + '" ' + st
@@ -308,9 +311,12 @@ window.PRINTSHEET = (function () {
     return {
       hard: hard.map(function (k) {
         var it = k.it, size, qty;
-        if (it.shape === 'circ') { size = n1(it.w * 2) + ' m diameter'; qty = n1(app.area(it)) + ' m²'; }
+        if (app.isRun && app.isRun(it)) { size = n1(app.runLen(it)) + ' m curved run, ' + n1(it.w) + ' m wide'; qty = n1(app.area(it)) + ' m²'; }
+        else if (it.shape === 'circ') { size = n1(it.w * 2) + ' m diameter'; qty = n1(app.area(it)) + ' m²'; }
         else { size = n1(it.w) + ' × ' + n1(it.h) + ' m'; qty = it.unit === 'lin' ? n1(Math.max(it.w, it.h)) + ' m' : n1(app.area(it)) + ' m²'; }
-        return {no: k.no, name: it.n, size: size, qty: it.unit === 'item' ? '1 item' : qty, cost: it.unit === 'm2' ? app.area(it) * it.cost : it.unit === 'lin' ? Math.max(it.w, it.h) * it.cost : it.cost};
+        var lin = app.linLen ? app.linLen(it) : Math.max(it.w, it.h);
+        if (app.isRun && app.isRun(it) && it.unit === 'lin') qty = n1(lin) + ' m';
+        return {no: k.no, name: it.n, size: size, qty: it.unit === 'item' ? '1 item' : qty, cost: it.unit === 'm2' ? app.area(it) * it.cost : it.unit === 'lin' ? lin * it.cost : it.cost};
       }),
       plants: order.map(function (n) {
         var r = byName[n], p = app.PL[n] || {}, b = (window.BLOOM || {})[n];

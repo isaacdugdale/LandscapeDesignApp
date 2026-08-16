@@ -107,6 +107,14 @@ there and every screen follows.
   selected the arrow keys nudge it 50 mm, shift makes that 500 mm, Backspace
   deletes it, Escape drops the selection, and ⌘Z undoes — none of which fire
   while you are typing in the notes or the ask box.
+- **Curved runs.** Select a path, swale, edge or wall and **Curve it** turns it into
+  a run: a smooth line through draggable points, a fixed width, and h no longer
+  meaning anything. Drag a point to move it, drag the small handle between two
+  points and it becomes a point, double-tap a point to take it out, and the blue
+  handle on the edge sets the width. **Straighten** puts it back in a box. Length,
+  area, cost, the protection-zone tests, the level check and both printed sheets
+  all read the curve rather than the rectangle around it — a bent trough is
+  checked for level along the whole of itself, not just end to end.
 - Selecting anything on the plan floats a bar over the drawing with its name, **Copy**,
   **Rotate 90°** on rectangles, and **Delete**. The inspector carries the same actions
   from the same definition; the bar exists because the inspector is a scroll away in

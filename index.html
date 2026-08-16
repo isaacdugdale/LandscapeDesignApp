@@ -658,7 +658,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v18';
+const BUILD='v19';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -922,11 +922,49 @@ class Component extends DCLogic {
     this._sc=this._sc||{}; this._sc[key]=h; return h;
   }
   /* ---------- geometry ---------- */
-  corners(it){ if(it.shape==='circ') return null;
+  /* ---------- curved runs ----------
+     A path, a swale, an edge or a berm is almost never a rectangle on the
+     ground; it bends around a tree and follows a contour. An item carrying a
+     pts array is a run: a smooth line through those points, w metres wide,
+     with h ignored. The curve is Catmull-Rom, which passes exactly through
+     every point rather than near it, so a handle ends up where you put it —
+     the thing that makes dragging one feel predictable. Everything else in the
+     app asks geometry through area, centre, samples and corners, so teaching
+     those four about pts is what makes a run behave like any other item. */
+  isRun(it){ return !!(it&&it.pts&&it.pts.length>1); }
+  /* the centreline, sampled */
+  spline(pts,per){ per=per||10;
+    if(pts.length<2) return pts.slice();
+    const P=[pts[0]].concat(pts,[pts[pts.length-1]]), o=[];
+    for(let i=0;i<P.length-3;i++){ const a=P[i],b=P[i+1],c=P[i+2],d=P[i+3];
+      for(let j=0;j<per;j++){ const t=j/per, t2=t*t, t3=t2*t;
+        o.push([0.5*(2*b[0]+(-a[0]+c[0])*t+(2*a[0]-5*b[0]+4*c[0]-d[0])*t2+(-a[0]+3*b[0]-3*c[0]+d[0])*t3),
+                0.5*(2*b[1]+(-a[1]+c[1])*t+(2*a[1]-5*b[1]+4*c[1]-d[1])*t2+(-a[1]+3*b[1]-3*c[1]+d[1])*t3)]); } }
+    o.push(pts[pts.length-1]); return o; }
+  runLen(it){ const s=this.spline(it.pts); let L=0;
+    for(let i=1;i<s.length;i++) L+=Math.hypot(s[i][0]-s[i-1][0],s[i][1]-s[i-1][1]);
+    return L; }
+  /* both edges of the ribbon, from the normal at each sample */
+  runEdges(it){ const s=this.spline(it.pts), hw=it.w/2, L=[], R=[];
+    for(let i=0;i<s.length;i++){ const a=s[Math.max(0,i-1)], b=s[Math.min(s.length-1,i+1)];
+      let dx=b[0]-a[0], dy=b[1]-a[1]; const m=Math.hypot(dx,dy)||1; dx/=m; dy/=m;
+      L.push([s[i][0]-dy*hw, s[i][1]+dx*hw]); R.push([s[i][0]+dy*hw, s[i][1]-dx*hw]); }
+    return {mid:s,left:L,right:R}; }
+  /* the outline as one closed ring, which is both what is drawn and what is
+     tested against the protection zones */
+  runPoly(it){ const e=this.runEdges(it); return e.left.concat(e.right.reverse()); }
+  /* Length is what a run is priced and scheduled by, and a bent one is longer
+     than the box around it. One place to ask, so nothing quotes the other. */
+  linLen(it){ return this.isRun(it)?this.runLen(it):Math.max(it.w,it.h); }
+  corners(it){ if(it.shape==='circ'||this.isRun(it)) return null;
     const cx=it.x+it.w/2, cy=it.y+it.h/2, a=(it.rot||0)*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
     return [[-it.w/2,-it.h/2],[it.w/2,-it.h/2],[it.w/2,it.h/2],[-it.w/2,it.h/2]].map(p=>[cx+p[0]*ca-p[1]*sa,cy+p[0]*sa+p[1]*ca]); }
-  centre(it){ return it.shape==='circ'?[it.x,it.y]:[it.x+it.w/2,it.y+it.h/2]; }
+  centre(it){ if(this.isRun(it)){ const s=this.spline(it.pts); return s[Math.floor(s.length/2)]; }
+    return it.shape==='circ'?[it.x,it.y]:[it.x+it.w/2,it.y+it.h/2]; }
   samples(it,n){ n=n||6; const o=[];
+    if(this.isRun(it)){ const e=this.runEdges(it);
+      for(let i=0;i<e.mid.length;i++){ o.push(e.mid[i]); o.push(e.left[i]); o.push(e.right[i]); }
+      return o; }
     if(it.shape==='circ'){ o.push([it.x,it.y]);
       for(let i=0;i<16;i++){const a=i/16*Math.PI*2;o.push([it.x+it.w*Math.cos(a),it.y+it.w*Math.sin(a)]);} return o; }
     const cs=this.corners(it);
@@ -935,7 +973,7 @@ class Component extends DCLogic {
       const b=[cs[3][0]+(cs[2][0]-cs[3][0])*u,cs[3][1]+(cs[2][1]-cs[3][1])*u];
       o.push([a[0]+(b[0]-a[0])*v,a[1]+(b[1]-a[1])*v]); }
     return o; }
-  area(it){ return it.shape==='circ'?Math.PI*it.w*it.w:it.w*it.h; }
+  area(it){ return this.isRun(it)?this.runLen(it)*it.w:(it.shape==='circ'?Math.PI*it.w*it.w:it.w*it.h); }
   inPoly(p,poly){ let c=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){
     const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];
     if(((yi>p[1])!=(yj>p[1]))&&(p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi))c=!c;} return c; }
@@ -972,7 +1010,7 @@ class Component extends DCLogic {
      a tonne a metre, so where a machine can stand is a question the layout has
      to answer before the stone is ordered. */
   stone(it){ if(!it||it.n!==BLOCK) return null;
-    const L=Math.max(it.w,it.h), b=Math.min(it.w,it.h);
+    const L=this.linLen(it), b=this.isRun(it)?it.w:Math.min(it.w,it.h);
     return {len:L,per:b*BLOCKH*STONET,total:L*b*BLOCKH*STONET}; }
   /* Ground raised behind an edge or over a bed. The app measures cut and fill
      from the fitted surface, which is levelling — it says nothing about material
@@ -987,7 +1025,15 @@ class Component extends DCLogic {
      from the build-up declared on the item rather than from the library. */
   /* Fall from one end of an item's long axis to the other, and across it. What a
      swale is checked on, and what tells you which way a mound should lie. */
-  contourFall(it){ const cs=this.corners(it); if(!cs) return null;
+  contourFall(it){
+    /* A bent trough has to be level along the whole of itself, not just end to
+       end, so the fall that matters is the highest point against the lowest. */
+    if(this.isRun(it)){ const e=this.runEdges(it); let hi=-1e9, lo=1e9;
+      for(const p of e.mid){ const z=this.RL(p[0],p[1]); if(z>hi)hi=z; if(z<lo)lo=z; }
+      const m=Math.floor(e.mid.length/2);
+      return {len:this.runLen(it),fall:hi-lo,
+        across:Math.abs(this.RL(e.left[m][0],e.left[m][1])-this.RL(e.right[m][0],e.right[m][1]))}; }
+    const cs=this.corners(it); if(!cs) return null;
     const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
     const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
     const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
@@ -1110,13 +1156,27 @@ class Component extends DCLogic {
       if(s.armed){ this.push(); const it=this.mkPlant(s.armed,snap(m[0]),snap(m[1]),s.uid);
         if(it){ const items=s.items.concat([it]); this.setState({uid:s.uid+1,armed:ev.shiftKey?s.armed:null});
           this.commit(items,it.u); } return; }
+      /* A point drags. The small one between two points becomes a point where
+         you take hold of it, so bending a run is one gesture rather than a mode
+         you enter first. */
+      const hp=ev.target.closest('.hP,.hA,.hW');
+      if(hp&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel); this.push();
+        if(hp.classList.contains('hW')){
+          this.drag={mode:'wide',it:it,m0:m,o:{w:it.w}};
+        } else {
+          let i=+hp.dataset.i;
+          if(hp.classList.contains('hA')){ const q=it.pts.slice(); q.splice(i,0,[m[0],m[1]]); it.pts=q; }
+          this.drag={mode:'pt',it:it,i:i,m0:m,o:{p:it.pts[i].slice()}};
+        }
+        el.setPointerCapture(ev.pointerId); this.draw(); return; }
       const h=ev.target.closest('.hS,.hT,.hR');
       if(h&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel); this.push();
         this.drag={mode:h.classList.contains('hS')?'size':h.classList.contains('hT')?'rot':'rad',it:it,m0:m,o:{x:it.x,y:it.y,w:it.w,h:it.h,rot:it.rot||0}};
         el.setPointerCapture(ev.pointerId); return; }
       const t=ev.target.closest('.mv');
       if(t){ const it=s.items.find(i=>i.u===+t.dataset.u); this.push();
-        this.drag={mode:'move',it:it,m0:m,o:{x:it.x,y:it.y}}; el.setPointerCapture(ev.pointerId);
+        this.drag={mode:'move',it:it,m0:m,o:{x:it.x,y:it.y,pts:this.isRun(it)?it.pts.map(p=>p.slice()):null}};
+        el.setPointerCapture(ev.pointerId);
         this.setState({sel:it.u},()=>this.draw()); return; }
       const tr=ev.target.closest('.thit');
       if(tr){ this.setState({sel:'tree'+tr.dataset.t},()=>this.draw()); return; }
@@ -1134,7 +1194,12 @@ class Component extends DCLogic {
       if(pts.size||ev.pointerType==='mouse')
         showHud('x '+m[0].toFixed(2)+'  y '+m[1].toFixed(2)+' m · ground '+this.RL(m[0],m[1]).toFixed(2)+' m AHD');
       if(this.drag){ const it=this.drag.it, dx=m[0]-this.drag.m0[0], dy=m[1]-this.drag.m0[1], o=this.drag.o;
-        if(this.drag.mode==='move'){ it.x=snap(o.x+dx); it.y=snap(o.y+dy); }
+        if(this.drag.mode==='pt'){ it.pts[this.drag.i]=[snap(m[0]),snap(m[1])]; }
+        else if(this.drag.mode==='wide'){ const c=this.centre(it);
+          it.w=Math.max(0.2,snap(2*Math.hypot(m[0]-c[0],m[1]-c[1]))); }
+        else if(this.drag.mode==='move'){
+          if(this.isRun(it)&&o.pts) it.pts=o.pts.map(p=>[snap(p[0]+dx),snap(p[1]+dy)]);
+          else { it.x=snap(o.x+dx); it.y=snap(o.y+dy); } }
         else if(this.drag.mode==='rad'){ it.w=Math.max(0.15,snap(Math.hypot(m[0]-it.x,m[1]-it.y))); }
         else if(this.drag.mode==='size'){ it.w=Math.max(0.3,snap(o.w+dx)); it.h=Math.max(0.3,snap(o.h+dy)); }
         else if(this.drag.mode==='rot'){ const c=this.centre(it); it.rot=Math.round((Math.atan2(m[0]-c[0],m[1]-c[1])*180/Math.PI)/5)*5; }
@@ -1150,6 +1215,13 @@ class Component extends DCLogic {
       if(pts.size){ this.pan=null; return; }
       stopDrag(); this.pan=null;
       if(!ev||ev.pointerType!=='mouse') hideHud(); };
+    el.addEventListener('dblclick',ev=>{
+      const hp=ev.target.closest('.hP'); if(!hp) return;
+      const it=this.state.items.find(i=>i.u===this.state.sel);
+      if(!this.isRun(it)||it.pts.length<=2) return;
+      ev.preventDefault(); this.push();
+      const q=it.pts.slice(); q.splice(+hp.dataset.i,1);
+      this.commit(this.state.items.map(i=>i.u===it.u?{...i,pts:q}:i)); });
     el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
     el.addEventListener('pointerleave',ev=>{ if(ev.pointerType==='mouse') hideHud(); });
     /* A trackpad speaks two dialects through the same event. A pinch arrives as
@@ -1201,12 +1273,27 @@ class Component extends DCLogic {
       if(it.t==='plant') s+='<circle cx="'+it.x+'" cy="'+this.fy(it.y)+'" r="0.09" fill="#56633f"/>';
       return s;
     }
+    if(this.isRun(it))
+      return '<path class="mv" data-u="'+it.u+'" d="'+this.polyD(this.runPoly(it))+'" stroke-linejoin="round" '+st+'/>';
     const c=this.centre(it);
     return '<g transform="rotate('+(-(it.rot||0))+' '+c[0]+' '+this.fy(c[1])+')"><rect class="mv" data-u="'+it.u+'" x="'+it.x+'" y="'+this.fy(it.y+it.h)+'" width="'+it.w+'" height="'+it.h+'" rx="'+(it.cat==='soft'?0.3:0.12)+'" '+st+'/></g>';
   }
+  /* a ring of plan points as an svg path, y flipped once, here */
+  polyD(pts){ return pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(3)+' '+this.fy(p[1]).toFixed(3)).join(' ')+'Z'; }
   handles(it){ if(!it) return '';
     const c=this.centre(it);
-    const dot=(x,y,cls,f)=>'<circle class="'+cls+'" cx="'+x+'" cy="'+this.fy(y)+'" r="0.34" fill="'+f+'" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>';
+    const dot=(x,y,cls,f,r,extra)=>'<circle class="'+cls+'" '+(extra||'')+' cx="'+x+'" cy="'+this.fy(y)+'" r="'+(r||0.34)+'" fill="'+f+'" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>';
+    if(this.isRun(it)){
+      /* One handle a point, and a smaller one between each pair that becomes a
+         point the moment you drag it — the same two moves PowerPoint gives you,
+         without a mode to be in. Double-tap a point to take it out again. */
+      let g='';
+      it.pts.forEach((p,i)=>{ g+=dot(p[0],p[1],'hP',COL.tpz,0.34,'data-i="'+i+'"'); });
+      for(let i=0;i<it.pts.length-1;i++){ const a=it.pts[i], b=it.pts[i+1];
+        g+=dot((a[0]+b[0])/2,(a[1]+b[1])/2,'hA','#fff',0.22,'data-i="'+(i+1)+'"'); }
+      const e=this.runEdges(it), m=Math.floor(e.mid.length/2);
+      g+=dot(e.left[m][0],e.left[m][1],'hW',COL.water,0.26);
+      return g; }
     if(it.shape==='circ') return dot(it.x+it.w,it.y,'hR',COL.tpz);
     const cs=this.corners(it), p=cs[2], a=(it.rot||0)*Math.PI/180;
     const rx=c[0]-Math.sin(a)*(it.h/2+0.9), ry=c[1]+Math.cos(a)*(it.h/2+0.9);
@@ -1315,7 +1402,7 @@ class Component extends DCLogic {
     for(const it of this.state.items){ const a=this.area(it);
       if(it.t==='plant'){plants++;cost+=it.cost;byg[it.g]=(byg[it.g]||0)+1;}
       else if(it.unit==='m2'){ if(it.cat==='soft'){soft+=a; if(it.n.indexOf('Mulch')>=0)mulch+=a*0.1;} else pave+=a; cost+=a*it.cost; }
-      else if(it.unit==='lin'){ const L=Math.max(it.w,it.h); lin+=L; cost+=L*it.cost; }
+      else if(it.unit==='lin'){ const L=this.linLen(it); lin+=L; cost+=L*it.cost; }
       else cost+=it.cost;
       /* carted in and heaped up, so it is priced and counted like anything else */
       const bu=this.buildup(it); if(bu){ added+=bu.vol; cost+=bu.vol*BURATE; } }
@@ -1336,7 +1423,7 @@ class Component extends DCLogic {
       /* The grate is the whole design: a long run so partial blockage still
          drains, and clearing it is the one job here that has consequences
          inside the house if it is skipped. */
-      if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' — '+Math.max(it.w,it.h).toFixed(1)+' m of grate to keep clear',
+      if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of grate to keep clear',
         body:'Long channel rather than a single square grate, so a partial blockage still leaves capacity, with a litter sump below the outlet you can reach and a spare pipe laid in the same trench while it is open. Clear it each autumn. In the courtyard it is the one piece of maintenance where skipping a year puts water inside the house.'});
       const bc=this.buildCheck(it,ck);
       if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' — ground raised '+bc.mm+' mm behind it',body:bc.msg});
@@ -1512,9 +1599,10 @@ class Component extends DCLogic {
     } else if(sel){
       const c=this.centre(sel), ck=this.checks(sel);
       selKicker=sel.t==='plant'?'Plant':'Hard element'; selName=sel.n;
-      selRows=[{k:'Size',v:(sel.shape==='circ'?(2*sel.w).toFixed(2)+' m across':sel.w.toFixed(2)+' × '+sel.h.toFixed(2)+' m')+' · '+this.area(sel).toFixed(1)+' m²'},
+      selRows=[{k:'Size',v:(this.isRun(sel)?this.runLen(sel).toFixed(2)+' m long × '+sel.w.toFixed(2)+' m wide, '+sel.pts.length+' points'
+          :(sel.shape==='circ'?(2*sel.w).toFixed(2)+' m across':sel.w.toFixed(2)+' × '+sel.h.toFixed(2)+' m'))+' · '+this.area(sel).toFixed(1)+' m²'},
         {k:'Ground level',v:this.RL(c[0],c[1]).toFixed(2)+' m AHD'},
-        {k:'From the reserve',v:(sel.x-(sel.shape==='circ'?sel.w:0)).toFixed(1)+' m'}];
+        {k:'From the reserve',v:(this.isRun(sel)?Math.min.apply(null,sel.pts.map(p=>p[0]))-sel.w/2:sel.x-(sel.shape==='circ'?sel.w:0)).toFixed(1)+' m'}];
       if(sel.t==='plant'){ const p=this.PL[sel.pn]||{w:sel.w*2,h:sel.ht};
         selRows.push({k:'Mature size',v:p.w+' m wide, '+p.h+' m tall'+(sel.tender?' · frost tender':'')}); }
       else if(sel.cat==='dig'||sel.cat==='pave'){ const cf=this.cutfill(sel);
@@ -1535,8 +1623,29 @@ class Component extends DCLogic {
           +';font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;white-space:nowrap;color:'
           +(danger?'var(--color-accent-700)':'var(--color-neutral-700)')});
       selActions=[
-        act('Copy',()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);})];
-      if(sel.shape!=='circ') selActions.push(act('Rotate 90°',()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}));
+        act('Copy',()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;
+          if(n.pts) n.pts=n.pts.map(q=>[q[0]+1,q[1]-1]);
+          this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);})];
+      /* Straight is where a run starts, because that is what you can place with
+         one drag. Curve it seeds three points down its long axis — ends and a
+         middle — and from then on it is handles. Straighten drops back to the
+         box that contains it, so nothing is one-way. */
+      if(sel.t!=='plant'&&sel.shape!=='circ'){
+        if(!this.isRun(sel)) selActions.push(act('Curve it',()=>{ this.push();
+          const c=this.centre(sel), a=(sel.rot||0)*Math.PI/180, L=Math.max(sel.w,sel.h)/2;
+          const ux=(sel.h>=sel.w?-Math.sin(a):Math.cos(a)), uy=(sel.h>=sel.w?Math.cos(a):Math.sin(a));
+          const pts=[[c[0]-ux*L,c[1]-uy*L],[c[0],c[1]],[c[0]+ux*L,c[1]+uy*L]].map(p=>[Math.round(p[0]/SNAP)*SNAP,Math.round(p[1]/SNAP)*SNAP]);
+          this.commit(s.items.map(i=>i.u===sel.u?{...i,pts:pts,w:Math.min(sel.w,sel.h),rot:0}:i),sel.u); }));
+        else selActions.push(act('Straighten',()=>{ this.push();
+          const xs=sel.pts.map(p=>p[0]), ys=sel.pts.map(p=>p[1]);
+          const x0=Math.min.apply(null,xs), x1=Math.max.apply(null,xs);
+          const y0=Math.min.apply(null,ys), y1=Math.max.apply(null,ys);
+          const n={...sel}; delete n.pts;
+          n.x=x0-(x1-x0<sel.w?sel.w/2:0); n.y=y0-(y1-y0<sel.w?sel.w/2:0);
+          n.w=Math.max(sel.w,x1-x0); n.h=Math.max(sel.w,y1-y0);
+          this.commit(s.items.map(i=>i.u===sel.u?n:i),sel.u); }));
+      }
+      if(sel.shape!=='circ'&&!this.isRun(sel)) selActions.push(act('Rotate 90°',()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}));
       selActions.push(act('Delete',()=>{this.push();this.commit(s.items.filter(i=>i.u!==sel.u),null);},true));
     }
     /* Cut and fill are computed; this one has to be told, so it is the only

@@ -44,6 +44,11 @@ Row shapes, which are positional and easy to shift by one:
 | `items`, `START` | `[name, x, y, w, h, rot, buildUpMm, buildUpMaterial]` |
 | `plants`, `STARTP` | `[plant id or exact name, x, y]` |
 
+An item may also carry `pts` — an array of `[x, y]` — which makes it a curved
+run: a smooth line through those points, `w` metres wide, with `x`, `y`, `h` and
+`rot` ignored. Ask geometry through `area`, `centre`, `samples`, `corners` and
+`linLen`, which all know about it; never read `w`/`h` directly to get a length.
+
 `rot` is the one that gets dropped. Leave it as `0` rather than omitting it, or
 the build-up depth is read as a rotation and the cost and volume come out `NaN`.
 Circles (`Planting mound`, plants) take a radius in `w` and `0` in `h`.
