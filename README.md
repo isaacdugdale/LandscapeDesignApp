@@ -114,6 +114,12 @@ there and every screen follows.
   device had alone. This is also why the base plan, `START`, has to carry anything
   meant to be in **New from base plan**: a new scheme is built from that, not from
   the named schemes. `CLAUDE.md` has the full recipe.
+- **Notes** under the plan are per-scheme, saved with it and carried into the Ask
+  brief, so a scheme arrives explaining itself. **Schemes → Push to gist** sends the
+  same JSON the backup writes to a private GitHub gist, using a fine-grained token
+  with gist write scope that you paste once and that stays in the browser's local
+  storage. It is the only thing in the app that talks to the internet and it only
+  does so on that tap; revoke the token on GitHub and everything else still works.
 - Schemes are per-device: they live in that browser's local storage. **Schemes → Back
   up** writes them to a JSON file through the share sheet and **Restore** reads one
   back, which is how a scheme reaches a second device. Restoring only adds; an

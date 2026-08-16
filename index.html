@@ -363,11 +363,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
           <div onClick="{{ goIssues }}" style="flex:1 1 232px;min-width:0;align-self:flex-start;border-radius:18px;background:var(--color-accent-100);padding:12px 13px;cursor:pointer" style-hover="background:var(--color-accent-200)">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
-                <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-accent-700)">What's wrong with this plan</div>
+                <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-accent-700)">Checks</div>
                 <div style="font-size:13px;color:var(--color-neutral-700);margin-top:4px">{{ issueSummary }}</div>
               </div>
               <div style="font-family:'Caprasimo';font-size:26px;color:var(--color-accent-700)">{{ issueCount }}</div>
             </div>
+          </div>
+
+          <div style="flex:1 1 272px;min-width:0;align-self:flex-start;border-radius:18px;background:var(--color-neutral-100);padding:12px 13px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600)">Notes</div>
+              <div style="font-size:11.5px;color:var(--color-neutral-600)">{{ schemeName }}</div>
+            </div>
+            <textarea value="{{ notes }}" onInput="{{ onNotes }}" placeholder="{{ notesHint }}" style="width:100%;min-height:132px;font:inherit;font-size:12.5px;line-height:1.5;padding:10px 12px;border-radius:14px;border:1.5px solid var(--color-neutral-300);background:#fff;color:var(--color-text);outline:none;resize:vertical"></textarea>
+            <div style="font-size:11.5px;color:var(--color-neutral-600);margin-top:6px">Kept with this scheme, and carried into the brief the Ask screen hands to Claude.</div>
           </div>
         </div>
         </div>
@@ -620,7 +629,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
           </sc-for>
         </div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--color-divider)">
-          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45">Schemes are kept on this iPad only. Back them up to a file to move them to another device, or to keep them if this app is removed.</div>
+          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45">Schemes are kept on this iPad only. Push them to a private gist to read them from anywhere, or back them up to a file to move them to another device.</div>
+          <div onClick="{{ pushGist }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">{{ gistLabel }}</div>
           <div onClick="{{ backup }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Back up</div>
           <div onClick="{{ restore }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Restore</div>
         </div>
@@ -717,7 +727,7 @@ class Component extends DCLogic {
     layers:{contour:true,grid:false,bld:true,tpz:true,srz:true,canopy:true,drain:true,labels:true},
     layersOpen:false,palTab:'plants',q:'',filt:{must:false,edible:false,local:false,hardy:false},armed:null,
     schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',refSec:{},expand:false,
-    issueFilter:'all',sunCache:{}};
+    issueFilter:'all',sunCache:{},notes:''};
 
   componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz); this.wait(); }
   componentWillUnmount(){ window.removeEventListener('resize',this._rz); }
@@ -792,7 +802,7 @@ class Component extends DCLogic {
       if(all.seeded.indexOf(sc.id)>=0) return;
       all.seeded.push(sc.id);
       const b=this.baseItems(sc);
-      all.schemes[sc.id]={name:sc.name,items:b.items,uid:b.uid,updated:Date.now()};
+      all.schemes[sc.id]={name:sc.name,items:b.items,uid:b.uid,notes:sc.notes||'',updated:Date.now()};
       if(!index.some(x=>x.id===sc.id)){ index=index.concat([{id:sc.id,name:sc.name,created:Date.now()}]); added=true; }
     });
     all.index=index;
@@ -1012,7 +1022,7 @@ class Component extends DCLogic {
   persist(){ try{
     const s=this.state, all=JSON.parse(localStorage.getItem(this.key())||'{}');
     all.schemes=all.schemes||{};
-    all.schemes[s.schemeId]={name:(s.schemes.find(x=>x.id===s.schemeId)||{}).name,items:s.items,uid:s.uid,updated:Date.now()};
+    all.schemes[s.schemeId]={name:(s.schemes.find(x=>x.id===s.schemeId)||{}).name,items:s.items,uid:s.uid,notes:s.notes||'',updated:Date.now()};
     all.index=s.schemes; all.activeId=s.schemeId; all.todos=s.todos;
     localStorage.setItem(this.key(),JSON.stringify(all));
     this.setState({savedAt:Date.now()});
@@ -1021,7 +1031,7 @@ class Component extends DCLogic {
     const all=JSON.parse(localStorage.getItem(this.key())||'null');
     if(!all||!all.index||!all.activeId) return null;
     const cur=all.schemes[all.activeId]; if(!cur||!cur.items) return null;
-    return {items:cur.items,uid:cur.uid||cur.items.length+1,schemes:all.index,schemeId:all.activeId,todos:all.todos||[],
+    return {items:cur.items,uid:cur.uid||cur.items.length+1,schemes:all.index,schemeId:all.activeId,todos:all.todos||[],notes:cur.notes||'',
       chat:[{who:'app',text:'Ask anything about the block, the rules or your layout. I read the survey, the tree plan, the geotechnical classification and whatever is on the plan right now.'}]};
   }catch(e){ return null; } }
   push(){ this.hist=this.hist||[]; this.hist.push(JSON.stringify(this.state.items)); if(this.hist.length>50)this.hist.shift(); }
@@ -1322,6 +1332,7 @@ class Component extends DCLogic {
     'Budget about $10,000 over 6-12 months, staged, her own labour, hand-dug. A contractor does the stormwater.',
     'Decisions made: keep the pear; no pond (snakes); the area off the house is paved with an outdoor kitchen, not a deck; lawn beats vegetables (toddler); vegetables become planters on the paving; natives only from here; front garden gets mounds and two fruit trees only, quince and pomegranate; the courtyard maple is gone; the driveway takes the sunniest front ground so nothing goes there.',
     'Water shaping: swales are level troughs on the contour with a mound on the downhill side, running across the block because the fall is 1 in 19 along it and 1 in 132 across it. Almost nothing here can be dug \u2014 inside a protection zone the trough is formed by raising its shoulders in 100 mm of coarse woodchip, and only the rear pocket is clear enough for soil. Gravel paths are part of the same system: laid level on 150 mm of aggregate they hold about 50 litres a square metre. Anything that puts water into the ground stays 3 m clear of a wall.',
+    'NOTES ON THIS SCHEME: '+((this.state.notes||'').trim()||'none written.'),
     'CURRENT LAYOUT: '+items,
     'CURRENT TOTAL: $'+Math.round(q.cost).toLocaleString()+' of $10,000. '+q.plants+' plants, '+q.pave.toFixed(0)+' m2 paving, '+q.soft.toFixed(0)+' m2 soft surface, '+q.mulch.toFixed(1)+' m3 mulch at 100 mm.',
     'WATER HELD BY THE SHAPING AS DRAWN: '+w.held.toFixed(1)+' m3 into dry ground, of which '+w.eng.toFixed(1)+' m3 is troughs and gravel that keep working once the mulch is wet. The 5 minute 1 in 10 year storm puts '+w.storm.toFixed(1)+' m3 on the block, so '+Math.round(w.share*100)+'% of it never reaches a pipe.',
@@ -1377,7 +1388,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},waterRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        notes:'',notesHint:'',onNotes:()=>{},pushGist:()=>{},gistLabel:'',canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},waterRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1591,6 +1602,9 @@ class Component extends DCLogic {
       savedLabel:s.savedAt?'Saved '+new Date(s.savedAt).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}):'Saving as you work',
       openSchemes:()=>this.setState({sheetOpen:true}), closeSheet:()=>this.setState({sheetOpen:false}),
       stop:ev=>{if(ev&&ev.stopPropagation)ev.stopPropagation();}, sheetOpen:s.sheetOpen, schemeList:schemeList,
+      notes:s.notes||'', notesHint:'What this scheme is for, what you changed, what to decide next.',
+      onNotes:ev=>{ const v=ev&&ev.target?ev.target.value:''; this.setState({notes:v},()=>{ clearTimeout(this._nt); this._nt=setTimeout(()=>this.persist(),600); }); },
+      pushGist:()=>this.pushGist(), gistLabel:(this.gistCfg().id?'Push to gist':'Set up gist'),
       newScheme:()=>this.newScheme(),
       backup:()=>this.backup(), restore:()=>this.restore(),
       undo:()=>{ if(!this.hist||!this.hist.length) return; const items=JSON.parse(this.hist.pop()); this.commit(items,null); },
@@ -1678,18 +1692,19 @@ class Component extends DCLogic {
   switchScheme(id){ if(id===this.state.schemeId){ this.setState({sheetOpen:false}); return; }
     this.persist();
     try{ const all=JSON.parse(localStorage.getItem(this.key())||'{}'); const sc=(all.schemes||{})[id];
-      if(sc&&sc.items){ this.setState({schemeId:id,items:sc.items,uid:sc.uid||sc.items.length+1,sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); return; } }catch(e){}
-    const b=this.seedScheme(id)||this.baseItems(); this.setState({schemeId:id,items:b.items,uid:b.uid,sel:null,sheetOpen:false},()=>{this.draw();this.persist();});
+      if(sc&&sc.items){ this.setState({schemeId:id,items:sc.items,uid:sc.uid||sc.items.length+1,notes:sc.notes||'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); return; } }catch(e){}
+    const d=(this.D.SCHEMES||[]).find(x=>x.id===id);
+    const b=this.seedScheme(id)||this.baseItems(); this.setState({schemeId:id,items:b.items,uid:b.uid,notes:(d&&d.notes)||'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();});
   }
   newScheme(){ const id='s'+Date.now(), b=this.baseItems();
     this.persist();
     this.setState({schemes:this.state.schemes.concat([{id:id,name:'Scheme '+(this.state.schemes.length+1),created:Date.now()}]),
-      schemeId:id,items:b.items,uid:b.uid,sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
+      schemeId:id,items:b.items,uid:b.uid,notes:'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
   dupScheme(id){ const src=this.state.schemeId===id?this.state.items:(()=>{try{return (JSON.parse(localStorage.getItem(this.key())||'{}').schemes||{})[id].items;}catch(e){return this.state.items;}})();
     const nid='s'+Date.now(), name=(this.state.schemes.find(x=>x.id===id)||{name:'Scheme'}).name+' copy';
     this.persist();
     this.setState({schemes:this.state.schemes.concat([{id:nid,name:name,created:Date.now()}]),schemeId:nid,
-      items:JSON.parse(JSON.stringify(src)),sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
+      items:JSON.parse(JSON.stringify(src)),notes:this.state.notes||'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
   delScheme(id){ const rest=this.state.schemes.filter(x=>x.id!==id); if(!rest.length) return;
     if(id===this.state.schemeId){ this.setState({schemes:rest},()=>this.switchScheme(rest[0].id)); }
     else this.setState({schemes:rest},()=>this.persist()); }
@@ -1704,6 +1719,42 @@ class Component extends DCLogic {
     const all=JSON.parse(localStorage.getItem(this.key())||'{}');
     return JSON.stringify({app:'234-duffy-studio',version:1,exported:Date.now(),
       index:all.index||this.state.schemes,schemes:all.schemes||{},todos:all.todos||[]},null,1); }
+  /* ---------- push to a gist ----------
+     The backup file, kept in a private gist so it can be read from a laptop or
+     handed to Claude without AirDropping anything. A fine-grained token with
+     gist write scope is pasted once and stays in this browser's local storage
+     next to the schemes themselves; it never leaves the device except to
+     api.github.com. This is the one place the app talks to the internet, and it
+     only does so when this button is pressed. Revoke the token on GitHub to
+     turn it off, and the app keeps working exactly as before. */
+  gistCfg(){ try{ return JSON.parse(localStorage.getItem('duffy-gist')||'{}'); }catch(e){ return {}; } }
+  saveGistCfg(c){ try{ localStorage.setItem('duffy-gist',JSON.stringify(c)); }catch(e){} }
+  async pushGist(){
+    const cfg=this.gistCfg();
+    if(!cfg.token){
+      const t=window.prompt('Paste a GitHub token with gist write access.\n\nMake one at github.com/settings/tokens — fine-grained, no repository access, Account permissions → Gists: read and write. It is kept on this device only.');
+      if(!t||!t.trim()) return; cfg.token=t.trim(); this.saveGistCfg(cfg);
+    }
+    this.toast('Pushing…');
+    const body={description:'234 Duffy schemes — '+this.stamp(),public:false,
+      files:{'234-duffy-schemes.json':{content:this.backupData()}}};
+    const url=cfg.id?'https://api.github.com/gists/'+cfg.id:'https://api.github.com/gists';
+    try{
+      const r=await fetch(url,{method:cfg.id?'PATCH':'POST',
+        headers:{'Authorization':'Bearer '+cfg.token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+        body:JSON.stringify(body)});
+      if(r.status===401||r.status===403){ delete cfg.token; this.saveGistCfg(cfg);
+        this.toast('GitHub rejected the token. Tap again to paste a new one.'); return; }
+      if(r.status===404&&cfg.id){ delete cfg.id; this.saveGistCfg(cfg);
+        this.toast('That gist is gone. Tap again to make a new one.'); return; }
+      if(!r.ok){ this.toast('GitHub said '+r.status+'. Nothing was sent.'); return; }
+      const j=await r.json();
+      cfg.id=j.id; cfg.url=j.html_url; cfg.at=Date.now(); this.saveGistCfg(cfg);
+      try{ await navigator.clipboard.writeText(j.html_url); }catch(e){}
+      this.setState({},()=>{});
+      this.toast('Pushed. Link copied: '+j.html_url);
+    }catch(e){ this.toast('Could not reach GitHub. Check the signal and try again.'); }
+  }
   async backup(){
     const name='234-duffy-schemes-'+this.stamp()+'.json', text=this.backupData();
     /* The share sheet is the only route to Files or AirDrop from a home-screen

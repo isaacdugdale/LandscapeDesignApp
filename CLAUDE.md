@@ -49,6 +49,14 @@ the build-up depth is read as a rotation and the cost and volume come out `NaN`.
 Circles (`Planting mound`, plants) take a radius in `w` and `0` in `h`.
 Plant ids are neither unique nor always filled in, so prefer the exact name.
 
+## Notes on a scheme
+
+Every scheme carries a `notes` string, shown in the Notes card under the plan and
+carried into the brief the Ask screen builds. When you ship a scheme, write its
+notes: what it is for, what you changed and why, and what is left to decide. The
+owner writes in the same box, so keep to plain sentences and do not treat it as
+yours alone.
+
 ## Before you say it is done
 
 - Bump `CACHE` in `sw.js` for any change to a served file, or devices keep the
