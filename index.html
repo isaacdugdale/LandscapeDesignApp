@@ -1727,6 +1727,21 @@ class Component extends DCLogic {
      api.github.com. This is the one place the app talks to the internet, and it
      only does so when this button is pressed. Revoke the token on GitHub to
      turn it off, and the app keeps working exactly as before. */
+  /* One file per scheme rather than one file for everything. A single 200 kB
+     blob is rendered truncated by GitHub and the newest scheme is at the end of
+     it, which is the one worth reading; split up, each file is a few kB and can
+     be opened, diffed or quoted on its own. index.json carries the list. */
+  gistFiles(){ this.persist();
+    const all=JSON.parse(localStorage.getItem(this.key())||'{}');
+    const index=all.index||this.state.schemes||[], schemes=all.schemes||{}, files={}, used={};
+    files['index.json']={content:JSON.stringify({app:'234-duffy-studio',version:2,
+      exported:Date.now(),index:index,todos:all.todos||[]},null,1)};
+    index.forEach(s=>{ const sc=schemes[s.id]; if(!sc||!sc.items) return;
+      let base=String(s.name||s.id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,44)||String(s.id);
+      if(used[base]) base+='-'+s.id; used[base]=1;
+      files[base+'.json']={content:JSON.stringify({id:s.id,name:s.name,updated:sc.updated||null,
+        uid:sc.uid||null,notes:sc.notes||'',items:sc.items},null,1)}; });
+    return files; }
   gistCfg(){ try{ return JSON.parse(localStorage.getItem('duffy-gist')||'{}'); }catch(e){ return {}; } }
   saveGistCfg(c){ try{ localStorage.setItem('duffy-gist',JSON.stringify(c)); }catch(e){} }
   async pushGist(){
@@ -1736,8 +1751,10 @@ class Component extends DCLogic {
       if(!t||!t.trim()) return; cfg.token=t.trim(); this.saveGistCfg(cfg);
     }
     this.toast('Pushing…');
-    const body={description:'234 Duffy schemes — '+this.stamp(),public:false,
-      files:{'234-duffy-schemes.json':{content:this.backupData()}}};
+    const files=this.gistFiles();
+    /* a scheme deleted here is deleted there: a null file is how the API removes one */
+    (cfg.files||[]).forEach(f=>{ if(!files[f]) files[f]=null; });
+    const body={description:'234 Duffy schemes — '+this.stamp(),public:false,files:files};
     const url=cfg.id?'https://api.github.com/gists/'+cfg.id:'https://api.github.com/gists';
     try{
       const r=await fetch(url,{method:cfg.id?'PATCH':'POST',
@@ -1749,7 +1766,8 @@ class Component extends DCLogic {
         this.toast('That gist is gone. Tap again to make a new one.'); return; }
       if(!r.ok){ this.toast('GitHub said '+r.status+'. Nothing was sent.'); return; }
       const j=await r.json();
-      cfg.id=j.id; cfg.url=j.html_url; cfg.at=Date.now(); this.saveGistCfg(cfg);
+      cfg.id=j.id; cfg.url=j.html_url; cfg.at=Date.now();
+      cfg.files=Object.keys(files).filter(f=>files[f]); this.saveGistCfg(cfg);
       try{ await navigator.clipboard.writeText(j.html_url); }catch(e){}
       this.setState({},()=>{});
       this.toast('Pushed. Link copied: '+j.html_url);

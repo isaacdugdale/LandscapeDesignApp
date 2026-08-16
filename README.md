@@ -116,7 +116,9 @@ there and every screen follows.
   the named schemes. `CLAUDE.md` has the full recipe.
 - **Notes** under the plan are per-scheme, saved with it and carried into the Ask
   brief, so a scheme arrives explaining itself. **Schemes → Push to gist** sends the
-  same JSON the backup writes to a private GitHub gist, using a fine-grained token
+  schemes to a private GitHub gist as one small file each plus an `index.json`,
+  which the file backup does not do — a single blob is rendered truncated and the
+  newest scheme is the part that gets cut. It uses a fine-grained token
   with gist write scope that you paste once and that stays in the browser's local
   storage. It is the only thing in the app that talks to the internet and it only
   does so on that tap; revoke the token on GitHub and everything else still works.
