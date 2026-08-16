@@ -630,10 +630,15 @@ const PLANTCOL={tree:'#728157',shrub:'#8fa073',groundcover:'#ccdbb2',grass:'#aeb
 const HARDCOL={
   'Paving / terrace':['#e4dccb','#a19786'],'Outdoor kitchen':['#d8c3a4','#8c491a'],'Gravel path':['#eee7db','#c0b6a5'],
   'Sunken firepit':['#f6a06b','#8c491a'],'Firepit terrace':['#e4dccb','#a19786'],'Seat / retaining wall':['#c0b6a5','#645c50'],
+  'Sandstone block edge':['#ebddc5','#645c50'],
   'Raised veg bed':['#ccdbb2','#56633f'],'Shed':['#dcd3c4','#645c50'],'Water tank':['#cfd9d3','#33646b'],
   'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Planting mound':['#dcc9a8','#8c491a'],
   'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50']
 };
+/* A single course of rough-sawn block, and sandstone runs about 2.3 tonnes the
+   cubic metre. The two numbers live here once so the Checks screen and the
+   inspector cannot quote different weights. */
+const BLOCK='Sandstone block edge', BLOCKH=0.45, STONET=2.3;
 const GROW={groundcover:3,grass:3,veggie:1,shrub:6,other:6,tree:12};
 /* her plant list came out of a spreadsheet, so names arrive half-cased and one is a pasted link */
 function DISP(n){ if(!n) return n;
@@ -801,6 +806,12 @@ class Component extends DCLogic {
     for(const p of pts){ const d=this.RL(p[0],p[1])-target; if(d>0){cut+=d;if(d>mx)mx=d;} else {fill-=d;if(-d>mn)mn=-d;} }
     const n=pts.length, a=this.area(it);
     return {cutV:cut/n*a,fillV:fill/n*a,maxCut:mx,maxFill:mn}; }
+  /* Everything else in the library she can carry. A block bench she cannot: half
+     a tonne a metre, so where a machine can stand is a question the layout has
+     to answer before the stone is ordered. */
+  stone(it){ if(!it||it.n!==BLOCK) return null;
+    const L=Math.max(it.w,it.h), b=Math.min(it.w,it.h);
+    return {len:L,per:b*BLOCKH*STONET,total:L*b*BLOCKH*STONET}; }
   growR(it,years){ if(it.t!=='plant') return it.w;
     const t=GROW[it.g]||6, f=Math.max(0.18,Math.min(1,0.18+0.82*Math.pow(Math.min(1,years/t),0.7)));
     return it.w*f; }
@@ -1056,6 +1067,12 @@ class Component extends DCLogic {
           body:'Levelling it needs '+(cf.maxCut*1000).toFixed(0)+' mm of cut and '+(cf.maxFill*1000).toFixed(0)+' mm of fill. Over the 500 mm cut or 400 mm fill limit, which triggers a site reclassification.'}); }
       if(it.t==='plant'&&it.tender) out.push({sev:'care',u:it.u,title:it.n,body:'Frost tender in Canberra. It will need a warm wall, a pot that can move, or replacing with something hardy.'});
       if(it.t==='plant'&&ck.out) out.push({sev:'care',u:it.u,title:it.n+' overhangs the boundary',body:'Its mature canopy crosses the line. Fine if you are happy to prune it, worth knowing before it is in the ground.'});
+      const stone=this.stone(it);
+      if(stone){ const zoned=ck.srz.size||ck.tpz.size;
+        out.push({sev:zoned?'care':'note',u:it.u,title:it.n+' weighs about '+stone.total.toFixed(1)+' tonnes',
+          body:'One course '+(Math.min(it.w,it.h)*1000).toFixed(0)+' mm deep is roughly '+stone.per.toFixed(1)+' t a metre, so none of it is hand work: the blocks come off a crane truck or are set with an excavator, and the only way in is the crossover and driveway at the street end.'
+            +(zoned?' This run sits inside a protection zone, where neither may track. Either the arm reaches it from ground outside the zone, or the run moves clear — settle that with the arborist before the stone is ordered.'
+                   :' Check the machine can reach the line without tracking over a protection zone to get there.')}); }
       if(it.n==='Sunken firepit'){ const d=it.x-it.w;
         if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
           body:'The ACT rule is three metres of clearance on the reserve side. Moving it about '+Math.max(0.5,3-d).toFixed(1)+' m toward the street fixes that, but pushes it toward the gum\u2019s protection zone.'}); }
@@ -1211,6 +1228,8 @@ class Component extends DCLogic {
       else if(sel.cat==='dig'||sel.cat==='pave'){ const cf=this.cutfill(sel);
         selRows.push({k:'Cut to level it',v:cf.cutV.toFixed(1)+' m³, max '+(cf.maxCut*1000).toFixed(0)+' mm'});
         selRows.push({k:'Fill to level it',v:cf.fillV.toFixed(1)+' m³, max '+(cf.maxFill*1000).toFixed(0)+' mm'}); }
+      const selStone=this.stone(sel);
+      if(selStone) selRows.push({k:'Stone to place',v:selStone.total.toFixed(1)+' t · '+selStone.per.toFixed(1)+' t a metre'});
       const hrs=[355,264,172].map(d=>this.sunHours(c[0],c[1],d,sel.t==='plant'?Math.min(1.5,sel.ht/2):0.9));
       selSun=[{h:hrs[0].toFixed(1)+' h',label:'21 Dec',col:'var(--color-accent-700)'},{h:hrs[1].toFixed(1)+' h',label:'21 Sep',col:'var(--color-accent-700)'},{h:hrs[2].toFixed(1)+' h',label:'21 Jun',col:'var(--color-neutral-700)'}];
       selVerdict=ck.msg;
