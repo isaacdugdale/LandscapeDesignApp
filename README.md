@@ -6,12 +6,22 @@ in the browser on the device.
 
 ## Publishing it
 
-GitHub Pages: **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**.
-After a minute the app is at `https://isaacdugdale.github.io/LandscapeDesignApp/`.
-On the iPad open that URL in Safari, then **Share → Add to Home Screen**.
+The live site is `https://isaacdugdale.github.io/LandscapeDesignApp/`. On the iPad
+open that URL in Safari, then **Share → Add to Home Screen**.
+
+**Pages serves the `claude/app-ipad-setup-3fqmbp` branch, not `main`.** Check the
+current source under **Settings → Pages** before believing this paragraph — the
+branch it names is the only thing that publishes, and pushing to any other branch
+changes nothing on the iPad however green the push looks. Confirm a publish by the
+`pages build and deployment` run for your commit's SHA under **Actions**, not by
+the push succeeding. To move the source to `main`, set it under Settings → Pages
+and update this paragraph in the same change, so the two cannot drift apart again.
 
 The app files must sit at the repository root — `index.html` next to `README.md` —
 because Pages only serves from `/` or `/docs`.
+
+`sw.js` caches the app, so a published change also needs `CACHE` bumped there or
+devices keep serving the old copy from disk. See the last note in this file.
 
 ## Files
 
