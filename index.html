@@ -652,8 +652,17 @@ const HARDCOL={
   'Sandstone block edge':['#ebddc5','#645c50'],
   'Raised veg bed':['#ccdbb2','#56633f'],'Shed':['#dcd3c4','#645c50'],'Water tank':['#cfd9d3','#33646b'],
   'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Planting mound':['#dcc9a8','#8c491a'],
-  'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50']
+  'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50'],
+  'Channel drain':['#b9ccd1','#33646b']
 };
+/* Soakage and a piped channel are opposite answers to the same problem, and the
+   library only had the first, so the courtyard drain was drawn as a soak pit —
+   the one thing the handbook rules out there. These name which elements infiltrate
+   and how close to a wall that stops being allowed. The geotechnical report and
+   the CSIRO guidance warn against soaking water into reactive clay a metre or two
+   from footings; 3 m is the margin, on a Class P site whose movement figure is
+   already spoken for. */
+const SOAKAGE={'Soak pit':1}, SOAKMIN=3, DRAIN='Channel drain';
 /* A single course of rough-sawn block, and sandstone runs about 2.3 tonnes the
    cubic metre. The two numbers live here once so the Checks screen and the
    inspector cannot quote different weights. */
@@ -866,6 +875,27 @@ class Component extends DCLogic {
      knows whether the ground behind a wall is being made up or left alone. */
   buildup(it){ const mm=(it&&it.t!=='plant'&&it.bu)||0; if(!mm) return null;
     return {mm:mm,mat:it.bum==='soil'?'soil':'chip',vol:this.area(it)*mm/1000}; }
+  /* Nearest wall to anything on the plan, measured from the item's own footprint
+     rather than its centre, so a long channel laid along a wall reads as touching
+     it. Buildings are axis-aligned boxes; the item may be rotated, so it is
+     sampled the same way the protection-zone test samples it. */
+  nearBuilding(it){ let best=null;
+    for(const p of this.samples(it,4)) for(const b of this.BLDR){
+      const dx=Math.max(b[1]-p[0],0,p[0]-b[3]), dy=Math.max(b[2]-p[1],0,p[1]-b[4]);
+      const d=Math.hypot(dx,dy);
+      if(!best||d<best.d) best={d:d,n:b[0]};
+    }
+    return best; }
+  /* Where the ground is free-draining sand a soak pit is the right answer, which
+     is why one is recommended beside the firepit. Beside the house it is reactive
+     clay and the wrong answer, and nothing in the layout says which is which
+     except how far from a wall it sits. */
+  soakCheck(it){
+    if(!it||!SOAKAGE[it.n]) return null;
+    const b=this.nearBuilding(it); if(!b||b.d>=SOAKMIN) return null;
+    return {lvl:'r',d:b.d,n:b.n,
+      msg:'Infiltrating water '+(b.d<0.05?'hard against':b.d.toFixed(1)+' m from')+' the '+b.n
+        +'. The geotechnical report and the CSIRO guidance both warn against soaking water into reactive clay this close to footings, and the Class P movement figure is already spoken for. Within '+SOAKMIN+' m of a wall it has to be piped — a '+DRAIN+' to a sleeve, not a pit. Soakage belongs out in the free-draining sand of the back garden.'}; }
   /* Clause 6.6.2–6.6.4 permits building up inside a protection zone where it
      forbids digging, but the bund spec fixes the terms: 100 mm of added material
      maximum, coarse woodchip rather than soil, because soil over a root plate
@@ -1142,6 +1172,13 @@ class Component extends DCLogic {
           body:'Levelling it needs '+(cf.maxCut*1000).toFixed(0)+' mm of cut and '+(cf.maxFill*1000).toFixed(0)+' mm of fill. Over the 500 mm cut or 400 mm fill limit, which triggers a site reclassification.'}); }
       if(it.t==='plant'&&it.tender) out.push({sev:'care',u:it.u,title:it.n,body:'Frost tender in Canberra. It will need a warm wall, a pot that can move, or replacing with something hardy.'});
       if(it.t==='plant'&&ck.out) out.push({sev:'care',u:it.u,title:it.n+' overhangs the boundary',body:'Its mature canopy crosses the line. Fine if you are happy to prune it, worth knowing before it is in the ground.'});
+      const sk=this.soakCheck(it);
+      if(sk) out.push({sev:'stop',u:it.u,title:it.n+' is '+(sk.d<0.05?'against':sk.d.toFixed(1)+' m from')+' the '+sk.n,body:sk.msg});
+      /* The grate is the whole design: a long run so partial blockage still
+         drains, and clearing it is the one job here that has consequences
+         inside the house if it is skipped. */
+      if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' — '+Math.max(it.w,it.h).toFixed(1)+' m of grate to keep clear',
+        body:'Long channel rather than a single square grate, so a partial blockage still leaves capacity, with a litter sump below the outlet you can reach and a spare pipe laid in the same trench while it is open. Clear it each autumn. In the courtyard it is the one piece of maintenance where skipping a year puts water inside the house.'});
       const bc=this.buildCheck(it,ck);
       if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' — ground raised '+bc.mm+' mm behind it',body:bc.msg});
       const stone=this.stone(it);
