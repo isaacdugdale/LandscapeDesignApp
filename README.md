@@ -54,10 +54,15 @@ there and every screen follows.
   register. Content is `handbook.js`, written as blocks (`p`, `h`, `note`, `ul`, `kv`,
   `tbl`); the screen that renders them is generic, so adding a section means adding data,
   not markup. Where a figure is also computed by the app, the app is what to trust.
-- Everything is southern hemisphere: 21 December is summer and 21 June is winter, the sun
-  sits due north at midday, and the deciduous canopies are modelled bare from 1 June to
-  mid-September. The one rough edge is that the September equinox falls a few days after
-  the leaves go back on, so the equinox column reads low under the pear and liquidambar.
+- Everything is southern hemisphere: 21 December is summer and 21 June is winter, and the
+  sun sits due north at midday. The four deciduous trees each carry their own leaf window,
+  set by what the tree is in this climate — the ornamental pear breaks bud in late August
+  and holds on into May, the ash a month behind it at both ends, the two street trees
+  earlier to drop and later to fill out. The windows live in `LEAF` in `site-data.js` as
+  four dates a piece, and the model ramps between them rather than switching, because a
+  tree leafing out shades progressively. Full shade lands about November to March, which
+  is the rule to plant by, except that April is still a full-canopy month here and the
+  pear is dense from early October.
 - Nothing is fetched from the internet. React and both typefaces are served from
   `vendor/`, and `sw.js` caches the app on first visit, so after that it opens with
   no signal. To change a vendored file, bump `CACHE` in `sw.js` or devices keep the
@@ -69,6 +74,16 @@ there and every screen follows.
   offers *Save to Files* as a PDF. A4 and A3, both landscape; the plan takes the largest
   standard scale that fits (1:125 on A3, 1:200 on A4) and says which. The drawing is
   vector, so it stays sharp at any size and a ruler on the paper reads true.
+- **Swales and mounds** are a level trough on the contour with the spoil laid along its
+  downhill side, and on this block almost none of them are dug: protection zones cover
+  half the back garden and nearly all the front, so the trough is formed by raising its
+  shoulders in 100 mm of coarse woodchip. Only the rear pocket is clear enough for soil.
+  The gravel paths are part of the same system — laid level on 150 mm of aggregate they
+  hold about 50 litres a square metre — which is why they run across the slope and why
+  the back path now stops 3 m short of the addition. **Works → Drainage** adds up what
+  every trough, path, bed and mound on the current plan holds against the design storm,
+  and the Checks screen stops any of them that infiltrates within 3 m of a wall or that
+  is turned down the fall line instead of across it.
 - **Works → Earthworks** is the first thing this design needs in the real world: a
   setout drawing with the no-dig zones loud, existing levels on a 4 m grid and every
   excavation keyed and colour-coded by what may touch it, then a schedule of volumes,
