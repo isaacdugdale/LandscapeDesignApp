@@ -101,6 +101,12 @@ there and every screen follows.
   survey — correct anything you disagree with. Plants grown for foliage are named under
   the chart rather than silently dropped. It is on **Works → Planting** as well as the
   printed set, so you can look at it without going near the print dialog.
+- **On a laptop** the window fills rather than sitting inside a drawing of an iPad,
+  and the trackpad behaves the way a trackpad should: two fingers slide the plan,
+  a pinch zooms it, and a mouse wheel still zooms in notches. With something
+  selected the arrow keys nudge it 50 mm, shift makes that 500 mm, Backspace
+  deletes it, Escape drops the selection, and ⌘Z undoes — none of which fire
+  while you are typing in the notes or the ask box.
 - Selecting anything on the plan floats a bar over the drawing with its name, **Copy**,
   **Rotate 90°** on rectangles, and **Delete**. The inspector carries the same actions
   from the same definition; the bar exists because the inspector is a scroll away in

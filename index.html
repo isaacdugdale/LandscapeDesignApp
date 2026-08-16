@@ -63,6 +63,17 @@ if('serviceWorker' in navigator){
 <script src="printsheet.js"></script>
 <style>
 body{margin:0;background:#e6dcc9;font-family:"Figtree",system-ui,sans-serif}
+/* what the pointer is over, said in the cursor: the plan drags, an item moves,
+   a handle resizes or turns. Touch never sees these. */
+@media (pointer:fine){
+  svg.plan{cursor:grab}
+  svg.plan:active{cursor:grabbing}
+  svg.plan .mv{cursor:move}
+  svg.plan .thit{cursor:pointer}
+  svg.plan .hS{cursor:nwse-resize}
+  svg.plan .hR{cursor:ew-resize}
+  svg.plan .hT{cursor:grab}
+}
 *{-webkit-tap-highlight-color:transparent}
 input[type=range]{-webkit-appearance:none;appearance:none;height:26px;background:transparent}
 input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:var(--color-neutral-300)}
@@ -657,7 +668,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v16';
+const BUILD='v17';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -737,8 +748,33 @@ class Component extends DCLogic {
     schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',refSec:{},expand:false,
     issueFilter:'all',sunCache:{},notes:''};
 
-  componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz); this.wait(); }
-  componentWillUnmount(){ window.removeEventListener('resize',this._rz); }
+  componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz);
+    this._kd=e=>this.onKey(e); window.addEventListener('keydown',this._kd); this.wait(); }
+  componentWillUnmount(){ window.removeEventListener('resize',this._rz); window.removeEventListener('keydown',this._kd); }
+  /* On a laptop the selection is a keyboard away from being nudged, and moving
+     something 50 mm with an arrow key is more accurate than any drag. Ignored
+     while typing, so the notes box and the ask box keep their arrow keys. */
+  onKey(e){
+    const t=e.target, tag=t&&t.tagName;
+    if(tag==='INPUT'||tag==='TEXTAREA'||(t&&t.isContentEditable)) return;
+    const s=this.state;
+    if((e.metaKey||e.ctrlKey)&&(e.key==='z'||e.key==='Z')){
+      e.preventDefault(); if(this.hist&&this.hist.length) this.commit(JSON.parse(this.hist.pop()),null); return; }
+    if(e.key==='Escape'){ if(s.armed) this.setState({armed:null}); else if(s.sel!=null) this.setState({sel:null},()=>this.draw()); return; }
+    if(s.screen!=='plan'||typeof s.sel!=='number') return;
+    const it=s.items.find(i=>i.u===s.sel); if(!it) return;
+    if(e.key==='Backspace'||e.key==='Delete'){
+      e.preventDefault(); this.push(); this.commit(s.items.filter(i=>i.u!==s.sel),null); return; }
+    const step=e.shiftKey?0.5:SNAP;
+    const d={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,step],ArrowDown:[0,-step]}[e.key];
+    if(!d) return;
+    e.preventDefault();
+    /* one history entry for a run of nudges, not one per key press */
+    if(!this._nudging){ this.push(); this._nudging=true; }
+    clearTimeout(this._nt2); this._nt2=setTimeout(()=>{this._nudging=false;},700);
+    const r=Math.round, q=v=>r(v/SNAP)*SNAP;
+    this.commit(s.items.map(i=>i.u===s.sel?{...i,x:q(i.x+d[0]),y:q(i.y+d[1])}:i));
+  }
   /* Shown inside a device frame while it is being designed; opened on the iPad
      itself (from the home screen) it fills the screen and follows the device. */
   measure(){
@@ -746,7 +782,12 @@ class Component extends DCLogic {
     let standalone=false;
     try{ standalone=navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches; }catch(e){}
     const touch=(navigator.maxTouchPoints||0)>0;
-    const fill=standalone||(touch&&w<1440&&h<1240);
+    /* A laptop is a real place to use this, not a place to preview it, so a
+       pointer-driven window of any size fills rather than sitting inside a
+       drawing of an iPad. The frame stays for the small preview the design
+       tool renders. */
+    let fine=false; try{ fine=window.matchMedia('(pointer:fine)').matches; }catch(e){}
+    const fill=standalone||(touch&&w<1440&&h<1240)||(!touch&&fine&&w>=1000);
     const orient=fill?(w>=h?'landscape':'portrait'):this.state.orient;
     if(fill!==this.state.fill||orient!==this.state.orient){
       this.setState({fill:fill,orient:orient},()=>{ if(this.state.ready){ this.view={...this.presetViews().all}; setTimeout(()=>{this.fit();this.draw();},30); } });
@@ -1121,11 +1162,32 @@ class Component extends DCLogic {
       if(!ev||ev.pointerType!=='mouse') hideHud(); };
     el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
     el.addEventListener('pointerleave',ev=>{ if(ev.pointerType==='mouse') hideHud(); });
+    /* A trackpad speaks two dialects through the same event. A pinch arrives as
+       a wheel with ctrlKey set, which macOS synthesises; two fingers sliding
+       arrive as a plain wheel with both deltas. Treating every wheel as zoom —
+       which is right for a mouse — makes a trackpad lurch in and out whenever
+       you meant to move sideways, so they are handled apart. Zoom is
+       exponential in the delta rather than a fixed step, because a pinch fires
+       a stream of small ones and a mouse notch fires a single large one, and
+       both should feel the same. */
     el.addEventListener('wheel',ev=>{ ev.preventDefault();
-      const r=el.getBoundingClientRect(), fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
-      const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h, k=ev.deltaY>0?1.1:1/1.1;
-      this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
-      this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); },{passive:false});
+      const r=el.getBoundingClientRect();
+      if(ev.ctrlKey||ev.metaKey||(!ev.deltaX&&ev.shiftKey)){
+        const fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
+        const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h;
+        const k=Math.exp(Math.max(-0.4,Math.min(0.4,ev.deltaY*0.012)));
+        this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
+        this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); return;
+      }
+      if(ev.deltaMode===0&&!ev.deltaX&&Math.abs(ev.deltaY)>=48){
+        /* a mouse notch, not a trackpad slide: zoom, as a mouse should */
+        const fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
+        const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h, k=ev.deltaY>0?1.1:1/1.1;
+        this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
+        this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); return;
+      }
+      this.view.x+=ev.deltaX/r.width*this.view.w;
+      this.view.y+=ev.deltaY/r.height*this.view.h; this.draw(); },{passive:false});
   }
   /* Zooming sets the width and the height follows it. A preset or a resize
      instead has a rectangle it must show, so there the view widens when the
@@ -1251,7 +1313,7 @@ class Component extends DCLogic {
       tx+='<text x="'+(v.x+14*mpp)+'" y="'+(v.y+v.h-12*mpp)+'" font-size="'+F(12)+'" fill="#82796a">← Mount Ainslie reserve, south-south-east</text>';
       tx+='<text x="'+(v.x+v.w-14*mpp)+'" y="'+(v.y+v.h-12*mpp)+'" font-size="'+F(12)+'" text-anchor="end" fill="#82796a">Duffy Street, north-north-west →</text>';
     }
-    el.innerHTML='<svg width="100%" height="100%" viewBox="'+v.x+' '+v.y+' '+v.w+' '+v.h+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
+    el.innerHTML='<svg class="plan" width="100%" height="100%" viewBox="'+v.x+' '+v.y+' '+v.w+' '+v.h+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
       +'<rect x="'+(v.x-5)+'" y="'+(v.y-5)+'" width="'+(v.w+10)+'" height="'+(v.h+10)+'" fill="'+COL.paper+'"/>'
       /* Labels sit over the things they name, so they must not take the touch:
          tapping a bed's name has to reach the bed, not land on the text. */
