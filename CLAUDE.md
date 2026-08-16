@@ -3,6 +3,14 @@
 Static site, no build step. `README.md` describes what each file is and how it
 publishes; read it first. This file is the part that is easy to get wrong.
 
+## Token usage
+
+Be frugal. This is a small repo and most jobs here are a data edit plus a
+paragraph. Read the part of a file you need rather than the whole of it, check a
+layout with one node script that prints everything at once rather than a run per
+question, and do not re-derive a number you already have. Say what changed and
+why in a few lines, not a report.
+
 ## Adding or changing a scheme
 
 A scheme is a named starting layout offered to the device. They live in
