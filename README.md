@@ -107,6 +107,12 @@ there and every screen follows.
 - The **expand** button on the plan (with the zoom controls) drops the sidebar, header,
   palette and inspector so the drawing has the whole screen. It is for once the palette
   has done its job and you are only moving things around.
+- A named scheme is seeded onto a device once, by its id, and never again — so a
+  change to one already on the device does not reach it. Ship the changed version
+  under a new id and it arrives as a new scheme in the list, leaving whatever the
+  device had alone. This is also why the base plan, `START`, has to carry anything
+  meant to be in **New from base plan**: a new scheme is built from that, not from
+  the named schemes.
 - Schemes are per-device: they live in that browser's local storage. **Schemes → Back
   up** writes them to a JSON file through the share sheet and **Restore** reads one
   back, which is how a scheme reaches a second device. Restoring only adds; an
