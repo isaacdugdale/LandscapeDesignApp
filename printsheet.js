@@ -215,6 +215,18 @@ window.PRINTSHEET = (function () {
       });
   }
 
+  /* Ground made up rather than cut. Not an excavation, so it cannot go in the
+     table above, but it is the digger's business all the same — and inside a
+     zone it is the number that binds, not the cut. */
+  function buildRows(app) {
+    return keyList(app).filter(function (k) { return app.buildup(k.it); })
+      .map(function (k) {
+        var bu = app.buildup(k.it), bc = app.buildCheck(k.it);
+        return {no: k.no, name: k.it.n, mm: bu.mm, vol: bu.vol,
+          mat: bu.mat === 'soil' ? 'Soil' : 'Coarse woodchip', lvl: bc.lvl, why: bc.msg};
+      });
+  }
+
   function earthSvg(app, P) {
     var D = app.D, s = app.state, e = planExtent();
     var availW = P.w - P.m * 2, availH = P.h - P.m * 2 - P.head - P.foot;
@@ -476,11 +488,27 @@ window.PRINTSHEET = (function () {
       + '<tr><td>Total fill</td><td class="ps-num">' + n1(totFill) + ' m\u00b3</td></tr>'
       + '<tr class="ps-tot"><td>' + (net >= 0 ? 'Net to cart away' : 'Net to import') + '</td><td class="ps-num">' + n1(Math.abs(net)) + ' m\u00b3</td></tr>'
       + '</tbody></table>'
+      + buildTable(app)
       + '<p class="ps-fine"><b>Dig mm</b> is depth below finished level where a document states one \u2014 only the firepit does, at 450 mm, which is also what keeps it under the 500 mm that would force a site reclassification. Everything else is levelling of the existing surface across the item\u2019s own footprint, from the fitted surface. Anything needing a depth decided on site is left blank rather than guessed. Bulking is not allowed for: loose spoil carts at roughly 1.25 times these figures.</p>';
   }
 
+  function buildTable(app) {
+    var rows = buildRows(app);
+    if (!rows.length) return '';
+    var tot = 0;
+    rows.forEach(function (r) { tot += r.vol; });
+    return '<h3 class="ps-h3">Ground made up above existing grade</h3>'
+      + '<table class="ps-tbl"><thead><tr><th>No.</th><th>Item</th><th class="ps-num">Depth mm</th><th>Material</th><th class="ps-num">Volume m³</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+        return '<tr' + (r.lvl === 'r' ? ' class="ps-no-dig"' : '') + '><td class="ps-no">' + r.no + '</td><td>' + esc(r.name) + '</td>'
+          + '<td class="ps-num">' + r.mm + '</td><td>' + esc(r.mat) + '</td><td class="ps-num">' + n1(r.vol) + '</td></tr>'
+          + '<tr><td></td><td colspan="4" class="ps-mut">' + esc(r.why) + '</td></tr>';
+      }).join('')
+      + '<tr class="ps-tot"><td></td><td>Total to cart in</td><td></td><td></td><td class="ps-num">' + n1(tot) + ' m³</td></tr>'
+      + '</tbody></table>';
+  }
+
   function earthNotes() {
-      + '</div>'
 
     return '<h3 class="ps-h3">Shaping along the rear boundary</h3>'
       + '<table class="ps-tbl"><tbody>'
@@ -495,6 +523,7 @@ window.PRINTSHEET = (function () {
       + '<h3 class="ps-h3">Rules that bind the machine</h3><ul class="ps-ul">'
       + '<li><b>Nothing deeper than 50 mm inside a protection zone</b> counts as excavation. Hand dig, hydro-excavate or bore. No root over 30 mm may be cut, and a locating trench is dug along the line nearest the tree first.</li>'
       + '<li><b>Nothing at all inside a structural root zone</b>, by any method.</li>'
+      + '<li><b>Building up inside a protection zone is capped at 100 mm</b>, hand placed, arborist supervising, and in coarse woodchip rather than soil — soil over a root plate reduces the air reaching the roots, which is the reason the cap exists. Building up is how paths and beds are made inside a zone; the cap is what makes it safe.</li>'
       + '<li><b>Keep cut under 500 mm and fill under 400 mm.</b> Beyond that the site classification has to be reassessed. The deepest thing here is the firepit at about 450 mm.</li>'
       + '<li><b>Near footings:</b> no trench below a 30° line from the footing edge, 45° in clay. Any permanent excavation deeper than 600 mm must be retained or battered.</li>'
       + '<li><b>No tracking or spoil stockpiles inside a protection zone.</b> Ground protection is rumble boards over 200 mm of coarse woodchip, cellular geotextile, or rated mats.</li>'
