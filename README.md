@@ -38,6 +38,7 @@ devices keep serving the old copy from disk. See the last note in this file.
 | `manifest.webmanifest`, `apple-touch-icon.png`, `icon-512.png` | Home-screen name and icon |
 | `offline/234-duffy-offline.html` | The whole app inlined into one file — AirDrop it and it works with no network |
 | `source/` | The original handbook and project data the site file was extracted from |
+| `CLAUDE.md` | How to add a scheme, publish, and check it — the parts that are easy to get wrong |
 
 Sun hours, ground levels, cut and fill, protection-zone rules and costs are computed
 in the app from `site-data.js` using the same maths as the handbook. Change a number
@@ -112,7 +113,7 @@ there and every screen follows.
   under a new id and it arrives as a new scheme in the list, leaving whatever the
   device had alone. This is also why the base plan, `START`, has to carry anything
   meant to be in **New from base plan**: a new scheme is built from that, not from
-  the named schemes.
+  the named schemes. `CLAUDE.md` has the full recipe.
 - Schemes are per-device: they live in that browser's local storage. **Schemes → Back
   up** writes them to a JSON file through the share sheet and **Restore** reads one
   back, which is how a scheme reaches a second device. Restoring only adds; an
