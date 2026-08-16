@@ -9,13 +9,12 @@ in the browser on the device.
 The live site is `https://isaacdugdale.github.io/LandscapeDesignApp/`. On the iPad
 open that URL in Safari, then **Share → Add to Home Screen**.
 
-**Pages serves the `claude/app-ipad-setup-3fqmbp` branch, not `main`.** Check the
-current source under **Settings → Pages** before believing this paragraph — the
-branch it names is the only thing that publishes, and pushing to any other branch
-changes nothing on the iPad however green the push looks. Confirm a publish by the
-`pages build and deployment` run for your commit's SHA under **Actions**, not by
-the push succeeding. To move the source to `main`, set it under Settings → Pages
-and update this paragraph in the same change, so the two cannot drift apart again.
+**Pages deploys from `main` / `/ (root)`**, set under **Settings → Pages**. Pushing
+to `main` publishes; pushing anywhere else does not, however green the push looks.
+Confirm a publish by the `pages build and deployment` run for your commit's own SHA
+under **Actions** — a push succeeding is not evidence the site changed. If the
+source is ever moved to another branch, rewrite this paragraph in the same change:
+this naming a stale branch is what cost a release once already.
 
 The app files must sit at the repository root — `index.html` next to `README.md` —
 because Pages only serves from `/` or `/docs`.
