@@ -35,8 +35,13 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',function(){
     if(had&&!reloaded){ reloaded=true; location.reload(); }
   });
+  /* updateViaCache none, because Pages serves sw.js with a ten minute max-age
+     and the browser will otherwise answer the update check from its own HTTP
+     cache — which is how a device sits on an old build after a reopen. The
+     explicit update() asks again on every open. */
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'})
+      .then(function(r){ try{ r.update(); }catch(e){} }).catch(function(){});
   });
 }
 </script>
@@ -629,7 +634,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
           </sc-for>
         </div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--color-divider)">
-          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45">Schemes are kept on this iPad only. Push them to a private gist to read them from anywhere, or back them up to a file to move them to another device.</div>
+          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45"><b>{{ build }}</b> · Schemes are kept on this iPad only. Push them to a private gist to read them from anywhere, or back them up to a file to move them to another device.</div>
           <div onClick="{{ pushGist }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">{{ gistLabel }}</div>
           <div onClick="{{ backup }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Back up</div>
           <div onClick="{{ restore }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Restore</div>
@@ -650,6 +655,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1434,&quot;height&quot;:1092}}">
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
+/* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
+   actually running can be read off the device rather than guessed at. */
+const BUILD='v16';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -1388,7 +1396,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        notes:'',notesHint:'',onNotes:()=>{},pushGist:()=>{},gistLabel:'',canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},waterRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        notes:'',notesHint:'',onNotes:()=>{},pushGist:()=>{},gistLabel:'',build:'',canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},waterRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1604,7 +1612,7 @@ class Component extends DCLogic {
       stop:ev=>{if(ev&&ev.stopPropagation)ev.stopPropagation();}, sheetOpen:s.sheetOpen, schemeList:schemeList,
       notes:s.notes||'', notesHint:'What this scheme is for, what you changed, what to decide next.',
       onNotes:ev=>{ const v=ev&&ev.target?ev.target.value:''; this.setState({notes:v},()=>{ clearTimeout(this._nt); this._nt=setTimeout(()=>this.persist(),600); }); },
-      pushGist:()=>this.pushGist(), gistLabel:(this.gistCfg().id?'Push to gist':'Set up gist'),
+      build:BUILD, pushGist:()=>this.pushGist(), gistLabel:(this.gistCfg().id?'Push to gist':'Set up gist'),
       newScheme:()=>this.newScheme(),
       backup:()=>this.backup(), restore:()=>this.restore(),
       undo:()=>{ if(!this.hist||!this.hist.length) return; const items=JSON.parse(this.hist.pop()); this.commit(items,null); },
