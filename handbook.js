@@ -68,30 +68,50 @@ window.HANDBOOK = [
 
 /* ----------------------------------------------------------------- sun --- */
 {id:'sun', group:'site', nav:'Sun', title:'Sun', sub:'Where the light is, season by season', blocks:[
-  ['p','Direct sunlight was modelled across the block at quarter-hour intervals, using the solar geometry for this latitude and the surveyed heights of every building and tree — including both neighbouring houses, from the ridge and eave levels recorded on their roofs, and the three boundary fences at an assumed 1.8 m. Deciduous canopies are treated as largely transparent from 1 June to mid-September and dense the rest of the year, the gum as a permanently open canopy. It is the same model the Sun view on the plan runs — southern hemisphere throughout, so the sun sits due north at midday, 78° up on 21 December and 31° on 21 June.'],
-  ['note','One approximation to keep in mind: the September equinox falls a few days after the model puts the leaves back on, so the equinox column understates the light under the pear and the liquidambar. Under the gum, which is evergreen, it is unaffected.'],
+  ['p','Direct sunlight was modelled across the block at quarter-hour intervals, using the solar geometry for this latitude and the surveyed heights of every building and tree — including both neighbouring houses, from the ridge and eave levels recorded on their roofs, and the three boundary fences at an assumed 1.8 m. The gum is treated as a permanently open canopy; the four deciduous trees each carry their own leaf window, set out below. It is the same model the Sun view on the plan runs — southern hemisphere throughout, so the sun sits due north at midday, 78° up on 21 December and 31° on 21 June.'],
   ['tbl',[
     ['Area','Summer','Equinox','Winter'],
-    ['Rear pocket and firepit','7.3 h','7.2 h','4.1 h'],
-    ['Side strip, east-north-east — vegetables and fruit','7.9 h','6.5 h','3.8 h'],
-    ['Paved terrace against the house','10.6 h','4.0 h','0.0 h'],
-    ['Under trees 1 and 2','3.8 h','2.9 h','1.3 h'],
-    ['Courtyard, once the maple goes','5.5 h','3.0 h','0.3 h'],
+    ['Rear pocket and firepit','7.0 h','6.7 h','4.0 h'],
+    ['Side strip, east-north-east — vegetables and fruit','8.3 h','6.5 h','3.9 h'],
+    ['Paved terrace against the house','10.9 h','4.1 h','0.0 h'],
+    ['Under trees 1 and 2','3.8 h','3.0 h','1.8 h'],
+    ['Courtyard, once the maple goes','5.7 h','2.9 h','0.1 h'],
     ['Courtyard, while the maple is alive','1.6 h','0.7 h','0.0 h'],
-    ['Back garden, average','6.0 h','4.5 h','2.0 h'],
-    ['Front garden, average','4.6 h','3.6 h','2.2 h']
+    ['Back garden, average','5.8 h','4.3 h','2.2 h'],
+    ['Front garden, average','4.5 h','3.4 h','2.0 h']
   ],[2.2,1,1,1]],
+  ['note','Three sampled days cannot show a deciduous garden. 21 December and 21 June fall in the middle of the leafy and the bare halves of the year, and the September equinox lands while three of the four canopies are still coming on. What the columns miss is April, May and October, which is where the difference between these trees actually lives — so read the windows below alongside the table, and scrub the day slider on the Sun view for anything in between.'],
+
+  ['h','When each canopy is actually there'],
+  ['p','Trees 2, 3, 4 and 5 are all deciduous, and they are not deciduous on the same dates. Tree 2 is an ornamental pear, which in this climate breaks bud in the last week of August and holds its leaves until well into May. Tree 3 runs on the ash window, a month behind it at both ends. Trees 4 and 5 are the street shade trees, earliest to drop and last to fill out. The dates are horticultural for Canberra rather than surveyed, and the model ramps between them rather than switching, because a tree leafing out shades progressively over a few weeks.'],
+  ['tbl',[
+    ['Tree','Buds break','Full canopy','Starts thinning','Bare'],
+    ['2 · ornamental pear','1 September','1 October','1 May','5 June'],
+    ['3 · ash','1 October','5 November','5 May','10 June'],
+    ['4 and 5 · street shade trees','25 September','25 October','20 April','25 May'],
+    ['1 · brittle gum','evergreen','—','—','—']
+  ],[1.5,1,1,1,1]],
+  ['p','Read as shade cast — how much light the canopy stops — that gives the year below. The gum sits at a flat 45% because it is evergreen and open-crowned.'],
+  ['tbl',[
+    ['Tree','Jan–Mar','Apr','May','Jun–Aug','Sep','Oct','Nov–Dec'],
+    ['2 · ornamental pear','85%','85%','62%','28%','55%','85%','85%'],
+    ['3 · ash','85%','85%','69%','28%','28%','51%','85%'],
+    ['4 and 5 · street shade trees','85%','85%','44%','28%','28%','66%','85%'],
+    ['1 · brittle gum','45%','45%','45%','45%','45%','45%','45%']
+  ],[1.6,1,0.7,0.7,1,0.7,0.7,1]],
+  ['note','Full shade runs from about November to March, which is the rule of thumb to plant by, but it is wrong at both ends and in opposite directions. April is a full-canopy month here — autumn colour and leaf drop are a May event in Canberra, not a March one — so anything counting on autumn sun gets it in May, not before. And the pear is a month early in spring: it is dense from the start of October, over the whole of the ground where the back garden’s spring growth happens.'],
 
   ['h','What the numbers mean'],
   ['ul',[
-    'The rear pocket is the most consistently sunny part of the back garden at 7.3, 7.2 and 4.1 hours, because it sits furthest from the two-storey neighbour. It is the best winter position on the block. Its sun is strongly afternoon-weighted, five hours after noon in summer against two before, which suits the firepit.',
-    'The east-north-east side strip is the best summer growing ground at 7.9 hours, still workable at 3.8 in midwinter, and reasonably even through the day: about four hours either side of noon in summer, tilting to the afternoon in cooler months because the two-storey neighbour takes some of the morning. This is where the productive garden belongs.',
-    'The paved terrace is a summer space only — 10.6 hours in December, 4.0 at the equinox, effectively none in June.',
-    'Under the two trees is genuinely shaded at 1.3 to 3.8 hours, so dry-shade planting belongs there and turf will not hold.',
-    'The front garden is the shadier half because of the liquidambar and the two street ashes in 142 m². Sun-loving structural plants need the open gaps between canopies.',
+    'The rear pocket is the most consistently sunny part of the back garden at 7.0, 6.7 and 4.0 hours, because it sits furthest from the two-storey neighbour. It is the best winter position on the block. Its sun is strongly afternoon-weighted, five hours after noon in summer against two before, which suits the firepit.',
+    'The east-north-east side strip is the best summer growing ground at 8.3 hours, still workable at 3.9 in midwinter, and reasonably even through the day: about four hours either side of noon in summer, tilting to the afternoon in cooler months because the two-storey neighbour takes some of the morning. This is where the productive garden belongs.',
+    'The paved terrace is a summer space only — 10.9 hours in December, 4.1 at the equinox, effectively none in June.',
+    'Under the two trees is genuinely shaded at 1.8 to 3.8 hours, so dry-shade planting belongs there and turf will not hold.',
+    'The front garden is the shadier half because of the liquidambar and the two street ashes in 142 m², averaging 4.5 hours in summer against 2.0 in winter. Its seasons run backwards from what a fruit tree wants: the canopies are densest from October to April, which is the whole growing season, and open from May to September, when there is least sun to let through. Sun-loving structural plants need the open gaps between canopies, and anything grown for a crop needs a gap, not a thinner patch of shade.',
     'The two-storey neighbour and the fences matter. Together they cost between one and three hours a day. That neighbour has an eave 5.6 m and a ridge 7.1 m above the ground beside it and blocks a good deal of morning sun along that side.'
   ]],
-  ['note','Fence height is the main assumption left. The survey does not record it. At 1.8 m the fences cost the side strip about an hour a day, and each additional 300 mm costs roughly another half hour in summer. Worth measuring.']
+  ['note','Fence height is the main assumption left. The survey does not record it. At 1.8 m the fences cost the side strip about an hour a day, and each additional 300 mm costs roughly another half hour in summer. Worth measuring.'],
+  ['note','Tree 3 is recorded as a liquidambar in the survey and is run here on the ash window. In this climate the two are within a week of each other at both ends, so nothing in the table moves either way; the windows are separate rows in the site data so that if the tree turns out to be one or the other, only that row changes.']
 ]},
 
 /* --------------------------------------------------------------- water --- */
@@ -196,12 +216,38 @@ window.HANDBOOK = [
     ['North outlet invert at boundary','610.01','kerb 609.85, verge fall 1:50, gravity OK'],
     ['Spine outlet invert at boundary','609.73','kerb 609.60, verge fall 1:58, gravity OK']
   ],[1.4,1,1.8]],
-  ['p','Pipe capacities by Manning, n = 0.010, running full. Flows by the rational method at the AS/NZS 3500.3 standard of a 5 minute duration and a 1 in 10 year storm for dwelling site drainage.']
+  ['p','Pipe capacities by Manning, n = 0.010, running full. Flows by the rational method at the AS/NZS 3500.3 standard of a 5 minute duration and a 1 in 10 year storm for dwelling site drainage.'],
+
+  ['h','What never reaches a pipe'],
+  ['p','The pipes are sized for the storm. Most rain is not the storm, and the second half of the water design is what happens to ordinary rain — which on this block should be soaking into the ground it falls on rather than being collected and taken to the kerb. Four surfaces do that work: the troughs on the contour, the gravel paths, the mulch blanket and the mounds. They are drawn on the plan like anything else, so the figures below are for the layout as it stands and move when it does.'],
+  ['water',''],
+  ['note','Two things this does not change. Roof water stays positively connected to the piped system, every downpipe, with nothing discharging at ground level — a roof concentrates too much volume into too small a patch of soil for infiltration to be a sensible answer near a footing. And the overland flow path along the side boundary stays clear and continuous to the street, because the case it exists for is the reserve bank letting go, which is far past anything a swale holds.']
 ]},
 
 /* --------------------------------------------------------------- earth --- */
-{id:'earth', group:'works', nav:'Earth shaping', title:'Earth shaping', sub:'The corner swale, the mulch blanket and the bund', blocks:[
-  ['p','Three pieces do the work of keeping reserve water away from the addition, and they are not interchangeable.'],
+{id:'earth', group:'works', nav:'Earth shaping', title:'Earth shaping', sub:'Getting water into the ground, and past the house', blocks:[
+  ['p','Two jobs, and they pull in opposite directions. Water arriving off the reserve has to be got past the addition without pooling against it, which is the boundary work below. Rain falling on the garden itself should go into the ground where it lands rather than run the length of the block, which is the contour work — the swales and mounds, and the paths that double as both.'],
+
+  ['h','Swales and mounds, and why none of them are trenches'],
+  ['p','A swale is a level trough on the contour with the spoil laid along its downhill side as a mound. Water spreads along it instead of running down the slope, sits, and soaks in; the mound is dry, aerated, raised ground to plant into, which on a block that is sand over a dense layer is the only way to give a shrub good drainage without cutting anything. The pair is the whole technique, and it is a good fit here: 1 in 19 of fall, erodible sand, and a fall line that runs straight at the house.'],
+  ['note','On this block a swale is not dug. Tree protection zones cover 52% of the open back garden and nearly all of the front, and clause 6.6.3 is explicit that paths and beds inside a zone are built above existing grade with no excavation and no compaction. So the trough is formed by raising its two shoulders in coarse woodchip rather than by taking a shovel to the middle, and the section that matters is the difference between the invert and the mound crest, not the depth below natural ground. Where a line does fall clear of every zone — and the plan says so, item by item — it can be cut instead, and the corner swale below is the one that is.'],
+  ['p','The contours run across the block, not down it, because the fall is 1 in 19 along the block and 1 in 132 across it. Every trough and mound therefore runs the short way, side boundary toward side boundary. The Checks screen tests each one and says how much it falls end to end: more than 100 mm of it, falling more along its length than across its width, and it is a drain pointed downhill rather than a store. Set them out with a water level on the day — the levels in this app come from a fitted surface with an RMS of 129 mm, which is not good enough to find level over 4 m.'],
+  ['kv',[
+    ['Trough section','1.0 to 1.4 m wide, 250 mm from invert to crest, batters around 1 in 4'],
+    ['Mound section','1.0 to 1.6 m wide, laid along the downhill side, rounded not peaked'],
+    ['Inside a protection zone','100 mm of added material maximum, coarse woodchip, hand placed, arborist supervising'],
+    ['Clear of every zone','soil, up to the project’s 400 mm fill limit — only the rear pocket qualifies'],
+    ['Off any wall','3 m minimum for anything that concentrates water into the ground'],
+    ['Ends','a level spill at the low end, rock at the inlet, and never into the overland flow corridor']
+  ]],
+  ['p','Six lines are drawn: two through the back woodland either side of the gravel path, one on the sunny east-north-east mound, one in the rear pocket, and two across the front garden. All but the rear pocket sit inside a protection zone, so all but the rear pocket are 100 mm of chip. The rear pocket mound is the only one that gets soil, and it is the only one carrying a small tree.'],
+
+  ['h','The gravel paths are part of the drainage'],
+  ['p','A gravel path laid level on the contour, on 150 mm of clean 20 mm aggregate over coarse chip, holds about 50 litres a square metre in the voids under your feet and lets it go slowly into the sand beneath. It is the cheapest storage on the block because you were going to build the path anyway, and it is the reason the paths run across the slope rather than down it: a path down the fall line is a channel with a gravel bed, which is the opposite of what is wanted.'],
+  ['note','Which is also why the back path now stops 3 m short of the addition. As drawn it ran to within 1.2 m of the addition’s uphill corner — the exact wall that risk 1 is about, above a subsoil drain put there to keep water out of that ground. A path holding water in its base is the one thing that must not go there, so it ends at the last contour and the mulch blanket carries the surface across the rest. Every infiltrating surface on the plan is checked against that 3 m and the Checks screen stops anything inside it.'],
+
+  ['h','Keeping reserve water off the addition'],
+  ['p','Three further pieces do that, and they are not interchangeable.'],
 
   ['h','The corner swale — the only part that can be dug'],
   ['p','The rear boundary falls 133 mm from the southern corner toward the west-south-west corner, about 1 in 164, so water running along the reserve path tends to arrive at that western corner by itself. That corner is also the only stretch of the rear boundary far enough from the gum to sit outside its protection zone, so it is the only part you can excavate.'],
@@ -223,9 +269,9 @@ window.HANDBOOK = [
   ['h','The diversion bund above the addition'],
   ['p','A low ridge a few metres uphill of the addition’s rear wall, angled so sheet flow crossing the woodland floor is turned aside into the side strip rather than continuing into the wall. It sits inside both trees’ protection zones, so it is built up rather than dug: 100 mm of added material maximum, hand placed, arborist supervising. Build it from coarse woodchip rather than soil — 100 mm of clay or topsoil over a mature gum’s root plate reduces the air reaching the roots, which is the reason the 100 mm cap exists. Make it wide and rounded rather than a sharp berm, so it overtops evenly along its length instead of breaching at one point.'],
 
-  ['h','How the three work together'],
-  ['p','In ordinary rain the mulch absorbs most of what crosses the boundary and the corner swale takes whatever concentrates at the western end. In heavier rain, sheet flow crosses the woodland floor, meets the bund, and is turned into the side strip where the overland path carries it to the street. In an extreme event the swale overtops as well and joins the same route. Nothing here holds water back; it all moves water past the building in a controlled way.'],
-  ['note','Sequence. Shape the corner swale, then build the bund, then mulch, then let a full wet season pass before planting around them, so the shaping can be corrected while it is still easy. Afterwards: clear the silt sump annually before winter, top up mulch every second or third year, and check after any severe storm that the bund has not been breached at a point.']
+  ['h','How it all works together'],
+  ['p','In ordinary rain the contour lines take it. Rain landing on the back garden meets the first trough within a few metres of where it fell, spreads along it and soaks in; what runs on meets the next. The mulch absorbs most of what crosses the boundary and the corner swale takes whatever concentrates at the western end. In heavier rain the troughs fill and spill at their level sills, sheet flow crosses the woodland floor, meets the bund, and is turned into the side strip where the overland path carries it to the street. In an extreme event the corner swale overtops as well and joins the same route. The contour work slows and stores; the boundary work moves water past the building. Neither substitutes for the other, and neither touches the overland flow corridor, which stays empty.'],
+  ['note','Sequence. Shape the corner swale, then build the bund, then set out the contour lines and raise their shoulders, then mulch the whole surface, then let a full wet season pass before planting anything but the sedges, so the shaping can be corrected while it is still easy. Watch where water actually stands in the first heavy rain and move the lines to suit — this is the one part of the garden where being wrong is cheap to fix in year one and expensive to fix in year five. Afterwards: clear the silt sump annually before winter, top up mulch every second or third year, and check after any severe storm that no trough has scoured at its spill and that the bund has not been breached at a point.']
 ]},
 
 /* ------------------------------------------------------------ planting --- */
@@ -240,13 +286,35 @@ window.HANDBOOK = [
     ['Zone','Approach'],
     ['No planting: paved apron','0.9 m of paving right around the house, falling away at 1:60. No beds, no irrigation, no taps.'],
     ['Dry groundcover band','From the apron out to about 3 m. Scleranthus, Dichondra, Poa, Lomandra. Drip you can switch off. Nothing thirsty, no aggressive roots.'],
-    ['Sunny edible strip','Best summer growing ground: 7.9 h summer, 6.5 h equinox, 3.8 h midwinter. Veg beds, espaliered fruit on the fence, citrus. Water freely.'],
-    ['Dry-shade woodland','1.3 to 3.8 h sun. Tubestock hand-dug through 100 mm coarse mulch, beds built up not cut in. Bursaria, Correa, Rhagodia, Poa, Dianella, Lomandra.'],
+    ['Sunny edible strip','Best summer growing ground: 8.3 h summer, 6.5 h equinox, 3.9 h midwinter. Veg beds, espaliered fruit on the fence, citrus. Water freely.'],
+    ['Dry-shade woodland','1.8 to 3.8 h sun. Tubestock hand-dug through 100 mm coarse mulch, beds built up not cut in. Bursaria, Correa, Rhagodia, Poa, Dianella, Lomandra.'],
     ['Rainforest pots','Shaded, sheltered. Stag horn, elk horn, burawang, tree fern, bromeliads. In pots and mounted, so soil moisture near the house stays put.'],
-    ['Swale and rear screen','Wettest, most erodible ground. Sedges and tussocks to bind it: Poa labillardierei, Ficinia nodosa, Carex. Acacia and hakea screen behind.'],
-    ['Sunny natives, rear pocket','The sunniest part of the back garden all year: 7.3 h summer, 4.1 h midwinter, strongly afternoon. Sun-loving natives, structural plants, and the winter sitting spot.'],
-    ['Front: structural and screening','Shadiest half of the block, 4.6 h summer down to 2.2 h in winter. Sun-lovers in the canopy gaps, shade-tolerant natives beneath. Screening at 1.5 to 2.5 m. Plant through mulch, never excavate.']
+    ['Swales and rear screen','Wettest, most erodible ground, and the same answer in every trough on the block. Sedges and tussocks to bind it: Poa labillardierei, Ficinia nodosa, Carex. Acacia and hakea screen behind.'],
+    ['Sunny natives, rear pocket','The sunniest part of the back garden all year: 7.0 h summer, 4.0 h midwinter, strongly afternoon. Sun-loving natives, structural plants, and the winter sitting spot.'],
+    ['Front: structural and screening','Shadiest half of the block, 4.5 h summer down to 2.0 h in winter. Sun-lovers in the canopy gaps, shade-tolerant natives beneath. Screening at 1.5 to 2.5 m. Plant through mulch, never excavate.'],
+    ['Mounds','Raised, sharply drained, dry on top. One large shrub or small tree each, chosen by how much summer sun the mound gets, with the wet-tolerant things at the toe rather than the crown.']
   ],[1,2.2]],
+
+  ['h','What goes on the mounds'],
+  ['p','A mound gives one thing no other part of this block can: sharp drainage and aerated root run, above the dense layer, without cutting anything. That suits the whole banksia-hakea-grevillea half of the native palette, which fails in wet feet and does not much mind poor soil. So each mound carries one large shrub or small tree at its crown, low things around its shoulders, and the wet-tolerant species at its toe where the trough spills.'],
+  ['p','What decides the species is summer sun, and in the front garden that is the awkward part. The deciduous canopies are densest from October to April, so a front mound in the open reads as a sunny position on the day you plant it in winter and is in shade for the whole growing season. The hours below are the mound centres as drawn, on 21 December.'],
+  ['tbl',[
+    ['Mound','Summer sun','What to put on it','Why'],
+    ['Rear pocket, west-south-west corner','5.7 h','Banksia marginata, or a dwarf Eucalyptus mannifera ‘Little Spotty’ if you want height','The only mound clear of every protection zone, so the only one that can be soil rather than chip, and the only one with real winter sun: 5.7 hours in December and 5.0 in June, the most even light anywhere on the block. It is where a small tree earns its place. Silver banksia takes the frost, feeds birds through winter and wants exactly this drainage.'],
+    ['East-north-east strip, beside the kitchen','11.0 h','Grevillea iaspicula, or Callistemon ‘Kings Park Special’ for a thicker screen','The sunniest ground on the block. Grevillea iaspicula is the local endangered one, flowers through winter and stays under 2.5 m, so it does not shade the vegetable beds behind it.'],
+    ['Back woodland berms, either side of the path','4.4 h south, 8.1 h north','Bursaria spinosa on the south berm, Leptospermum obovatum on the north','Two different positions despite being 8 m apart. The south berm is dry shade under the gum and the pear, with root competition from both, and bursaria is local, thorny enough to be a screen and copes with 4 hours. The north berm sits in the gap between the two canopies and takes 8.1 hours in December — and nothing at all in June, because the addition stands between it and the low winter sun. Put something there that does not depend on winter light.'],
+    ['Front, between the house and the ash','5.7 h','Dodonaea viscosa','Evergreen, tough, dry-shade tolerant, 2 by 3 m, and it holds its screen through winter when the deciduous canopies have gone and the front windows are most exposed.'],
+    ['Front, at the boundary','5.3 h','Hakea salicifolia, with Olearia phlogopappa beneath','The privacy layer, at the 1.5 to 2.5 m the front needs. Willow-leaf hakea screens fast and evergreen, and takes the dry shade under the street trees better than anything on the list.'],
+    ['Front pocket, east wing side','4.7 and 5.7 h','Acacia pravissima uphill, pomegranate on the sunnier downhill mound','The warmest corner of the front garden, with a trough between the two mounds. The pomegranate is one of the two fruit trees the front is getting and it wants every hour it can find, so it takes the downhill mound rather than the shaded one.']
+  ],[1.3,0.7,1.6,2.6]],
+  ['note','Both fruit trees have moved, and one of the moves costs something. The quince had 5.7 hours in December where it was drawn; on the mound in front of the lounge it has 7.3, the sunniest ground in the front garden and about what a quince needs to ripen. The pomegranate had 6.3 hours, but it was standing in the overland flow corridor, which has to stay clear — moved onto the mound just outside it, it has 5.7. That is the trade, and it is the right way round: the corridor is the route water takes if the reserve bank lets go. Both trees are in canopy gaps rather than under a canopy, which for a deciduous front garden is the only place they work, and both stay 3 m off the wall.'],
+  ['ul',[
+    'Plant the crown, not the ring. One shrub per mound, at the top, with groundcover and tussocks over the rest of it. A mound planted all over dries out unevenly and the crown is the only part with the drainage the shrub is there for.',
+    'Wet feet at the toe. Callistemon sieberi and Leptospermum obovatum take both a flooded week and a dry summer, so they go at the bottom of a mound or the shoulder of a trough. Nothing from the banksia and grevillea side goes there.',
+    'Everything on a mound is hand watered for two summers and then left. The mound is the reason it survives being left, and also the reason it will die if it is never watered in the first place — raised ground dries faster than flat ground while roots are still in the potting mix.',
+    'Silver Princess is on the list and flagged frost tender for a reason. It will take a Canberra winter on a well-drained mound and not in a wet hollow, and it is the one choice here that is a gamble rather than a safe bet.',
+    'Nothing new goes closer than 3 m to a wall, on a mound or off one. The mounds inside a protection zone are 100 mm of coarse woodchip, planted through by hand, which is what clause 6.6.4 asks for.'
+  ]],
 
   ['h','When it flowers'],
   ['p','Every plant on the plan, by mature height and flowering month. The bar’s thickness is the plant’s mature spread and its colour is the flower’s own. It updates as you plant.'],
@@ -257,7 +325,7 @@ window.HANDBOOK = [
   ['p','From the apron out to about three metres you are still in the ground that affects the footings. Dry-tolerant groundcovers and low grasses here — Scleranthus, Dichondra, Poa, Lomandra — which take a dry summer without help. If you run drip, run it on a tap you turn off, not a timer. Avoid aggressive root systems and anything you will feel obliged to water twice a week.'],
 
   ['h','The sunny strip along the east-north-east boundary'],
-  ['p','The best summer growing ground on the property at 7.9 hours, and 3.8 at the winter solstice, spread fairly evenly across the day. Sandy and free draining, and four metres or more clear of the house, so you can water it properly without consequence for the footings.'],
+  ['p','The best summer growing ground on the property at 8.3 hours, and 3.9 at the winter solstice, spread fairly evenly across the day. Sandy and free draining, and four metres or more clear of the house, so you can water it properly without consequence for the footings.'],
   ['p','Raised vegetable beds, fruit espaliered flat against the fence to use the vertical space and reflected warmth, and citrus in the sunniest section. The fence itself costs about an hour a day, so anything low and light-hungry does better a metre or two out from it than hard against it.'],
 
   ['h','Under the two big trees'],
@@ -269,12 +337,15 @@ window.HANDBOOK = [
 
   ['h','The rear boundary and the swale'],
   ['p','The wettest and most erodible ground on the block, and periodically running water. Planting here does structural work as much as visual: roots hold the soil and slow the flow. Sedges and tussocks through the swale — Poa labillardierei, Ficinia nodosa, Carex. Behind them the acacia and hakea screen from your local provenance list, which gives the filtered privacy from the walking track and matches the revegetation on the reserve side of the fence. Plant this before the first winter if you can, because bare ground in a channel is what fails.'],
+  ['p','The same goes for every contour trough, front and back. A trough is bare ground holding running water for the first year or two, which is exactly the condition that scours, so the sedges go in with the shaping rather than after it — they are the only planting on this whole design that should not wait for a wet season to pass. Poa labillardierei and Ficinia nodosa through the invert, tussocks and Lomandra on the shoulders, and the shrub on the mound behind them once the shaping has proved itself.'],
 
   ['h','The rear pocket and firepit terrace'],
-  ['p','Afternoon and evening sun, free-draining sand, clear of the tree zones, so this is the one part of the back garden where you can dig freely. It is also the sunniest part of the back garden across the whole year, holding 4.1 hours in midwinter, which makes it the sensible place for a winter sitting spot — the paved terrace near the house drops to nothing in June.'],
+  ['p','Afternoon and evening sun, free-draining sand, clear of the tree zones, so this is the one part of the back garden where you can dig freely. It is also the sunniest part of the back garden across the whole year, holding 4.0 hours in midwinter, which makes it the sensible place for a winter sitting spot — the paved terrace near the house drops to nothing in June.'],
 
   ['h','The front garden'],
   ['p','The shadier half of the block, because of the liquidambar and the two street ashes, and the part where you cannot change levels. Proteas, leucadendrons, grass trees and waratah need full sun and sharp drainage, so they go in the open gaps between canopies, not under them, with shade-tolerant natives beneath. Everything planted through mulch, nothing excavated. The screening layer for privacy sits just inside the front boundary at 1.5 to 2.5 metres mature height, covering the sunken lounge and bedroom windows without blocking their light.'],
+  ['p','This is where the mounds do most of their work, because they are the only way to get sharp drainage into a garden nobody is allowed to dig. Four round mounds and one berm, each 100 mm of coarse woodchip over the existing surface, with a trough on the uphill side of the two that have room for one. That is not much of a hill, but it is enough: 100 mm of chip crown over sand drains far better than the flat ground beside it, and the difference is what a hakea or a dodonaea needs to survive here.'],
+  ['note','The front garden’s seasons run backwards. Its canopies are deciduous, so the shade is densest from October to April and lifts from May to September — dense exactly through the growing season, open exactly when there is least sun to be had. Everything structural in the front is therefore chosen for summer shade and winter exposure, which is a real palette rather than a compromise: dodonaea, bursaria, indigofera, olearia and correa all evolved under a eucalypt canopy and behave this way round. What does not work is anything grown for a crop, unless it stands in a gap.'],
   ['note','Two things to avoid. Do not run automatic irrigation inside the apron zone or against the walls; overwatering on a timer is one of the most common causes of footing damage and is entirely avoidable. And do not plant a new large tree close to the house — the site is already a problem site because of tree-induced soil drying, and another one compounds the issue the engineer is designing around.']
 ]},
 
@@ -287,8 +358,8 @@ window.HANDBOOK = [
   ['tbl',[
     ['Direct sun, hours per day','Summer','Equinox','Winter'],
     ['With the maple','1.6 h','0.7 h','0 h'],
-    ['After it goes','5.5 h','3.0 h','0.3 h'],
-    ['Open back garden, for comparison','6.0 h','4.5 h','2.0 h']
+    ['After it goes','5.7 h','2.9 h','0.1 h'],
+    ['Open back garden, for comparison','5.8 h','4.3 h','2.2 h']
   ],[2.2,1,1,1]],
   ['p','Its canopy is 4 m across in a 4 m courtyard, so it covers the whole space. While it lives, the courtyard is deep fern-gully shade. Once it goes, summer sun rises roughly threefold into a still, walled enclosure with a black wall facing the sun. Winter stays dark either way, because the surrounding walls block the low sun regardless.'],
   ['note','Put the plants where the light does not change. The stepping-stone path along the existing house wall is roofed by the awning, so it stays shaded whether or not the maple survives. Anything mounted or standing under that awning is unaffected by the tree’s fate. Everything in the open part of the courtyard will need moving or shading when the canopy goes — straightforward in a pot, impossible in the ground.'],
@@ -338,7 +409,7 @@ window.HANDBOOK = [
     'The kitchen needs water, waste, power and probably gas. Services through a zone need hand or hydro excavation, or boring at 1,000 mm, and clause 6.5.2 rules out additional services through a zone unless the plan specifies them. Siting the kitchen in the band clear of tree 2’s zone avoids the question entirely.'
   ]],
   ['p','The band from about 16.7 m to 19.9 m off the rear boundary, alongside the kitchen addition, is clear of every protection zone and adjoins the existing patio and its awning. A 3.2 by 3.0 m area there takes the kitchen with no tree constraint and the shortest service runs. The paved terrace sits at 17.6 m so it is also clear; widening it westward means building up rather than cutting in.'],
-  ['note','Sun there is 10.6 hours in December, 4.0 at the equinox and effectively none in June, so treat it as a warm-weather space and put any winter sitting position in the rear pocket instead. Grade the paving to fall away from the house at 1:60 minimum, and connect the sink waste properly rather than letting it soak beside a footing.']
+  ['note','Sun there is 10.9 hours in December, 4.1 at the equinox and effectively none in June, so treat it as a warm-weather space and put any winter sitting position in the rear pocket instead. Grade the paving to fall away from the house at 1:60 minimum, and connect the sink waste properly rather than letting it soak beside a footing.']
 ]},
 
 /* --------------------------------------------------------------- risks --- */

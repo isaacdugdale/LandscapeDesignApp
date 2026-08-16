@@ -520,6 +520,16 @@ window.PRINTSHEET = (function () {
       + '<tr><td>Mulch blanket</td><td>100 mm coarse 25 mm chip across the boundary in front of the gum. Spread, not graded in</td></tr>'
       + '</tbody></table>'
 
+      + '<h3 class="ps-h3">Contour troughs and mounds</h3>'
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Direction</td><td>across the block, not down it — 1 in 19 along the fall, 1 in 132 across it</td></tr>'
+      + '<tr><td>Trough section</td><td>1.0–1.4 m wide, 250 mm invert to crest, batters about 1 in 4</td></tr>'
+      + '<tr><td>Method inside a zone</td><td>shoulders raised in coarse woodchip. The invert is not cut — no excavation, no compaction</td></tr>'
+      + '<tr><td>Method clear of a zone</td><td>may be cut instead, spoil to the mound. Only the rear pocket qualifies</td></tr>'
+      + '<tr><td>Level</td><td>set out with a water level on the day. Over 100 mm end to end it is a drain, not a store</td></tr>'
+      + '<tr><td>Standoff</td><td>3 m minimum from any wall for anything holding water in the ground</td></tr>'
+      + '</tbody></table>'
+
       + '<h3 class="ps-h3">Rules that bind the machine</h3><ul class="ps-ul">'
       + '<li><b>Nothing deeper than 50 mm inside a protection zone</b> counts as excavation. Hand dig, hydro-excavate or bore. No root over 30 mm may be cut, and a locating trench is dug along the line nearest the tree first.</li>'
       + '<li><b>Nothing at all inside a structural root zone</b>, by any method.</li>'
@@ -527,7 +537,8 @@ window.PRINTSHEET = (function () {
       + '<li><b>Keep cut under 500 mm and fill under 400 mm.</b> Beyond that the site classification has to be reassessed. The deepest thing here is the firepit at about 450 mm.</li>'
       + '<li><b>Near footings:</b> no trench below a 30° line from the footing edge, 45° in clay. Any permanent excavation deeper than 600 mm must be retained or battered.</li>'
       + '<li><b>No tracking or spoil stockpiles inside a protection zone.</b> Ground protection is rumble boards over 200 mm of coarse woodchip, cellular geotextile, or rated mats.</li>'
-      + '<li><b>Keep the overland flow path along the side boundary clear</b> — no spoil heap, no plant, no materials, at any stage.</li>'
+      + '<li><b>Keep the overland flow path along the side boundary clear</b> — no spoil heap, no plant, no materials, at any stage. No trough or mound crosses it either.</li>'
+      + '<li><b>Nothing that puts water into the ground within 3 m of a wall.</b> Troughs, gravel paths and soak pits all stand off; mulch and mounds sit on the surface and do not.</li>'
       + '</ul>'
 
       + '<h3 class="ps-h3">Confirm before the machine arrives</h3><ul class="ps-ul">'
@@ -801,5 +812,41 @@ window.PRINTSHEET = (function () {
       + '</div>';
   }
 
-  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView};
+  /* ---------------------------------------------------------------- water --- */
+
+  /* The half of the drainage design that is not a pipe. Every surface on the plan
+     that puts water into the ground, what it holds, and — for the three that
+     concentrate it — how far it is standing off a wall. Read off the plan, so it
+     answers for the layout as it is now rather than for the one in the handbook. */
+  function waterView(app) {
+    var w = app.water();
+    if (!w.rows.length) {
+      return '<div class="ps-screen"><p class="ps-fine">Nothing on the plan is holding water yet. '
+        + 'Swales, gravel paths, mulched beds and mounds all count here; add one and this fills in.</p></div>';
+    }
+    var rows = w.rows.map(function (r) {
+      var stand = r.eng ? (r.wall == null ? '—'
+        : n1(r.wall) + ' m' + (r.wall < 3 ? ' <b>too close</b>' : '')) : 'on the surface';
+      return '<tr><td>' + esc(r.n) + '</td><td class="ps-num">' + n1(r.area) + '</td>'
+        + '<td class="ps-num">' + Math.round(r.d * 1000) + '</td>'
+        + '<td class="ps-num">' + Math.round(r.vol * 1000).toLocaleString('en-AU') + '</td>'
+        + '<td>' + esc(r.mat) + '</td><td class="ps-num">' + stand + '</td></tr>';
+    }).join('');
+    return '<div class="ps-screen">'
+      + '<table class="ps-tbl"><thead><tr><th>Surface</th><th class="ps-num">Area m²</th>'
+      + '<th class="ps-num">Depth mm</th><th class="ps-num">Holds L</th><th>Made of</th>'
+      + '<th class="ps-num">Off the wall</th></tr></thead><tbody>' + rows + '</tbody></table>'
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Held where it falls</td><td class="ps-num">' + Math.round(w.held * 1000).toLocaleString('en-AU') + ' L</td></tr>'
+      + '<tr><td>Of that, still working once the mulch is wet</td><td class="ps-num">' + Math.round(w.eng * 1000).toLocaleString('en-AU') + ' L</td></tr>'
+      + '<tr><td>Design storm over the whole block, 5 min, 1 in 10 yr</td><td class="ps-num">' + Math.round(w.storm * 1000).toLocaleString('en-AU') + ' L</td></tr>'
+      + '<tr class="ps-tot"><td>Share of that storm never reaching a pipe</td><td class="ps-num">' + Math.round(w.share * 100) + '%</td></tr>'
+      + '</tbody></table>'
+      + '<p class="ps-fine">Depth is the working depth of the material, not how deep it is dug: a trough ponds 250 mm at its invert over a battered section, a gravel path is the void in its 150 mm base, and a mound or a mulch blanket holds what the chip itself holds. '
+      + 'These are first-flush figures into dry ground. In sustained rain the chip is already wet and only the troughs and the gravel are still taking water, which is the second line above. '
+      + 'None of it replaces the piped system, and none of it is allowed to change the fact that the overland flow path stays clear — it decides how much of ordinary rain never reaches a pipe at all.</p>'
+      + '</div>';
+  }
+
+  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, waterView: waterView};
 })();

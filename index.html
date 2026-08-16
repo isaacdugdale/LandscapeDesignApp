@@ -457,6 +457,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
                 <div ref="{{ earthRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
 
+              <sc-if value="{{ b.isWater }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ waterRef }}" style="margin:4px 0 10px"></div>
+              </sc-if>
+
               <sc-if value="{{ b.isTbl }}" hint-placeholder-val="{{ false }}">
                 <div class="ls-scroll-x" style="margin:2px 0 16px;border-radius:16px;background:var(--color-neutral-100);overflow-x:auto">
                   <div style="min-width:520px">
@@ -653,20 +657,46 @@ const HARDCOL={
   'Raised veg bed':['#ccdbb2','#56633f'],'Shed':['#dcd3c4','#645c50'],'Water tank':['#cfd9d3','#33646b'],
   'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Planting mound':['#dcc9a8','#8c491a'],
   'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50'],
-  'Channel drain':['#b9ccd1','#33646b']
+  'Channel drain':['#b9ccd1','#33646b'],
+  'Swale, on contour':['#cfd9d3','#33646b'],'Mound, built up':['#dcc9a8','#8c491a']
 };
 /* Soakage and a piped channel are opposite answers to the same problem, and the
    library only had the first, so the courtyard drain was drawn as a soak pit —
-   the one thing the handbook rules out there. These name which elements infiltrate
-   and how close to a wall that stops being allowed. The geotechnical report and
-   the CSIRO guidance warn against soaking water into reactive clay a metre or two
-   from footings; 3 m is the margin, on a Class P site whose movement figure is
-   already spoken for. */
-const SOAKAGE={'Soak pit':1}, SOAKMIN=3, DRAIN='Channel drain';
+   the one thing the handbook rules out there. This names which surfaces put water
+   into the ground rather than into a pipe, how much each holds before it overflows,
+   and how close to a wall that stops being allowed.
+
+   d is the working depth in metres and v the share of it that is void; where d is
+   0 the depth is whatever build-up the item declares, so a mound holds what it is
+   actually made of. The geotechnical report and the CSIRO guidance warn against
+   soaking water into reactive clay a metre or two from footings, so anything that
+   concentrates water keeps 3 m off a wall, on a Class P site whose movement figure
+   is already spoken for. Mulch and mounds spread water rather than concentrate it
+   and sit on the surface, so they carry no margin. */
+const SOAKMIN=3, DRAIN='Channel drain';
+const SOAK={
+  'Soak pit':          {d:1.00,v:0.35,min:SOAKMIN,mat:'gravel-filled pit'},
+  'Swale, on contour': {d:0.25,v:0.50,min:SOAKMIN,mat:'shallow trough'},
+  'Gravel path':       {d:0.15,v:0.35,min:SOAKMIN,mat:'gravel over a coarse chip base'},
+  'Mulched bed':       {d:0.10,v:0.25,min:0,mat:'coarse woodchip'},
+  'Planting mound':    {d:0,   v:0.25,min:0,mat:'coarse woodchip'},
+  'Mound, built up':   {d:0,   v:0.25,min:0,mat:'coarse woodchip'}
+};
+/* The design storm the drainage is sized on, put over the whole block: 122 mm/h
+   for five minutes is 10.2 mm, which is 8.2 m³ on 807 m². It is what the shaping
+   is measured against on the Drainage page. */
+const BLOCKM2=807, RAIN5=10.2;
 /* A single course of rough-sawn block, and sandstone runs about 2.3 tonnes the
    cubic metre. The two numbers live here once so the Checks screen and the
    inspector cannot quote different weights. */
 const BLOCK='Sandstone block edge', BLOCKH=0.45, STONET=2.3;
+/* A swale is only a swale while it is level along its own length. The block falls
+   1 in 19 one way and 1 in 132 the other, so this is really a test of whether the
+   thing has been turned the right way round: it fails when it drops more than
+   100 mm end to end and drops more along its length than across its width. A short
+   trough on gently curving ground can read close to either way, and the fitted
+   surface is only good to about 130 mm, so a tighter test would cry wolf. */
+const SWALE='Swale, on contour', MOUND='Mound, built up', LEVELTOL=0.10;
 /* Added material: the tree plan's cap inside a protection zone, the project's
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
@@ -741,7 +771,12 @@ class Component extends DCLogic {
     const D=this.D; let uid=1, items=[];
     ((def&&def.items)||D.START).forEach(s=>{const i=this.mk(s[0],s[1],s[2],s[3],s[4],s[5],uid++);
       if(i){ if(s[6]!=null){ i.bu=s[6]; i.bum=s[7]||'chip'; } items.push(i); }});
-    ((def&&def.plants)||D.STARTP||[]).forEach(s=>{const p=D.PLANTS.find(p=>p.id===s[0]); if(p){const i=this.mkPlant(p.n,s[1],s[2],uid++); if(i)items.push(i);}});
+    /* By id where the list has a usable one, by name otherwise: the ids came out
+       of a spreadsheet and are neither unique nor always filled in, so a scheme
+       that has to name a particular shrub says which one in words. */
+    ((def&&def.plants)||D.STARTP||[]).forEach(s=>{
+      const p=(s[0]?D.PLANTS.find(p=>p.id===s[0]):null)||D.PLANTS.find(p=>p.n===s[0]);
+      if(p){const i=this.mkPlant(p.n,s[1],s[2],uid++); if(i)items.push(i);}});
     return {items,uid};
   }
   seedScheme(id){ const d=(this.D.SCHEMES||[]).find(x=>x.id===id); return d?this.baseItems(d):null; }
@@ -766,8 +801,13 @@ class Component extends DCLogic {
   mk(name,x,y,w,h,rot,uid){
     const l=this.LIBM[name]; if(!l) return null;
     const c=HARDCOL[name]||['#dcd3c4','#82796a'];
-    const st=l[2]==='dig'?1:(l[2]==='pave'?2:3);
-    return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st,bu:0,bum:'chip'};
+    /* Digging is stage one because it decides where water goes, and so does a
+       swale, a mound, a mulch blanket and a gravel path laid on the contour —
+       none of which are excavations here. Where the library states a stage it
+       wins, and where it states a build-up the item arrives carrying it, so a
+       mound is priced and counted as the material it is actually made of. */
+    const st=l[9]||(l[2]==='dig'?1:(l[2]==='pave'?2:3));
+    return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st,bu:l[10]||0,bum:l[11]||'chip'};
   }
   mkPlant(name,x,y,uid){
     const p=this.PL[name]; if(!p) return null;
@@ -784,7 +824,23 @@ class Component extends DCLogic {
     const az=Math.atan2(-Math.sin(ha)*Math.cos(dec),Math.cos(la)*Math.sin(dec)-Math.sin(la)*Math.cos(dec)*Math.cos(ha));
     return {alt:alt*180/Math.PI,az:(az*180/Math.PI+360)%360};
   }
-  trans(t,doy){ return t[6]>0?t[6]:((doy>=152&&doy<=259)?0.72:0.15); }
+  /* How much light a canopy lets through on a given day. A number in the tree's
+     row is a canopy that never changes — the gum, permanently open at 0.55. A
+     name is a deciduous window from LEAF in the site data, and the windows differ
+     by what the tree is: in this climate the ornamental pear is in leaf from early
+     spring to late autumn, the ash a month less at each end, and the two street
+     trees less again. Between the four dates the canopy is ramped rather than
+     switched, because a tree leafing out shades progressively over a few weeks
+     and drops its leaves the same way. */
+  trans(t,doy){
+    const p=t[6];
+    if(typeof p==='number') return p>0?p:0.15;
+    const L=(this.D.LEAF||{})[p]; if(!L) return 0.15;
+    if(doy<=L.thin||doy>=L.full) return L.dense;
+    if(doy>=L.bare&&doy<=L.out) return L.open;
+    if(doy<L.bare) return L.dense+(L.open-L.dense)*(doy-L.thin)/(L.bare-L.thin);
+    return L.open+(L.dense-L.open)*(doy-L.out)/(L.full-L.out);
+  }
   blockTop(b){ return b[6]+(b[5]-b[6])*0.5; }
   sunlit(px,py,pz,alt,az,doy){
     const D=this.D;
@@ -875,12 +931,44 @@ class Component extends DCLogic {
      knows whether the ground behind a wall is being made up or left alone. */
   buildup(it){ const mm=(it&&it.t!=='plant'&&it.bu)||0; if(!mm) return null;
     return {mm:mm,mat:it.bum==='soil'?'soil':'chip',vol:this.area(it)*mm/1000}; }
+  /* What one surface holds before it overflows. A trough and a gravel path hold
+     it in the void between the stones, a mulch blanket in the chip itself, and
+     a mound holds whatever it was built out of — which is why its depth comes
+     from the build-up declared on the item rather than from the library. */
+  /* Fall from one end of an item's long axis to the other, and across it. What a
+     swale is checked on, and what tells you which way a mound should lie. */
+  contourFall(it){ const cs=this.corners(it); if(!cs) return null;
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+    const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const long=d(e[0],e[2])>=d(e[1],e[3])?[e[0],e[2]]:[e[1],e[3]];
+    const cross=long[0]===e[0]?[e[1],e[3]]:[e[0],e[2]];
+    const fall=(p)=>Math.abs(this.RL(p[0][0],p[0][1])-this.RL(p[1][0],p[1][1]));
+    return {len:d(long[0],long[1]),fall:fall(long),across:fall(cross)}; }
+  storage(it){ const s=SOAK[it&&it.n]; if(!s||(it.t==='plant')) return null;
+    const d=s.d||((it.bu||0)/1000); if(!d) return null;
+    return {vol:this.area(it)*d*s.v,d:d,mat:s.mat,eng:!!s.min}; }
+  /* The water plan, added up off the plan itself. Everything that infiltrates
+     against the storm the pipes are sized on — 122 mm/h for five minutes, which
+     is 10.2 mm, or 8.2 m³ over the block. Held is first-flush storage into dry
+     ground: in sustained rain the chip is already wet and only the troughs and
+     the gravel are still taking water, which is why the two are counted apart. */
+  water(){ let held=0,eng=0,rows=[];
+    for(const it of this.state.items){ const st=this.storage(it); if(!st) continue;
+      held+=st.vol; if(st.eng) eng+=st.vol;
+      rows.push({n:it.n,area:this.area(it),d:st.d,vol:st.vol,eng:st.eng,mat:st.mat,
+        wall:st.eng?(this.nearBuilding(it)||{}).d:null}); }
+    rows.sort((a,b)=>b.vol-a.vol);
+    const storm=BLOCKM2*RAIN5/1000;
+    return {held:held,eng:eng,storm:storm,share:storm?held/storm:0,engShare:storm?eng/storm:0,rows:rows}; }
   /* Nearest wall to anything on the plan, measured from the item's own footprint
      rather than its centre, so a long channel laid along a wall reads as touching
      it. Buildings are axis-aligned boxes; the item may be rotated, so it is
-     sampled the same way the protection-zone test samples it. */
+     sampled the same way the protection-zone test samples it. Buildings only,
+     not the driveway: what the soakage rule protects is a footing, and water
+     going into the ground beside a driveway hurts nothing. */
   nearBuilding(it){ let best=null;
-    for(const p of this.samples(it,4)) for(const b of this.BLDR){
+    for(const p of this.samples(it,4)) for(const b of this.D.BOXH){
       const dx=Math.max(b[1]-p[0],0,p[0]-b[3]), dy=Math.max(b[2]-p[1],0,p[1]-b[4]);
       const d=Math.hypot(dx,dy);
       if(!best||d<best.d) best={d:d,n:b[0]};
@@ -891,8 +979,8 @@ class Component extends DCLogic {
      clay and the wrong answer, and nothing in the layout says which is which
      except how far from a wall it sits. */
   soakCheck(it){
-    if(!it||!SOAKAGE[it.n]) return null;
-    const b=this.nearBuilding(it); if(!b||b.d>=SOAKMIN) return null;
+    const s=SOAK[it&&it.n]; if(!s||!s.min) return null;
+    const b=this.nearBuilding(it); if(!b||b.d>=s.min) return null;
     return {lvl:'r',d:b.d,n:b.n,
       msg:'Infiltrating water '+(b.d<0.05?'hard against':b.d.toFixed(1)+' m from')+' the '+b.n
         +'. The geotechnical report and the CSIRO guidance both warn against soaking water into reactive clay this close to footings, and the Class P movement figure is already spoken for. Within '+SOAKMIN+' m of a wall it has to be piped — a '+DRAIN+' to a sleeve, not a pit. Soakage belongs out in the free-draining sand of the back garden.'}; }
@@ -1187,6 +1275,14 @@ class Component extends DCLogic {
           body:'One course '+(Math.min(it.w,it.h)*1000).toFixed(0)+' mm deep is roughly '+stone.per.toFixed(1)+' t a metre, so none of it is hand work: the blocks come off a crane truck or are set with an excavator, and the only way in is the crossover and driveway at the street end.'
             +(zoned?' This run sits inside a protection zone, where neither may track. Either the arm reaches it from ground outside the zone, or the run moves clear — settle that with the arborist before the stone is ordered.'
                    :' Check the machine can reach the line without tracking over a protection zone to get there.')}); }
+      /* The one thing a swale has to be. Turned the wrong way it is a drain
+         pointed at the house rather than a store, and on this block the two
+         directions differ by a factor of seven. */
+      if(it.n===SWALE){ const cf=this.contourFall(it);
+        if(cf&&cf.fall>LEVELTOL&&cf.fall>=cf.across) out.push({sev:'stop',u:it.u,title:it.n+' is not on the contour',
+          body:'It falls '+(cf.fall*1000).toFixed(0)+' mm from one end to the other, so it would run water along itself instead of holding it. Turned to lie the other way it falls about '+(cf.across*1000).toFixed(0)+' mm over the same ground. Contours here run across the block, not down it.'});
+        else if(cf) out.push({sev:'note',u:it.u,title:it.n+' — '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
+          body:'On the contour, so it fills along its whole length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing — the fitted surface is only good to about 130 mm. Rock the inlet, and leave a level spill at the low end so an overflow leaves the way you chose.'}); }
       if(it.n==='Sunken firepit'){ const d=it.x-it.w;
         if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
           body:'The ACT rule is three metres of clearance on the reserve side. Moving it about '+Math.max(0.5,3-d).toFixed(1)+' m toward the street fixes that, but pushes it toward the gum\u2019s protection zone.'}); }
@@ -1194,6 +1290,9 @@ class Component extends DCLogic {
       if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
         body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. Anything here needs a formed route around it along the fence — a drainage change, not yet priced.'});
     }
+    const w=this.water();
+    if(w.held>0.05) out.push({sev:'note',title:'The shaping holds '+w.held.toFixed(1)+' m³ of rain',
+      body:'Every trough, gravel path, mulched bed and mound on the plan adds up to '+Math.round(w.held*1000).toLocaleString()+' litres held where it falls, against the '+w.storm.toFixed(1)+' m³ the design storm puts on the whole block in five minutes — '+Math.round(w.share*100)+'% of it. That is first-flush storage into dry ground. Once the chip is wet only the troughs and the gravel are still taking water, and that part is '+Math.round(w.engShare*100)+'%. None of it replaces the piped system; it decides how much never reaches it.'});
     const q=this.quantities();
     if(q.cost>BUDGET) out.push({sev:'care',title:'Over the ten thousand',body:'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+', which is $'+Math.round(q.cost-BUDGET).toLocaleString()+' past the budget. Staging it is the answer, not cutting it.'});
     (this.state.todos||[]).forEach((t,i)=>out.push({sev:'note',title:'From a conversation',body:t}));
@@ -1202,7 +1301,7 @@ class Component extends DCLogic {
   }
   /* ---------- ask ---------- */
   factSheet(){
-    const q=this.quantities(), iss=this.issues();
+    const q=this.quantities(), iss=this.issues(), w=this.water();
     const items=this.state.items.map(i=>{ const bu=this.buildup(i);
       return i.n+' at ('+i.x.toFixed(1)+','+i.y.toFixed(1)+')'+(i.t==='plant'?'':' '+i.w.toFixed(1)+'x'+i.h.toFixed(1)+'m')
         +(bu?' [ground made up '+bu.mm+' mm in '+(bu.mat==='soil'?'soil':'coarse woodchip')+']':''); }).join('; ');
@@ -1213,15 +1312,18 @@ class Component extends DCLogic {
     'Soil: 100 mm of loose silty sand over clayey sand and sandy clay, refusal at 1.0-1.1 m; free-draining sand where she gardens, reactive clay where the house sits. Class P site because of the trees; the 20-40 mm movement figure assumes the pear stays.',
     'The walking path behind the rear fence sits on a raised man-made bank that holds hillside water back. It protects the block most of the time but concentrates risk into a rarer, larger event. The overland flow corridor along the side boundary (y 0.5-3.0) must stay clear and continuous to the street; capacity 236 L/s.',
     'Trees: 1 brittle gum (trunk 1.97 m from the rear boundary, structural root zone crosses it, so no channel can follow that boundary past it), 2 Manchurian pear (RETAIN, hand excavation approved), 3 liquidambar, 4 and 5 velvet ash street trees (public).',
-    'Sun hours [21 Dec, 21 Sep, 21 Jun]: rear pocket 7.4/7.3/4.5, east-north-east side strip 8.1/6.5/4.0, paved terrace 11.0/3.9/0.0, under trees 1 and 2 2.9/1.9/1.4, back garden average 5.8/4.4/2.2, front garden average 4.3/3.4/2.3, courtyard 5.7/3.1/0.0.',
+    'Sun hours [21 Dec, 21 Sep, 21 Jun]: rear pocket 7.0/6.7/4.0, east-north-east side strip 8.3/6.5/3.9, paved terrace 10.9/4.1/0.0, under trees 1 and 2 3.8/3.0/1.8, back garden average 5.8/4.3/2.2, front garden average 4.5/3.4/2.0, courtyard 5.7/2.9/0.1.',
+    'Trees 2, 3, 4 and 5 are deciduous and each has its own leaf window for this climate. Tree 2, ornamental pear: buds break 1 Sep, full canopy 1 Oct, thinning from 1 May, bare 5 Jun. Tree 3, ash window: 1 Oct, 5 Nov, 5 May, 10 Jun. Trees 4 and 5, street shade trees: 25 Sep, 25 Oct, 20 Apr, 25 May. Tree 1 is an evergreen gum. Full shade therefore runs about November to March, but April is still a full-canopy month and the pear is dense from early October. The front garden is shaded through the whole growing season and open from May to September, which is backwards for anything grown for a crop.',
     'Drainage: DN150 spine at 1 in 19, capacity 45.2 L/s against 5.32 design flow; DN100 north line sleeved under the garage; corner swale is the only stretch of rear boundary outside the gum protection zone.',
     'Cut over 500 mm or fill over 400 mm triggers a site reclassification.',
     'Inside a tree protection zone the plan permits building up where it forbids digging, but caps added material at 100 mm, hand placed, arborist supervising, and asks for coarse woodchip rather than soil, because soil over a root plate reduces the air reaching the roots. Anything deeper than 50 mm counts as excavation.',
     'The block is inside the ACT mapped bushfire prone area. Bushfire construction compliance is already dealt with and the certifier is satisfied; do not reopen it. Landscape only: the ACT rule is three metres clearance to the reserve for a firepit.',
     'Budget about $10,000 over 6-12 months, staged, her own labour, hand-dug. A contractor does the stormwater.',
     'Decisions made: keep the pear; no pond (snakes); the area off the house is paved with an outdoor kitchen, not a deck; lawn beats vegetables (toddler); vegetables become planters on the paving; natives only from here; front garden gets mounds and two fruit trees only, quince and pomegranate; the courtyard maple is gone; the driveway takes the sunniest front ground so nothing goes there.',
+    'Water shaping: swales are level troughs on the contour with a mound on the downhill side, running across the block because the fall is 1 in 19 along it and 1 in 132 across it. Almost nothing here can be dug \u2014 inside a protection zone the trough is formed by raising its shoulders in 100 mm of coarse woodchip, and only the rear pocket is clear enough for soil. Gravel paths are part of the same system: laid level on 150 mm of aggregate they hold about 50 litres a square metre. Anything that puts water into the ground stays 3 m clear of a wall.',
     'CURRENT LAYOUT: '+items,
     'CURRENT TOTAL: $'+Math.round(q.cost).toLocaleString()+' of $10,000. '+q.plants+' plants, '+q.pave.toFixed(0)+' m2 paving, '+q.soft.toFixed(0)+' m2 soft surface, '+q.mulch.toFixed(1)+' m3 mulch at 100 mm.',
+    'WATER HELD BY THE SHAPING AS DRAWN: '+w.held.toFixed(1)+' m3 into dry ground, of which '+w.eng.toFixed(1)+' m3 is troughs and gravel that keep working once the mulch is wet. The 5 minute 1 in 10 year storm puts '+w.storm.toFixed(1)+' m3 on the block, so '+Math.round(w.share*100)+'% of it never reaches a pipe.',
     'LIVE PROBLEM LIST: '+(iss.length?iss.map(i=>i.sev+': '+i.title+' — '+i.body).join(' | '):'nothing clashing.')].join('\n');
   }
   async ask(text){
@@ -1246,7 +1348,7 @@ class Component extends DCLogic {
     if(s.includes('firepit')) return 'As drawn the firepit sits '+((this.state.items.find(i=>i.n==='Sunken firepit')||{x:3,w:0.85}).x-0.85).toFixed(1)+' m from the reserve boundary. The ACT rule is three metres. Moving it toward the street fixes it until you reach the gum\u2019s protection zone.';
     if(s.includes('mulch')) return 'At 100 mm you need '+q.mulch.toFixed(1)+' m³ for the mulched beds as drawn. Coarse 25 mm chip, not fine or shredded, so it knits together on the slope.';
     if(s.includes('cost')||s.includes('budget')||s.includes('stage')) return 'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+' of the $10,000, materials only with your labour, and it excludes the stormwater contractor.';
-    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 10.6 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 7.9 hours in summer, 6.5 at the equinox, 3.8 in midwinter. Under trees 1 and 2 it is 3.8 hours even in summer. The full table is on the Site screen, under Sun.';
+    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 10.9 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 8.3 hours in summer, 6.5 at the equinox, 3.9 in midwinter. Under trees 1 and 2 it is 3.8 hours even in summer. Trees 2 to 5 are deciduous on their own dates \u2014 full canopy from about November to March, April included, and bare through winter. The full table is on the Site screen, under Sun.';
     return 'The site knowledge is here but the answering model is unavailable in this preview. The figures behind every screen are the same ones in the handbook: 807 m², a 2.08 m fall to the street, 52% of the open back garden inside protection zones, and $'+Math.round(q.cost).toLocaleString()+' spent of $10,000.';
   }
   scrollChat(){ const el=this.chatEl; if(el) el.scrollTop=el.scrollHeight; }
@@ -1274,7 +1376,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},waterRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1314,7 +1416,7 @@ class Component extends DCLogic {
       const k=b[0], plain=k==='p'||k==='h'||k==='note';
       const w=b[2]||[];
       return {
-        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth',
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isWater:k==='water',
         x:plain?b[1]:'',
         items:k==='ul'?b[1].map(t=>({x:t})):[],
         head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
@@ -1472,6 +1574,8 @@ class Component extends DCLogic {
           const btn=el.querySelector('[data-earth-print]');
           if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','earth'); };
         }catch(e){ el.textContent=''; } },
+      waterRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ el.innerHTML=window.PRINTSHEET.waterView(this); }catch(e){ el.textContent=''; } },
       bloomRef:el=>{ if(!el||!window.PRINTSHEET) return;
         try{ const c=window.PRINTSHEET.bloomChart(this);
           el.innerHTML=c.empty
