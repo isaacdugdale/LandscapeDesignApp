@@ -76,7 +76,10 @@ there and every screen follows.
   standard scale that fits (1:125 on A3, 1:200 on A4) and says which. The drawing is
   vector, so it stays sharp at any size and a ruler on the paper reads true.
 - **Swales and mounds** are a level trough on the contour with the spoil laid along its
-  downhill side, and on this block almost none of them are dug: protection zones cover
+  downhill side. They arrive as curved runs rather than rectangles, each one following the
+  surveyed contour it sits on, because that is the shape a level trough has on the ground —
+  the base plan and the **Contour swales** scheme both ship them that way. On this block
+  almost none of them are dug: protection zones cover
   half the back garden and nearly all the front, so the trough is formed by raising its
   shoulders in 100 mm of coarse woodchip. Only the rear pocket is clear enough for soil.
   The gravel paths are part of the same system — laid level on 150 mm of aggregate they
@@ -114,7 +117,13 @@ there and every screen follows.
   handle on the edge sets the width. **Straighten** puts it back in a box. Length,
   area, cost, the protection-zone tests, the level check and both printed sheets
   all read the curve rather than the rectangle around it — a bent trough is
-  checked for level along the whole of itself, not just end to end.
+  checked for level along the whole of itself, not just end to end. A starting
+  layout can say so too: the ninth column of an `items` or `START` row is the
+  point list, so a scheme arrives already bent instead of waiting to be bent by
+  hand. The tan dotted line on the plan is *not* one of these — it is the
+  existing berm behind the addition, drawn with the pipes and the flow corridor
+  from `DRAIN` in `site-data.js`, which is why it is not in the elements list
+  and cannot be selected.
 - Selecting anything on the plan floats a bar over the drawing with its name, **Copy**,
   **Rotate 90°** on rectangles, and **Delete**. The inspector carries the same actions
   from the same definition; the bar exists because the inspector is a scroll away in

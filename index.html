@@ -658,7 +658,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v19';
+const BUILD='v20';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -816,11 +816,18 @@ class Component extends DCLogic {
   /* With no argument this is her working layout. With one of the named schemes
      from the data it is that one instead — same row shape, plus the two extra
      columns for ground made up behind an item, which a starting layout has to
-     be able to say or the scheme arrives claiming work it does not do. */
+     be able to say or the scheme arrives claiming work it does not do, plus a
+     ninth for a curve. A trough on the contour is a bent line on the ground and
+     always was, so a starting layout has to be able to say so rather than only
+     ever arriving as a box for someone to bend by hand. The points are copied
+     rather than referenced: a drag writes into pts in place, and two devices
+     seeded from the same row must not end up sharing one array. */
   baseItems(def){
     const D=this.D; let uid=1, items=[];
     ((def&&def.items)||D.START).forEach(s=>{const i=this.mk(s[0],s[1],s[2],s[3],s[4],s[5],uid++);
-      if(i){ if(s[6]!=null){ i.bu=s[6]; i.bum=s[7]||'chip'; } items.push(i); }});
+      if(i){ if(s[6]!=null){ i.bu=s[6]; i.bum=s[7]||'chip'; }
+        if(s[8]&&s[8].length>1) i.pts=s[8].map(p=>[p[0],p[1]]);
+        items.push(i); }});
     /* By id where the list has a usable one, by name otherwise: the ids came out
        of a spreadsheet and are neither unique nor always filled in, so a scheme
        that has to name a particular shrub says which one in words. */

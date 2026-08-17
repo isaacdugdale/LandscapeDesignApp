@@ -41,13 +41,18 @@ Row shapes, which are positional and easy to shift by one:
 
 | Array | Row |
 | --- | --- |
-| `items`, `START` | `[name, x, y, w, h, rot, buildUpMm, buildUpMaterial]` |
+| `items`, `START` | `[name, x, y, w, h, rot, buildUpMm, buildUpMaterial, pts]` |
 | `plants`, `STARTP` | `[plant id or exact name, x, y]` |
 
-An item may also carry `pts` — an array of `[x, y]` — which makes it a curved
+The ninth column, `pts`, is an array of `[x, y]`, and it makes the item a curved
 run: a smooth line through those points, `w` metres wide, with `x`, `y`, `h` and
 `rot` ignored. Ask geometry through `area`, `centre`, `samples`, `corners` and
 `linLen`, which all know about it; never read `w`/`h` directly to get a length.
+Write the first point into `x` and `y` anyway so the row reads honestly, and put
+`null` in the two build-up columns where there is no build-up — they have to be
+filled for `pts` to land in the ninth slot at all. A trough or a path is a bent
+line on the ground, so prefer a run over a box for one; the swales in `START`
+and in `s-contour-swales` are the worked example.
 
 `rot` is the one that gets dropped. Leave it as `0` rather than omitting it, or
 the build-up depth is read as a rotation and the cost and volume come out `NaN`.
