@@ -41,13 +41,26 @@ Row shapes, which are positional and easy to shift by one:
 
 | Array | Row |
 | --- | --- |
-| `items`, `START` | `[name, x, y, w, h, rot, buildUpMm, buildUpMaterial]` |
+| `items`, `START` | `[name, x, y, w, h, rot, buildUpMm, buildUpMaterial, pts]` |
 | `plants`, `STARTP` | `[plant id or exact name, x, y]` |
+| `LIB` | `[name, shape, cat, w, h, cost, unit, fill, stroke, stage, buildUpMm, buildUpMaterial, locked, sharp]` |
 
-An item may also carry `pts` — an array of `[x, y]` — which makes it a curved
+`LIB` is the element library and the palette is built straight off it, so adding
+an element is adding a row plus a `HARDCOL` entry for its plan colours. `locked`
+means the element *arrives* locked — site fabric does, so a pipe is not nudged
+while a bed is being moved — and `sharp` means its run keeps its corners instead
+of being splined through them. Both are booleans and both are read as `l[12]`
+and `l[13]`, so a row that stops short of them is simply unlocked and smooth.
+
+The ninth column, `pts`, is an array of `[x, y]`, and it makes the item a curved
 run: a smooth line through those points, `w` metres wide, with `x`, `y`, `h` and
 `rot` ignored. Ask geometry through `area`, `centre`, `samples`, `corners` and
 `linLen`, which all know about it; never read `w`/`h` directly to get a length.
+Write the first point into `x` and `y` anyway so the row reads honestly, and put
+`null` in the two build-up columns where there is no build-up — they have to be
+filled for `pts` to land in the ninth slot at all. A trough or a path is a bent
+line on the ground, so prefer a run over a box for one; the swales in `START`
+and in `s-contour-swales` are the worked example.
 
 `rot` is the one that gets dropped. Leave it as `0` rather than omitting it, or
 the build-up depth is read as a rotation and the cost and volume come out `NaN`.

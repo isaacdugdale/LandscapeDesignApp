@@ -658,7 +658,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v19';
+const BUILD='v22';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -678,6 +678,8 @@ const HARDCOL={
   'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50'],
   'Channel drain':['#b9ccd1','#33646b'],
   'Swale, on contour':['#cfd9d3','#33646b'],'Mound, built up':['#dcc9a8','#8c491a'],
+  /* the tan the dotted line was drawn in, so it stays the thing you recognise */
+  'Diversion berm':['#e6d6bb','#b2622d'],'Stormwater line':['#b9ccd1','#33646b'],
   'Path, firm surface':['#e4dccb','#a19786'],'Gate':['#d8c3a4','#645c50']
 };
 /* Soakage and a piped channel are opposite answers to the same problem, and the
@@ -700,7 +702,8 @@ const SOAK={
   'Gravel path':       {d:0.15,v:0.35,min:SOAKMIN,mat:'gravel over a coarse chip base'},
   'Mulched bed':       {d:0.10,v:0.25,min:0,mat:'coarse woodchip'},
   'Planting mound':    {d:0,   v:0.25,min:0,mat:'coarse woodchip'},
-  'Mound, built up':   {d:0,   v:0.25,min:0,mat:'coarse woodchip'}
+  'Mound, built up':   {d:0,   v:0.25,min:0,mat:'coarse woodchip'},
+  'Diversion berm':    {d:0,   v:0.25,min:0,mat:'coarse woodchip'}
 };
 /* The design storm the drainage is sized on, put over the whole block: 122 mm/h
    for five minutes is 10.2 mm, which is 8.2 m³ on 807 m². It is what the shaping
@@ -717,6 +720,22 @@ const BLOCK='Sandstone block edge', BLOCKH=0.45, STONET=2.3;
    trough on gently curving ground can read close to either way, and the fitted
    surface is only good to about 130 mm, so a tighter test would cry wolf. */
 const SWALE='Swale, on contour', MOUND='Mound, built up', LEVELTOL=0.10;
+/* A berm is the opposite instruction to a trough, which is why it is its own
+   element rather than a mound with a job description. A trough is judged on
+   being level; a berm is judged on not being, because water has to leave along
+   it, and on standing across the whole of what it protects rather than most of
+   it. The one behind the addition was drawn into the site data as a dotted line
+   for want of an element to be — you could see it and not touch it. */
+const BERM='Diversion berm', BERMSAG=0.15;
+/* The pipes. They were site data drawn under everything, which made them
+   impossible to touch by accident and impossible to touch on purpose. As
+   elements they are both, so they arrive locked — see LOCKED below. A line is
+   buried, so running under the garage slab is the design rather than a clash:
+   the handbook's own route out of the back garden is two DN100 sleeves cast
+   under that slab, because a trench through the pear's zone needs the tree plan
+   amended. Nothing else in the library goes under a building, so the exemption
+   is named here rather than guessed from the category. */
+const PIPE='Stormwater line', BURIED={'Stormwater line':1};
 /* Added material: the tree plan's cap inside a protection zone, the project's
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
@@ -753,6 +772,9 @@ class Component extends DCLogic {
     if(e.key==='Escape'){ if(s.armed) this.setState({armed:null}); else if(s.sel!=null) this.setState({sel:null},()=>this.draw()); return; }
     if(s.screen!=='plan'||typeof s.sel!=='number') return;
     const it=s.items.find(i=>i.u===s.sel); if(!it) return;
+    /* Locked is locked from the keyboard too, or the one key that deletes
+       without a confirmation would be the way every pipe went. */
+    if(it.lk) return;
     if(e.key==='Backspace'||e.key==='Delete'){
       e.preventDefault(); this.push(); this.commit(s.items.filter(i=>i.u!==s.sel),null); return; }
     const step=e.shiftKey?0.5:SNAP;
@@ -800,6 +822,12 @@ class Component extends DCLogic {
 
   /* ---------- data helpers ---------- */
   RL(x,y){const C=this.C;return C[0]+C[1]*x+C[2]*y+C[3]*x*x+C[4]*x*y+C[5]*y*y;}
+  /* Site data draws a line until the layout takes it over. The pipes and the
+     berm were drawn out of DRAIN before they were elements, and a scheme saved
+     on the iPad before that still has to show them — so the site version is
+     drawn only while nothing in the layout is standing in for it. Asked by name
+     rather than by line, because both sets are seeded whole. */
+  owns(name){ return (this.state.items||[]).some(i=>i.n===name); }
   fy(y){return this.YTOP-y;}
   /* Landscape holds the handbook's framing — reserve left, Duffy Street right,
      consistent with every other drawing in the set. Portrait turns the plan
@@ -816,11 +844,18 @@ class Component extends DCLogic {
   /* With no argument this is her working layout. With one of the named schemes
      from the data it is that one instead — same row shape, plus the two extra
      columns for ground made up behind an item, which a starting layout has to
-     be able to say or the scheme arrives claiming work it does not do. */
+     be able to say or the scheme arrives claiming work it does not do, plus a
+     ninth for a curve. A trough on the contour is a bent line on the ground and
+     always was, so a starting layout has to be able to say so rather than only
+     ever arriving as a box for someone to bend by hand. The points are copied
+     rather than referenced: a drag writes into pts in place, and two devices
+     seeded from the same row must not end up sharing one array. */
   baseItems(def){
     const D=this.D; let uid=1, items=[];
     ((def&&def.items)||D.START).forEach(s=>{const i=this.mk(s[0],s[1],s[2],s[3],s[4],s[5],uid++);
-      if(i){ if(s[6]!=null){ i.bu=s[6]; i.bum=s[7]||'chip'; } items.push(i); }});
+      if(i){ if(s[6]!=null){ i.bu=s[6]; i.bum=s[7]||'chip'; }
+        if(s[8]&&s[8].length>1) i.pts=s[8].map(p=>[p[0],p[1]]);
+        items.push(i); }});
     /* By id where the list has a usable one, by name otherwise: the ids came out
        of a spreadsheet and are neither unique nor always filled in, so a scheme
        that has to name a particular shrub says which one in words. */
@@ -857,12 +892,17 @@ class Component extends DCLogic {
        wins, and where it states a build-up the item arrives carrying it, so a
        mound is priced and counted as the material it is actually made of. */
     const st=l[9]||(l[2]==='dig'?1:(l[2]==='pave'?2:3));
-    return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st,bu:l[10]||0,bum:l[11]||'chip'};
+    /* Thirteenth column: does this element arrive locked. Site fabric does —
+       the pipes and the berm are on the plan to be read and measured, not to be
+       nudged while you are moving a bed next to them. The library decides how
+       one arrives; the item carries whether it is, so locking your own terrace
+       and unlocking a pipe both stick with the scheme. */
+    return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st,bu:l[10]||0,bum:l[11]||'chip',lk:l[12]?1:0,sharp:l[13]?1:0};
   }
   mkPlant(name,x,y,uid){
     const p=this.PL[name]; if(!p) return null;
     return {u:uid,t:'plant',pn:name,n:DISP(p.n),shape:'circ',cat:'light',x:x,y:y,w:p.w/2,h:0,rot:0,cost:p.cost,unit:'item',
-      fill:PLANTCOL[p.g]||'#8fa073',stroke:'#56633f',g:p.g,ht:p.h,tender:p.tender,st:3};
+      fill:PLANTCOL[p.g]||'#8fa073',stroke:'#56633f',g:p.g,ht:p.h,tender:p.tender,st:3,lk:0};
   }
   /* ---------- solar ---------- */
   sunpos(doy,hh){
@@ -941,11 +981,26 @@ class Component extends DCLogic {
         o.push([0.5*(2*b[0]+(-a[0]+c[0])*t+(2*a[0]-5*b[0]+4*c[0]-d[0])*t2+(-a[0]+3*b[0]-3*c[0]+d[0])*t3),
                 0.5*(2*b[1]+(-a[1]+c[1])*t+(2*a[1]-5*b[1]+4*c[1]-d[1])*t2+(-a[1]+3*b[1]-3*c[1]+d[1])*t3)]); } }
     o.push(pts[pts.length-1]); return o; }
-  runLen(it){ const s=this.spline(it.pts); let L=0;
+  /* A run is a smooth line through its points, which is what a trough, a path
+     or an edge is, and is not what a pipe is. A pipe's corners are surveyed and
+     the spline rounds one off by the better part of a metre — enough to move a
+     line that is placed to stay clear of a protection zone. A sharp run keeps
+     its polyline exactly and is only densified along it, so the route is the
+     surveyed one, the handles are the corners themselves rather than fifty
+     points approximating them, and the zone tests still get a sample every half
+     metre instead of one per leg. */
+  sharpLine(pts,step){ const o=[]; step=step||0.5;
+    for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i];
+      const n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/step));
+      for(let k=0;k<n;k++) o.push([a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n]); }
+    o.push(pts[pts.length-1].slice()); return o; }
+  /* The one place that decides which of the two an item is. */
+  centreLine(it){ return it.sharp?this.sharpLine(it.pts):this.spline(it.pts); }
+  runLen(it){ const s=this.centreLine(it); let L=0;
     for(let i=1;i<s.length;i++) L+=Math.hypot(s[i][0]-s[i-1][0],s[i][1]-s[i-1][1]);
     return L; }
   /* both edges of the ribbon, from the normal at each sample */
-  runEdges(it){ const s=this.spline(it.pts), hw=it.w/2, L=[], R=[];
+  runEdges(it){ const s=this.centreLine(it), hw=it.w/2, L=[], R=[];
     for(let i=0;i<s.length;i++){ const a=s[Math.max(0,i-1)], b=s[Math.min(s.length-1,i+1)];
       let dx=b[0]-a[0], dy=b[1]-a[1]; const m=Math.hypot(dx,dy)||1; dx/=m; dy/=m;
       L.push([s[i][0]-dy*hw, s[i][1]+dx*hw]); R.push([s[i][0]+dy*hw, s[i][1]-dx*hw]); }
@@ -959,7 +1014,7 @@ class Component extends DCLogic {
   corners(it){ if(it.shape==='circ'||this.isRun(it)) return null;
     const cx=it.x+it.w/2, cy=it.y+it.h/2, a=(it.rot||0)*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
     return [[-it.w/2,-it.h/2],[it.w/2,-it.h/2],[it.w/2,it.h/2],[-it.w/2,it.h/2]].map(p=>[cx+p[0]*ca-p[1]*sa,cy+p[0]*sa+p[1]*ca]); }
-  centre(it){ if(this.isRun(it)){ const s=this.spline(it.pts); return s[Math.floor(s.length/2)]; }
+  centre(it){ if(this.isRun(it)){ const s=this.centreLine(it); return s[Math.floor(s.length/2)]; }
     return it.shape==='circ'?[it.x,it.y]:[it.x+it.w/2,it.y+it.h/2]; }
   samples(it,n){ n=n||6; const o=[];
     if(this.isRun(it)){ const e=this.runEdges(it);
@@ -984,7 +1039,7 @@ class Component extends DCLogic {
       for(const t of D.TREES){ if(!t.ctrl) continue;
         const d2=(p[0]-t.x)**2+(p[1]-t.y)**2;
         if(d2<=t.srz*t.srz)srz.add(t.id); else if(d2<=t.ctrl*t.ctrl)tpz.add(t.id); }
-      for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) bld.add(b[0]);
+      if(!BURIED[it.n]) for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) bld.add(b[0]);
       if(!this.inPoly(p,BOUND)) out=true;
     }
     const m=[]; let lvl='g';
@@ -1025,6 +1080,33 @@ class Component extends DCLogic {
      from the build-up declared on the item rather than from the library. */
   /* Fall from one end of an item's long axis to the other, and across it. What a
      swale is checked on, and what tells you which way a mound should lie. */
+  /* The line an item runs along: the curve itself for a run, the long axis of
+     the box otherwise. A trough and a berm are both judged along it, and both
+     have to work for either shape, because Straighten is one tap away. */
+  midline(it){ if(this.isRun(it)) return this.centreLine(it);
+    const cs=this.corners(it); if(!cs) return null;
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+    const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const L=d(e[0],e[2])>=d(e[1],e[3])?[e[0],e[2]]:[e[1],e[3]], o=[];
+    for(let i=0;i<=20;i++) o.push([L[0][0]+(L[1][0]-L[0][0])*i/20, L[0][1]+(L[1][1]-L[0][1])*i/20]);
+    return o; }
+  /* Which way a berm sheds, and whether it covers what it stands in front of.
+     A low point in the middle of a berm is the failure that matters: water
+     gathers at it and stays, a metre from the wall the berm was built to keep
+     it away from. Water leaving past either end is the design working. */
+  bermShed(it){ const m=this.midline(it); if(!m||m.length<3) return null;
+    const z=m.map(p=>this.RL(p[0],p[1]));
+    let lo=0, hi=0;
+    for(let i=1;i<z.length;i++){ if(z[i]<z[lo])lo=i; if(z[i]>z[hi])hi=z[i]>z[hi]?i:hi; }
+    const f=lo/(z.length-1), ys=m.map(p=>p[1]);
+    const w=this.nearBuilding(it), b=w?this.D.BOXH.find(x=>x[0]===w.n):null;
+    const y0=Math.min.apply(null,ys), y1=Math.max.apply(null,ys);
+    return {sag:f>BERMSAG&&f<1-BERMSAG, at:f, len:this.linLen(it),
+      drop:z[hi]-z[lo], ends:z[hi]-Math.min(z[0],z[z.length-1]),
+      low:m[lo], end:z[0]<=z[z.length-1]?'east-north-east':'west-south-west',
+      wall:w, short:b?[Math.max(0,y0-b[2]),Math.max(0,b[4]-y1)]:null,
+      spare:b?[Math.max(0,b[2]-y0),Math.max(0,y1-b[4])]:null}; }
   contourFall(it){
     /* A bent trough has to be level along the whole of itself, not just end to
        end, so the fall that matters is the highest point against the lowest. */
@@ -1160,7 +1242,9 @@ class Component extends DCLogic {
          you take hold of it, so bending a run is one gesture rather than a mode
          you enter first. */
       const hp=ev.target.closest('.hP,.hA,.hW');
-      if(hp&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel); this.push();
+      if(hp&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel);
+        if(it&&it.lk) return;
+        this.push();
         if(hp.classList.contains('hW')){
           this.drag={mode:'wide',it:it,m0:m,o:{w:it.w}};
         } else {
@@ -1170,11 +1254,17 @@ class Component extends DCLogic {
         }
         el.setPointerCapture(ev.pointerId); this.draw(); return; }
       const h=ev.target.closest('.hS,.hT,.hR');
-      if(h&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel); this.push();
+      if(h&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel);
+        if(it&&it.lk) return;
+        this.push();
         this.drag={mode:h.classList.contains('hS')?'size':h.classList.contains('hT')?'rot':'rad',it:it,m0:m,o:{x:it.x,y:it.y,w:it.w,h:it.h,rot:it.rot||0}};
         el.setPointerCapture(ev.pointerId); return; }
       const t=ev.target.closest('.mv');
-      if(t){ const it=s.items.find(i=>i.u===+t.dataset.u); this.push();
+      if(t){ const it=s.items.find(i=>i.u===+t.dataset.u);
+        /* Locked still selects — reading a pipe and unlocking it both start
+           with tapping it. It just does not take hold. */
+        if(it&&it.lk){ this.setState({sel:it.u},()=>this.draw()); return; }
+        this.push();
         this.drag={mode:'move',it:it,m0:m,o:{x:it.x,y:it.y,pts:this.isRun(it)?it.pts.map(p=>p.slice()):null}};
         el.setPointerCapture(ev.pointerId);
         this.setState({sel:it.u},()=>this.draw()); return; }
@@ -1218,7 +1308,7 @@ class Component extends DCLogic {
     el.addEventListener('dblclick',ev=>{
       const hp=ev.target.closest('.hP'); if(!hp) return;
       const it=this.state.items.find(i=>i.u===this.state.sel);
-      if(!this.isRun(it)||it.pts.length<=2) return;
+      if(!this.isRun(it)||it.lk||it.pts.length<=2) return;
       ev.preventDefault(); this.push();
       const q=it.pts.slice(); q.splice(+hp.dataset.i,1);
       this.commit(this.state.items.map(i=>i.u===it.u?{...i,pts:q}:i)); });
@@ -1282,6 +1372,13 @@ class Component extends DCLogic {
   polyD(pts){ return pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(3)+' '+this.fy(p[1]).toFixed(3)).join(' ')+'Z'; }
   handles(it){ if(!it) return '';
     const c=this.centre(it);
+    /* A locked item selected shows an outline and no dots. Nothing to grab is
+       the message, and an empty selection would instead read as a bug. */
+    if(it.lk){ const d=this.isRun(it)?this.polyD(this.runPoly(it))
+        :(it.shape==='circ'?null:this.polyD(this.corners(it)));
+      const st='fill="none" stroke="'+COL.tpz+'" stroke-width="2.5" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"';
+      return d?'<path '+st+' d="'+d+'"/>'
+              :'<circle cx="'+it.x+'" cy="'+this.fy(it.y)+'" r="'+(it.w+0.25)+'" '+st+'/>'; }
     const dot=(x,y,cls,f,r,extra)=>'<circle class="'+cls+'" '+(extra||'')+' cx="'+x+'" cy="'+this.fy(y)+'" r="'+(r||0.34)+'" fill="'+f+'" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>';
     if(this.isRun(it)){
       /* One handle a point, and a smaller one between each pair that becomes a
@@ -1341,11 +1438,14 @@ class Component extends DCLogic {
       const P=D.DRAIN, line=(pts,st)=>'<path d="'+pts.map((p,i)=>(i?'L':'M')+p[0]+' '+this.fy(p[1])).join('')+'" '+st+'/>';
       g+=line(P.overland,'fill="none" stroke="'+COL.water+'" stroke-width="11" opacity="0.16" '+nss);
       g+=line(P.swale,'fill="none" stroke="'+COL.water+'" stroke-width="5" opacity="0.45" '+nss);
-      g+=line(P.berm,'fill="none" stroke="'+COL.tpz+'" stroke-width="4" stroke-dasharray="5 3" opacity="0.6" '+nss);
       g+=line(P.sleeve,'fill="none" stroke="'+COL.water+'" stroke-width="7" opacity="0.22" '+nss);
-      g+=line(P.spine,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
-      g+=line(P.north,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
-      g+=line(P.court,'fill="none" stroke="'+COL.water+'" stroke-width="2.2" stroke-dasharray="6 4" '+nss);
+      /* The sleeve highlight, the pits and the corridor are annotation on the
+         lines rather than objects, so they are drawn either way. */
+      if(!this.owns(BERM)) g+=line(P.berm,'fill="none" stroke="'+COL.tpz+'" stroke-width="4" stroke-dasharray="5 3" opacity="0.6" '+nss);
+      if(!this.owns(PIPE)){
+        g+=line(P.spine,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
+        g+=line(P.north,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
+        g+=line(P.court,'fill="none" stroke="'+COL.water+'" stroke-width="2.2" stroke-dasharray="6 4" '+nss); }
       g+=P.pits.map(p=>'<circle cx="'+p[1]+'" cy="'+this.fy(p[2])+'" r="0.3" fill="'+COL.water+'" stroke="#fff" stroke-width="1.4" '+nss+'/>').join('');
     }
     if(L.tpz) g+=D.TREES.map(t=>t.ctrl?'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.ctrl+'" fill="'+COL.tpz+'" fill-opacity="0.07" stroke="'+COL.tpz+'" stroke-width="1.1" stroke-dasharray="7 4" '+nss+'/>':'').join('');
@@ -1398,15 +1498,19 @@ class Component extends DCLogic {
       +'<g pointer-events="none">'+tx+'</g></svg>';
   }
   /* ---------- derived ---------- */
-  quantities(){ let pave=0,soft=0,lin=0,plants=0,cost=0,mulch=0,added=0; const byg={};
+  quantities(){ let pave=0,soft=0,lin=0,pipe=0,plants=0,cost=0,mulch=0,added=0; const byg={};
     for(const it of this.state.items){ const a=this.area(it);
       if(it.t==='plant'){plants++;cost+=it.cost;byg[it.g]=(byg[it.g]||0)+1;}
       else if(it.unit==='m2'){ if(it.cat==='soft'){soft+=a; if(it.n.indexOf('Mulch')>=0)mulch+=a*0.1;} else pave+=a; cost+=a*it.cost; }
-      else if(it.unit==='lin'){ const L=this.linLen(it); lin+=L; cost+=L*it.cost; }
+      /* Buried line is linear metres too, and eighty metres of it landing in
+         "walls and edges" would make that number say nothing. Counted apart,
+         and carrying no cost here because the drainage is its own trade —
+         Works → Drainage is where the pipe sizes and falls are priced. */
+      else if(it.unit==='lin'){ const L=this.linLen(it); if(BURIED[it.n]) pipe+=L; else lin+=L; cost+=L*it.cost; }
       else cost+=it.cost;
       /* carted in and heaped up, so it is priced and counted like anything else */
       const bu=this.buildup(it); if(bu){ added+=bu.vol; cost+=bu.vol*BURATE; } }
-    return {pave,soft,lin,plants,cost,mulch,added,byg}; }
+    return {pave,soft,lin,pipe,plants,cost,mulch,added,byg}; }
   issues(){
     const s=this.state, out=[];
     for(const it of s.items){
@@ -1441,6 +1545,30 @@ class Component extends DCLogic {
           body:'It falls '+(cf.fall*1000).toFixed(0)+' mm from one end to the other, so it would run water along itself instead of holding it. Turned to lie the other way it falls about '+(cf.across*1000).toFixed(0)+' mm over the same ground. Contours here run across the block, not down it.'});
         else if(cf) out.push({sev:'note',u:it.u,title:it.n+' — '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
           body:'On the contour, so it fills along its whole length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing — the fitted surface is only good to about 130 mm. Rock the inlet, and leave a level spill at the low end so an overflow leaves the way you chose.'}); }
+      /* What a pipe is judged on is its route, not its level: clause 6.5.2 rules
+         out a new service through a protection zone unless the tree plan says
+         so, which is the whole reason the sleeves are cast under the slab. */
+      if(it.n===PIPE){ const under=new Set();
+        for(const p of this.samples(it,4)) for(const b of this.BLDR)
+          if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) under.add(b[0]);
+        let deep=0;
+        for(const p of this.samples(it,4)) for(const t of this.D.TREES){ if(!t.ctrl) continue;
+          const d=t.ctrl-Math.hypot(p[0]-t.x,p[1]-t.y); if(d>deep) deep=d; }
+        const zoned=[...ck.srz,...ck.tpz], u=under.size?' It runs under the '+[...under].join(' and the ')+', which is what the cast-in sleeves are for — laid while the slab is formed and a serious problem afterwards.':'';
+        if(zoned.length) out.push({sev:'care',u:it.u,title:it.n+' crosses the protection zone of tree '+zoned.join(', '),
+          body:'It reaches '+(deep*1000).toFixed(0)+' mm inside the zone at its closest. Clause 6.5.2 rules out an additional service through a protection zone unless the tree plan specifies it, so this route needs the plan amended before it is dug, and then hand or hydro excavation with the arborist present. The sleeves cast under the garage slab are the route that avoids all of that.'
+            +(deep<0.25?' At this depth it is a graze rather than a crossing, and well inside what the survey can resolve — worth confirming the zone radius on site before moving anything.':'')+u});
+        else out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of line',
+          body:'Clear of every protection zone, so no tree approval and no supervision, which is the reason for this route rather than the short one.'+u+' Falls and pipe sizes are in Works → Drainage; this line is the route on the ground.'}); }
+      /* The two things a berm has to be, and neither is level. */
+      if(it.n===BERM){ const bs=this.bermShed(it);
+        if(bs&&bs.sag) out.push({sev:'care',u:it.u,title:it.n+' has a low point in the middle of it',
+          body:'The ground under it dips '+(bs.drop*1000).toFixed(0)+' mm about '+(bs.at*100).toFixed(0)+' per cent along, near x '+bs.low[0].toFixed(1)+', y '+bs.low[1].toFixed(1)+'. Water turned aside by the berm runs to that dip and stays there rather than leaving along the face, which is the one place it must not stand'+(bs.wall?' — '+bs.wall.d.toFixed(1)+' m from the '+bs.wall.n:'')+'. Carry the crest through the dip, or move the run to ground that sheds.'});
+        else if(bs) out.push({sev:'note',u:it.u,title:it.n+' — '+bs.len.toFixed(1)+' m, shedding '+(bs.ends*1000).toFixed(0)+' mm to its ends',
+          body:'A berm is the opposite of a trough: it is built to send water somewhere, so it wants fall along itself, and it has it. Sheet flow crossing the woodland floor is turned along the face and let go past the '+(bs.end)+' end rather than continuing into the wall. Wide and rounded rather than sharp, so it overtops evenly along its length instead of breaching at one point.'
+            +(bs.wall&&bs.short?(bs.short[0]+bs.short[1]>0.05
+              ? ' It stops '+Math.max(bs.short[0],bs.short[1]).toFixed(1)+' m short of the '+bs.wall.n+'’s corner, so water walks round the end of it — run it past both corners.'
+              : ' It stands across the whole of the '+bs.wall.n+'’s uphill wall, with '+bs.spare[0].toFixed(1)+' m spare at one end and '+bs.spare[1].toFixed(1)+' m at the other.'):'')}); }
       if(it.n==='Sunken firepit'){ const d=it.x-it.w;
         if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
           body:'The ACT rule is three metres of clearance on the reserve side. Moving it about '+Math.max(0.5,3-d).toFixed(1)+' m toward the street fixes that, but pushes it toward the gum\u2019s protection zone.'}); }
@@ -1622,6 +1750,13 @@ class Component extends DCLogic {
         style:'padding:7px 13px;border-radius:999px;border:1.5px solid '+(danger?'var(--color-accent-300)':'var(--color-neutral-300)')
           +';font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;white-space:nowrap;color:'
           +(danger?'var(--color-accent-700)':'var(--color-neutral-700)')});
+      /* One switch, and while it is on it is the only thing offered. Half the
+         value of a lock is that the destructive actions are not sitting next to
+         it waiting to be tapped instead. */
+      const lockAct=act(sel.lk?'Unlock':'Lock',()=>{ this.push();
+        this.commit(s.items.map(i=>i.u===sel.u?{...i,lk:sel.lk?0:1}:i),sel.u); });
+      if(sel.lk){ selActions=[lockAct]; }
+      else{
       selActions=[
         act('Copy',()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;
           if(n.pts) n.pts=n.pts.map(q=>[q[0]+1,q[1]-1]);
@@ -1646,7 +1781,9 @@ class Component extends DCLogic {
           this.commit(s.items.map(i=>i.u===sel.u?n:i),sel.u); }));
       }
       if(sel.shape!=='circ'&&!this.isRun(sel)) selActions.push(act('Rotate 90°',()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}));
+      selActions.push(lockAct);
       selActions.push(act('Delete',()=>{this.push();this.commit(s.items.filter(i=>i.u!==sel.u),null);},true));
+      }
     }
     /* Cut and fill are computed; this one has to be told, so it is the only
        thing in the inspector you set rather than read. Hard elements only —
@@ -1715,11 +1852,13 @@ class Component extends DCLogic {
 
     const stages=[1,2,3].map(n=>{
       const list=s.items.filter(i=>(i.st||3)===n);
-      const cost=list.reduce((a,i)=>a+(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?Math.max(i.w,i.h)*i.cost:i.cost)),0);
+      /* linLen, not max(w,h): a bent run's length is the curve, and reading w
+         off one gives 0.3 m of stormwater line and a swale that costs nothing. */
+      const cost=list.reduce((a,i)=>a+(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?this.linLen(i)*i.cost:i.cost)),0);
       return {when:STAGEDEF[n].when,title:STAGEDEF[n].title,why:STAGEDEF[n].why,
         cost:'$'+Math.round(cost).toLocaleString(),count:list.length+' items',
         bar:'height:100%;width:'+Math.min(100,cost/BUDGET*100*2.2)+'%;background:'+(n===1?'var(--color-accent)':(n===2?'var(--color-accent-2-500)':'var(--color-neutral-500)')),
-        items:list.map(i=>({name:i.n,cost:'$'+Math.round(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?Math.max(i.w,i.h)*i.cost:i.cost)).toLocaleString(),
+        items:list.map(i=>({name:i.n,cost:'$'+Math.round(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?this.linLen(i)*i.cost:i.cost)).toLocaleString(),
           dot:'flex:0 0 12px;height:12px;border-radius:'+(i.shape==='circ'?'999px':'4px')+';background:'+i.fill+';border:1.5px solid '+i.stroke,
           move:()=>{ this.push(); const items=s.items.map(x=>x.u===i.u?{...x,st:(x.st||3)%3+1}:x); this.commit(items); }}))};
     });
@@ -1837,6 +1976,7 @@ class Component extends DCLogic {
       barStyle:'height:100%;width:'+Math.min(100,q.cost/BUDGET*100)+'%;background:'+(q.cost>BUDGET?'#a8332a':'var(--color-accent-2-500)'),
       qtyRows:[{k:'Paving and terrace',v:q.pave.toFixed(1)+' m²'},{k:'Soft surfaces',v:q.soft.toFixed(1)+' m²'},
         {k:'Walls and edges',v:q.lin.toFixed(1)+' m'},{k:'Mulch at 100 mm',v:q.mulch.toFixed(1)+' m³'}]
+        .concat(q.pipe>0?[{k:'Drainage line',v:q.pipe.toFixed(1)+' m'}]:[])
         .concat(q.added>0?[{k:'Ground made up',v:q.added.toFixed(1)+' m³'}]:[])
         .concat([{k:'Plants',v:String(q.plants)}]),
       issueCount:String(iss.length), issueSummary:stops?stops+(stops===1?' hard clash':' hard clashes')+' and '+(iss.length-stops)+' to watch':(iss.length?'Nothing hard, '+iss.length+' to watch':'Nothing clashing'),

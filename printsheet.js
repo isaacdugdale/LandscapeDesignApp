@@ -71,11 +71,13 @@ window.PRINTSHEET = (function () {
     };
     g += line(P2.overland, 'stroke="#33646b" stroke-width="' + L(2.6) + '" opacity="0.12"');
     g += line(P2.swale, 'stroke="#33646b" stroke-width="' + L(1.3) + '" opacity="0.32"');
-    g += line(P2.berm, 'stroke="#b2622d" stroke-width="' + L(0.5) + '" stroke-dasharray="' + L(1.6) + ' ' + L(1) + '" opacity="0.65"');
-    g += line(P2.spine, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
-    g += line(P2.north, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
+    if (!app.owns('Diversion berm')) g += line(P2.berm, 'stroke="#b2622d" stroke-width="' + L(0.5) + '" stroke-dasharray="' + L(1.6) + ' ' + L(1) + '" opacity="0.65"');
+    if (!app.owns('Stormwater line')) {
+      g += line(P2.spine, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
+      g += line(P2.north, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
+    }
     g += line(P2.sleeve, 'stroke="#33646b" stroke-width="' + L(1.5) + '" opacity="0.2"');
-    g += line(P2.court, 'stroke="#33646b" stroke-width="' + L(0.4) + '" stroke-dasharray="' + L(1.4) + ' ' + L(0.9) + '"');
+    if (!app.owns('Stormwater line')) g += line(P2.court, 'stroke="#33646b" stroke-width="' + L(0.4) + '" stroke-dasharray="' + L(1.4) + ' ' + L(0.9) + '"');
     g += P2.pits.map(function (p) {
       return '<circle cx="' + p[1] + '" cy="' + app.fy(p[2]) + '" r="' + (0.28) + '" fill="#33646b" stroke="#fff" stroke-width="' + L(0.3) + '"/>';
     }).join('');
@@ -263,12 +265,14 @@ window.PRINTSHEET = (function () {
       return '<rect x="' + d[1] + '" y="' + app.fy(d[4]) + '" width="' + (d[3] - d[1]) + '" height="' + (d[4] - d[2]) + '" fill="#e6dbc4" stroke="#a89878" stroke-width="' + L(0.3) + '"/>';
     }).join('');
 
-    /* the swale and the bund: the actual shaping work, not editor items */
+    /* the rear swale: still site data rather than an editor item. The berm
+       beside it may be either, so it is drawn here only while the layout has
+       no element standing in for it — otherwise it arrives twice. */
     var line = function (pts, st) {
       return '<path d="' + pts.map(function (q, i) { return (i ? 'L' : 'M') + q[0] + ' ' + app.fy(q[1]); }).join('') + '" fill="none" ' + st + '/>';
     };
     g += line(D.DRAIN.swale, 'stroke="#33646b" stroke-width="' + L(2.2) + '" opacity="0.5" stroke-linecap="round"');
-    g += line(D.DRAIN.berm, 'stroke="#b2622d" stroke-width="' + L(1.6) + '" opacity="0.5" stroke-linecap="round"');
+    if (!app.owns('Diversion berm')) g += line(D.DRAIN.berm, 'stroke="#b2622d" stroke-width="' + L(1.6) + '" opacity="0.5" stroke-linecap="round"');
 
     /* every excavation, keyed and shaded by what may touch it */
     earthRows(app).forEach(function (r) {
@@ -643,6 +647,7 @@ window.PRINTSHEET = (function () {
       + '<tr><td>Paving and terrace</td><td class="ps-num">' + n1(q.pave) + ' m²</td></tr>'
       + '<tr><td>Soft surfaces</td><td class="ps-num">' + n1(q.soft) + ' m²</td></tr>'
       + '<tr><td>Walls and edges</td><td class="ps-num">' + n1(q.lin) + ' m</td></tr>'
+      + (q.pipe > 0 ? '<tr><td>Drainage line</td><td class="ps-num">' + n1(q.pipe) + ' m</td></tr>' : '')
       + '<tr><td>Mulch at 100 mm</td><td class="ps-num">' + n1(q.mulch) + ' m³</td></tr>'
       + '<tr><td>Plants</td><td class="ps-num">' + q.plants + '</td></tr>'
       + '<tr class="ps-tot"><td>Materials total, your labour</td><td class="ps-num">' + money(q.cost) + '</td></tr>'

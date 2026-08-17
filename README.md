@@ -76,7 +76,10 @@ there and every screen follows.
   standard scale that fits (1:125 on A3, 1:200 on A4) and says which. The drawing is
   vector, so it stays sharp at any size and a ruler on the paper reads true.
 - **Swales and mounds** are a level trough on the contour with the spoil laid along its
-  downhill side, and on this block almost none of them are dug: protection zones cover
+  downhill side. They arrive as curved runs rather than rectangles, each one following the
+  surveyed contour it sits on, because that is the shape a level trough has on the ground —
+  the base plan and the **Contour swales** scheme both ship them that way. On this block
+  almost none of them are dug: protection zones cover
   half the back garden and nearly all the front, so the trough is formed by raising its
   shoulders in 100 mm of coarse woodchip. Only the rear pocket is clear enough for soil.
   The gravel paths are part of the same system — laid level on 150 mm of aggregate they
@@ -114,9 +117,53 @@ there and every screen follows.
   handle on the edge sets the width. **Straighten** puts it back in a box. Length,
   area, cost, the protection-zone tests, the level check and both printed sheets
   all read the curve rather than the rectangle around it — a bent trough is
-  checked for level along the whole of itself, not just end to end.
+  checked for level along the whole of itself, not just end to end. A starting
+  layout can say so too: the ninth column of an `items` or `START` row is the
+  point list, so a scheme arrives already bent instead of waiting to be bent by
+  hand.
+- **The site fabric is editable, and arrives locked.** The berm behind the addition
+  and the stormwater lines were drawn out of `DRAIN` in `site-data.js` — visible,
+  untouchable, and absent from the elements list, because there was nothing in the
+  library they could be. **Diversion berm** and **Stormwater line** are those things
+  now: same tan, same blue, same alignments, but selectable, movable, costed and
+  checked. Because nobody wants to nudge a pipe while moving a bed, they arrive
+  **locked** — a locked item selects and reads normally, shows a dashed outline
+  instead of grab handles, and ignores drags, arrow keys and Backspace. The only
+  action offered is **Unlock**; unlocked, it behaves like anything else and **Lock**
+  is there to put it back. Every element carries the switch, not just these two, so
+  a terrace you have settled can be locked out of the way of your own elbows. The
+  library's thirteenth column is what *arrives* locked; the item carries whether it
+  *is*, so both choices save with the scheme.
+- A scheme saved before those elements existed still has to show the pipes, so the
+  site version of a line is drawn only while nothing in the layout stands in for it
+  — `owns()` decides, by element name, in the app and on both printed sheets. The
+  sleeve highlights, the pits and the overland corridor are annotation rather than
+  objects and are drawn either way.
+- **A run can keep its corners.** A `pts` run is normally a smooth Catmull-Rom line,
+  which is what a trough, a path or an edge is — and is not what a pipe is. Splining
+  the spine's surveyed dogleg moved it 871 mm, enough to shift a line that is placed
+  to stay clear of a protection zone; evenly spaced control points needed 76 of them
+  to get that under 100 mm. So the library's fourteenth column marks an element
+  *sharp*: its centreline is the polyline itself, densified every 500 mm so the zone
+  tests still get a sample per half metre, with handles on the surveyed corners
+  rather than fifty points approximating them.
+- **Diversion berm** is deliberately not a `Mound, built up`, because the two carry
+  opposite instructions — a trough or a mound on the contour is judged on being level, and a
+  berm is judged on *not* being. The Checks screen asks it two questions: does the
+  ground fall along it, so water leaves past an end rather than gathering at a low
+  point a foot from the wall; and does it stand across the whole of the wall it
+  protects, or does water walk round the end of it. **Stormwater line** is checked on
+  its route rather than its level: clause 6.5.2 rules out a new service through a
+  protection zone unless the tree plan says so, and it is the one element in the
+  library that is *buried*, so passing under the garage slab is the design rather
+  than a clash and its metres are counted as drainage rather than as walls and edges.
+- Making the berm an element made visible something that was always true: in the base plan the back path runs along
+  the same strip, so the two now draw over each other. Nothing checks for overlap,
+  so nothing will say so — move one of them, or accept a path along the berm's toe
+  and know the chip is counted twice. **Contour swales** has the path further uphill
+  and does not have the problem.
 - Selecting anything on the plan floats a bar over the drawing with its name, **Copy**,
-  **Rotate 90°** on rectangles, and **Delete**. The inspector carries the same actions
+  **Rotate 90°** on rectangles, **Lock**, and **Delete**. The inspector carries the same actions
   from the same definition; the bar exists because the inspector is a scroll away in
   normal mode and hidden in focus mode, which is when you are actually moving things.
 - The **expand** button on the plan (with the zoom controls) drops the sidebar, header,
