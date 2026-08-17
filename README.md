@@ -132,7 +132,14 @@ there and every screen follows.
   brief, so a scheme arrives explaining itself. **Schemes → Push to gist** sends the
   schemes to a private GitHub gist as one small file each plus an `index.json`,
   which the file backup does not do — a single blob is rendered truncated and the
-  newest scheme is the part that gets cut. It uses a fine-grained token
+  newest scheme is the part that gets cut. That gist is how the iPad's schemes are
+  read on a laptop: open <https://gist.github.com/isaacdugdale> signed in as
+  yourself and it is the one titled **234 Duffy Schemes**, holding `index.json`
+  and one file per scheme. Do not write its URL down here or anywhere else public.
+  A gist pushed as private is unlisted rather than access-controlled — it does not
+  appear on that page to anyone but you, but the URL is the whole of the lock, so
+  in a repository this public it would be the same as making the schemes public.
+  It uses a fine-grained token
   with gist write scope that you paste once and that stays in the browser's local
   storage. It is the only thing in the app that talks to the internet and it only
   does so on that tap; revoke the token on GitHub and everything else still works.
