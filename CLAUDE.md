@@ -43,6 +43,14 @@ Row shapes, which are positional and easy to shift by one:
 | --- | --- |
 | `items`, `START` | `[name, x, y, w, h, rot, buildUpMm, buildUpMaterial, pts]` |
 | `plants`, `STARTP` | `[plant id or exact name, x, y]` |
+| `LIB` | `[name, shape, cat, w, h, cost, unit, fill, stroke, stage, buildUpMm, buildUpMaterial, locked, sharp]` |
+
+`LIB` is the element library and the palette is built straight off it, so adding
+an element is adding a row plus a `HARDCOL` entry for its plan colours. `locked`
+means the element *arrives* locked — site fabric does, so a pipe is not nudged
+while a bed is being moved — and `sharp` means its run keeps its corners instead
+of being splined through them. Both are booleans and both are read as `l[12]`
+and `l[13]`, so a row that stops short of them is simply unlocked and smooth.
 
 The ninth column, `pts`, is an array of `[x, y]`, and it makes the item a curved
 run: a smooth line through those points, `w` metres wide, with `x`, `y`, `h` and
