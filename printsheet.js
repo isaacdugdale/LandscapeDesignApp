@@ -71,7 +71,6 @@ window.PRINTSHEET = (function () {
     };
     g += line(P2.overland, 'stroke="#33646b" stroke-width="' + L(2.6) + '" opacity="0.12"');
     g += line(P2.swale, 'stroke="#33646b" stroke-width="' + L(1.3) + '" opacity="0.32"');
-    g += line(P2.berm, 'stroke="#b2622d" stroke-width="' + L(0.5) + '" stroke-dasharray="' + L(1.6) + ' ' + L(1) + '" opacity="0.65"');
     g += line(P2.spine, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
     g += line(P2.north, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
     g += line(P2.sleeve, 'stroke="#33646b" stroke-width="' + L(1.5) + '" opacity="0.2"');
@@ -263,12 +262,13 @@ window.PRINTSHEET = (function () {
       return '<rect x="' + d[1] + '" y="' + app.fy(d[4]) + '" width="' + (d[3] - d[1]) + '" height="' + (d[4] - d[2]) + '" fill="#e6dbc4" stroke="#a89878" stroke-width="' + L(0.3) + '"/>';
     }).join('');
 
-    /* the swale and the bund: the actual shaping work, not editor items */
+    /* the rear swale: still site data rather than an editor item. The berm
+       that used to be drawn beside it is an element now, so it arrives with
+       the rest of the shaping below and must not be drawn twice. */
     var line = function (pts, st) {
       return '<path d="' + pts.map(function (q, i) { return (i ? 'L' : 'M') + q[0] + ' ' + app.fy(q[1]); }).join('') + '" fill="none" ' + st + '/>';
     };
     g += line(D.DRAIN.swale, 'stroke="#33646b" stroke-width="' + L(2.2) + '" opacity="0.5" stroke-linecap="round"');
-    g += line(D.DRAIN.berm, 'stroke="#b2622d" stroke-width="' + L(1.6) + '" opacity="0.5" stroke-linecap="round"');
 
     /* every excavation, keyed and shaded by what may touch it */
     earthRows(app).forEach(function (r) {

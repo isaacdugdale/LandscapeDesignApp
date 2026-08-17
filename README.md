@@ -120,10 +120,23 @@ there and every screen follows.
   checked for level along the whole of itself, not just end to end. A starting
   layout can say so too: the ninth column of an `items` or `START` row is the
   point list, so a scheme arrives already bent instead of waiting to be bent by
-  hand. The tan dotted line on the plan is *not* one of these — it is the
-  existing berm behind the addition, drawn with the pipes and the flow corridor
-  from `DRAIN` in `site-data.js`, which is why it is not in the elements list
-  and cannot be selected.
+  hand.
+- **The berm behind the addition is an element.** It used to be a tan dotted line
+  drawn with the pipes and the flow corridor, out of `DRAIN` in `site-data.js` —
+  visible and untouchable, and not in the elements list, because there was nothing
+  in the library it could be. **Diversion berm** is that thing now: same tan, same
+  line, but selectable, draggable, curvable, costed and checked like everything
+  else. It is deliberately not a `Mound, built up`, because the two carry opposite
+  instructions — a trough or a mound on the contour is judged on being level, and a
+  berm is judged on *not* being. The Checks screen asks it two questions: does the
+  ground fall along it, so water leaves past an end rather than gathering at a low
+  point a foot from the wall; and does it stand across the whole of the wall it
+  protects, or does water walk round the end of it. Making it an element also made
+  visible something that was always true: in the base plan the back path runs along
+  the same strip, so the two now draw over each other. Nothing checks for overlap,
+  so nothing will say so — move one of them, or accept a path along the berm's toe
+  and know the chip is counted twice. **Contour swales** has the path further uphill
+  and does not have the problem.
 - Selecting anything on the plan floats a bar over the drawing with its name, **Copy**,
   **Rotate 90°** on rectangles, and **Delete**. The inspector carries the same actions
   from the same definition; the bar exists because the inspector is a scroll away in

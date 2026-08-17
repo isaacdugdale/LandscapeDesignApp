@@ -658,7 +658,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v20';
+const BUILD='v21';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -678,6 +678,8 @@ const HARDCOL={
   'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50'],
   'Channel drain':['#b9ccd1','#33646b'],
   'Swale, on contour':['#cfd9d3','#33646b'],'Mound, built up':['#dcc9a8','#8c491a'],
+  /* the tan the dotted line was drawn in, so it stays the thing you recognise */
+  'Diversion berm':['#e6d6bb','#b2622d'],
   'Path, firm surface':['#e4dccb','#a19786'],'Gate':['#d8c3a4','#645c50']
 };
 /* Soakage and a piped channel are opposite answers to the same problem, and the
@@ -700,7 +702,8 @@ const SOAK={
   'Gravel path':       {d:0.15,v:0.35,min:SOAKMIN,mat:'gravel over a coarse chip base'},
   'Mulched bed':       {d:0.10,v:0.25,min:0,mat:'coarse woodchip'},
   'Planting mound':    {d:0,   v:0.25,min:0,mat:'coarse woodchip'},
-  'Mound, built up':   {d:0,   v:0.25,min:0,mat:'coarse woodchip'}
+  'Mound, built up':   {d:0,   v:0.25,min:0,mat:'coarse woodchip'},
+  'Diversion berm':    {d:0,   v:0.25,min:0,mat:'coarse woodchip'}
 };
 /* The design storm the drainage is sized on, put over the whole block: 122 mm/h
    for five minutes is 10.2 mm, which is 8.2 m³ on 807 m². It is what the shaping
@@ -717,6 +720,13 @@ const BLOCK='Sandstone block edge', BLOCKH=0.45, STONET=2.3;
    trough on gently curving ground can read close to either way, and the fitted
    surface is only good to about 130 mm, so a tighter test would cry wolf. */
 const SWALE='Swale, on contour', MOUND='Mound, built up', LEVELTOL=0.10;
+/* A berm is the opposite instruction to a trough, which is why it is its own
+   element rather than a mound with a job description. A trough is judged on
+   being level; a berm is judged on not being, because water has to leave along
+   it, and on standing across the whole of what it protects rather than most of
+   it. The one behind the addition was drawn into the site data as a dotted line
+   for want of an element to be — you could see it and not touch it. */
+const BERM='Diversion berm', BERMSAG=0.15;
 /* Added material: the tree plan's cap inside a protection zone, the project's
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
@@ -1032,6 +1042,33 @@ class Component extends DCLogic {
      from the build-up declared on the item rather than from the library. */
   /* Fall from one end of an item's long axis to the other, and across it. What a
      swale is checked on, and what tells you which way a mound should lie. */
+  /* The line an item runs along: the curve itself for a run, the long axis of
+     the box otherwise. A trough and a berm are both judged along it, and both
+     have to work for either shape, because Straighten is one tap away. */
+  midline(it){ if(this.isRun(it)) return this.spline(it.pts);
+    const cs=this.corners(it); if(!cs) return null;
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+    const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const L=d(e[0],e[2])>=d(e[1],e[3])?[e[0],e[2]]:[e[1],e[3]], o=[];
+    for(let i=0;i<=20;i++) o.push([L[0][0]+(L[1][0]-L[0][0])*i/20, L[0][1]+(L[1][1]-L[0][1])*i/20]);
+    return o; }
+  /* Which way a berm sheds, and whether it covers what it stands in front of.
+     A low point in the middle of a berm is the failure that matters: water
+     gathers at it and stays, a metre from the wall the berm was built to keep
+     it away from. Water leaving past either end is the design working. */
+  bermShed(it){ const m=this.midline(it); if(!m||m.length<3) return null;
+    const z=m.map(p=>this.RL(p[0],p[1]));
+    let lo=0, hi=0;
+    for(let i=1;i<z.length;i++){ if(z[i]<z[lo])lo=i; if(z[i]>z[hi])hi=z[i]>z[hi]?i:hi; }
+    const f=lo/(z.length-1), ys=m.map(p=>p[1]);
+    const w=this.nearBuilding(it), b=w?this.D.BOXH.find(x=>x[0]===w.n):null;
+    const y0=Math.min.apply(null,ys), y1=Math.max.apply(null,ys);
+    return {sag:f>BERMSAG&&f<1-BERMSAG, at:f, len:this.linLen(it),
+      drop:z[hi]-z[lo], ends:z[hi]-Math.min(z[0],z[z.length-1]),
+      low:m[lo], end:z[0]<=z[z.length-1]?'east-north-east':'west-south-west',
+      wall:w, short:b?[Math.max(0,y0-b[2]),Math.max(0,b[4]-y1)]:null,
+      spare:b?[Math.max(0,b[2]-y0),Math.max(0,y1-b[4])]:null}; }
   contourFall(it){
     /* A bent trough has to be level along the whole of itself, not just end to
        end, so the fall that matters is the highest point against the lowest. */
@@ -1348,7 +1385,6 @@ class Component extends DCLogic {
       const P=D.DRAIN, line=(pts,st)=>'<path d="'+pts.map((p,i)=>(i?'L':'M')+p[0]+' '+this.fy(p[1])).join('')+'" '+st+'/>';
       g+=line(P.overland,'fill="none" stroke="'+COL.water+'" stroke-width="11" opacity="0.16" '+nss);
       g+=line(P.swale,'fill="none" stroke="'+COL.water+'" stroke-width="5" opacity="0.45" '+nss);
-      g+=line(P.berm,'fill="none" stroke="'+COL.tpz+'" stroke-width="4" stroke-dasharray="5 3" opacity="0.6" '+nss);
       g+=line(P.sleeve,'fill="none" stroke="'+COL.water+'" stroke-width="7" opacity="0.22" '+nss);
       g+=line(P.spine,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
       g+=line(P.north,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
@@ -1448,6 +1484,15 @@ class Component extends DCLogic {
           body:'It falls '+(cf.fall*1000).toFixed(0)+' mm from one end to the other, so it would run water along itself instead of holding it. Turned to lie the other way it falls about '+(cf.across*1000).toFixed(0)+' mm over the same ground. Contours here run across the block, not down it.'});
         else if(cf) out.push({sev:'note',u:it.u,title:it.n+' — '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
           body:'On the contour, so it fills along its whole length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing — the fitted surface is only good to about 130 mm. Rock the inlet, and leave a level spill at the low end so an overflow leaves the way you chose.'}); }
+      /* The two things a berm has to be, and neither is level. */
+      if(it.n===BERM){ const bs=this.bermShed(it);
+        if(bs&&bs.sag) out.push({sev:'care',u:it.u,title:it.n+' has a low point in the middle of it',
+          body:'The ground under it dips '+(bs.drop*1000).toFixed(0)+' mm about '+(bs.at*100).toFixed(0)+' per cent along, near x '+bs.low[0].toFixed(1)+', y '+bs.low[1].toFixed(1)+'. Water turned aside by the berm runs to that dip and stays there rather than leaving along the face, which is the one place it must not stand'+(bs.wall?' — '+bs.wall.d.toFixed(1)+' m from the '+bs.wall.n:'')+'. Carry the crest through the dip, or move the run to ground that sheds.'});
+        else if(bs) out.push({sev:'note',u:it.u,title:it.n+' — '+bs.len.toFixed(1)+' m, shedding '+(bs.ends*1000).toFixed(0)+' mm to its ends',
+          body:'A berm is the opposite of a trough: it is built to send water somewhere, so it wants fall along itself, and it has it. Sheet flow crossing the woodland floor is turned along the face and let go past the '+(bs.end)+' end rather than continuing into the wall. Wide and rounded rather than sharp, so it overtops evenly along its length instead of breaching at one point.'
+            +(bs.wall&&bs.short?(bs.short[0]+bs.short[1]>0.05
+              ? ' It stops '+Math.max(bs.short[0],bs.short[1]).toFixed(1)+' m short of the '+bs.wall.n+'’s corner, so water walks round the end of it — run it past both corners.'
+              : ' It stands across the whole of the '+bs.wall.n+'’s uphill wall, with '+bs.spare[0].toFixed(1)+' m spare at one end and '+bs.spare[1].toFixed(1)+' m at the other.'):'')}); }
       if(it.n==='Sunken firepit'){ const d=it.x-it.w;
         if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
           body:'The ACT rule is three metres of clearance on the reserve side. Moving it about '+Math.max(0.5,3-d).toFixed(1)+' m toward the street fixes that, but pushes it toward the gum\u2019s protection zone.'}); }
