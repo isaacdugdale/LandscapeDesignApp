@@ -35,8 +35,13 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',function(){
     if(had&&!reloaded){ reloaded=true; location.reload(); }
   });
+  /* updateViaCache none, because Pages serves sw.js with a ten minute max-age
+     and the browser will otherwise answer the update check from its own HTTP
+     cache — which is how a device sits on an old build after a reopen. The
+     explicit update() asks again on every open. */
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'})
+      .then(function(r){ try{ r.update(); }catch(e){} }).catch(function(){});
   });
 }
 </script>
@@ -58,6 +63,17 @@ if('serviceWorker' in navigator){
 <script src="printsheet.js"></script>
 <style>
 body{margin:0;background:#e6dcc9;font-family:"Figtree",system-ui,sans-serif}
+/* what the pointer is over, said in the cursor: the plan drags, an item moves,
+   a handle resizes or turns. Touch never sees these. */
+@media (pointer:fine){
+  svg.plan{cursor:grab}
+  svg.plan:active{cursor:grabbing}
+  svg.plan .mv{cursor:move}
+  svg.plan .thit{cursor:pointer}
+  svg.plan .hS{cursor:nwse-resize}
+  svg.plan .hR{cursor:ew-resize}
+  svg.plan .hT{cursor:grab}
+}
 *{-webkit-tap-highlight-color:transparent}
 input[type=range]{-webkit-appearance:none;appearance:none;height:26px;background:transparent}
 input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:var(--color-neutral-300)}
@@ -360,14 +376,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
             </sc-for>
           </div>
 
-          <div onClick="{{ goIssues }}" style="flex:1 1 232px;min-width:0;align-self:flex-start;border-radius:18px;background:var(--color-accent-100);padding:12px 13px;cursor:pointer" style-hover="background:var(--color-accent-200)">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-accent-700)">What's wrong with this plan</div>
-                <div style="font-size:13px;color:var(--color-neutral-700);margin-top:4px">{{ issueSummary }}</div>
-              </div>
-              <div style="font-family:'Caprasimo';font-size:26px;color:var(--color-accent-700)">{{ issueCount }}</div>
+          <div style="flex:1 1 272px;min-width:0;align-self:flex-start;border-radius:18px;background:var(--color-neutral-100);padding:12px 13px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--color-neutral-600)">Notes</div>
+              <div style="font-size:11.5px;color:var(--color-neutral-600)">{{ schemeName }}</div>
             </div>
+            <textarea value="{{ notes }}" onInput="{{ onNotes }}" placeholder="{{ notesHint }}" style="width:100%;min-height:132px;font:inherit;font-size:12.5px;line-height:1.5;padding:10px 12px;border-radius:14px;border:1.5px solid var(--color-neutral-300);background:#fff;color:var(--color-text);outline:none;resize:vertical"></textarea>
+            <div style="font-size:11.5px;color:var(--color-neutral-600);margin-top:6px">Kept with this scheme, and carried into the brief the Ask screen hands to Claude.</div>
           </div>
         </div>
         </div>
@@ -455,6 +470,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 
               <sc-if value="{{ b.isEarth }}" hint-placeholder-val="{{ false }}">
                 <div ref="{{ earthRef }}" style="margin:4px 0 10px"></div>
+              </sc-if>
+
+              <sc-if value="{{ b.isLevels }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ levelsRef }}" style="margin:4px 0 10px"></div>
+              </sc-if>
+
+              <sc-if value="{{ b.isWater }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ waterRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
 
               <sc-if value="{{ b.isTbl }}" hint-placeholder-val="{{ false }}">
@@ -616,7 +639,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
           </sc-for>
         </div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--color-divider)">
-          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45">Schemes are kept on this iPad only. Back them up to a file to move them to another device, or to keep them if this app is removed.</div>
+          <div style="flex:1;min-width:0;font-size:12px;color:var(--color-neutral-600);line-height:1.45"><b>{{ build }}</b> · Schemes are kept on this iPad only. Push them to a private gist to read them from anywhere, or back them up to a file to move them to another device.</div>
+          <div onClick="{{ pushGist }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">{{ gistLabel }}</div>
           <div onClick="{{ backup }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Back up</div>
           <div onClick="{{ restore }}" style="padding:8px 15px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font-size:12.5px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;white-space:nowrap">Restore</div>
         </div>
@@ -636,6 +660,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1434,&quot;height&quot;:1092}}">
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
+/* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
+   actually running can be read off the device rather than guessed at. */
+const BUILD='v27';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -653,24 +680,108 @@ const HARDCOL={
   'Raised veg bed':['#ccdbb2','#56633f'],'Shed':['#dcd3c4','#645c50'],'Water tank':['#cfd9d3','#33646b'],
   'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Planting mound':['#dcc9a8','#8c491a'],
   'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50'],
-  'Channel drain':['#b9ccd1','#33646b']
+  'Channel drain':['#b9ccd1','#33646b'],'Yard sump':['#b9ccd1','#33646b'],
+  'Swale, on contour':['#cfd9d3','#33646b'],'Mound, built up':['#dcc9a8','#8c491a'],
+  /* the tan the dotted line was drawn in, so it stays the thing you recognise */
+  'Diversion berm':['#e6d6bb','#b2622d'],'Stormwater line':['#b9ccd1','#33646b'],
+  'Path, firm surface':['#e4dccb','#a19786'],'Gate':['#d8c3a4','#645c50']
 };
 /* Soakage and a piped channel are opposite answers to the same problem, and the
    library only had the first, so the courtyard drain was drawn as a soak pit —
-   the one thing the handbook rules out there. These name which elements infiltrate
-   and how close to a wall that stops being allowed. The geotechnical report and
-   the CSIRO guidance warn against soaking water into reactive clay a metre or two
-   from footings; 3 m is the margin, on a Class P site whose movement figure is
-   already spoken for. */
-const SOAKAGE={'Soak pit':1}, SOAKMIN=3, DRAIN='Channel drain';
+   the one thing the handbook rules out there. This names which surfaces put water
+   into the ground rather than into a pipe, how much each holds before it overflows,
+   and how close to a wall that stops being allowed.
+
+   d is the working depth in metres and v the share of it that is void; where d is
+   0 the depth is whatever build-up the item declares, so a mound holds what it is
+   actually made of. The geotechnical report and the CSIRO guidance warn against
+   soaking water into reactive clay a metre or two from footings, so anything that
+   concentrates water keeps 3 m off a wall, on a Class P site whose movement figure
+   is already spoken for. Mulch and mounds spread water rather than concentrate it
+   and sit on the surface, so they carry no margin. */
+const SOAKMIN=3, DRAIN='Channel drain';
+const SOAK={
+  'Soak pit':          {d:1.00,v:0.35,min:SOAKMIN,mat:'gravel-filled pit'},
+  'Swale, on contour': {d:0.25,v:0.50,min:SOAKMIN,mat:'shallow trough'},
+  'Gravel path':       {d:0.15,v:0.35,min:SOAKMIN,mat:'gravel over a coarse chip base'},
+  'Mulched bed':       {d:0.10,v:0.25,min:0,mat:'coarse woodchip'},
+  'Planting mound':    {d:0,   v:0.25,min:0,mat:'coarse woodchip'},
+  'Mound, built up':   {d:0,   v:0.25,min:0,mat:'coarse woodchip'},
+  'Diversion berm':    {d:0,   v:0.25,min:0,mat:'coarse woodchip'}
+};
+/* The design storm the drainage is sized on, put over the whole block: 122 mm/h
+   for five minutes is 10.2 mm, which is 8.2 m³ on 807 m². It is what the shaping
+   is measured against on the Drainage page. */
+const BLOCKM2=807, RAIN5=10.2;
 /* A single course of rough-sawn block, and sandstone runs about 2.3 tonnes the
    cubic metre. The two numbers live here once so the Checks screen and the
    inspector cannot quote different weights. */
-const BLOCK='Sandstone block edge', BLOCKH=0.45, STONET=2.3;
+const BLOCK='Sandstone block edge', BLOCKH=0.50, STONET=2.3;
+/* A swale is only a swale while it is level along its own length. The block falls
+   1 in 19 one way and 1 in 132 the other, so this is really a test of whether the
+   thing has been turned the right way round: it fails when it drops more than
+   100 mm end to end and drops more along its length than across its width. A short
+   trough on gently curving ground can read close to either way, and the fitted
+   surface was only good to about 130 mm, so a tighter test would have cried
+     wolf. The levels are triangulated survey points now and better than that,
+     but the tolerance stays where it is: what it really guards against is a
+     short trough on gently curving ground reading either way round. */
+const SWALE='Swale, on contour', MOUND='Mound, built up', LEVELTOL=0.10;
+/* A berm is the opposite instruction to a trough, which is why it is its own
+   element rather than a mound with a job description. A trough is judged on
+   being level; a berm is judged on not being, because water has to leave along
+   it, and on standing across the whole of what it protects rather than most of
+   it. The one behind the addition was drawn into the site data as a dotted line
+   for want of an element to be — you could see it and not touch it. */
+const BERM='Diversion berm', BERMSAG=0.15;
+/* The pipes. They were site data drawn under everything, which made them
+   impossible to touch by accident and impossible to touch on purpose. As
+   elements they are both, so they arrive locked — see LOCKED below. A line is
+   buried, so running under the garage slab is the design rather than a clash:
+   the handbook's own route out of the back garden is two DN100 sleeves cast
+   under that slab, because a trench through the pear's zone needs the tree plan
+   amended. Nothing else in the library goes under a building, so the exemption
+   is named here rather than guessed from the category. */
+const PIPE='Stormwater line', BURIED={'Stormwater line':1};
+/* The pits. Eight of them were drawn out of DRAIN.pits as annotation — dots on
+   the lines, there to be read and impossible to move — and the builder asking
+   for yard sumps is asking about exactly those. A sump is the opposite element
+   to a soak pit and deliberately absent from SOAK: it is a box that collects
+   water and hands it to a pipe, so nothing about it belongs within the 3 m
+   standoff test, and the one thing that would make it wrong here is putting one
+   somewhere it cannot fall to a line. Unlike a pipe it is NOT buried — its
+   grate is the ground surface, so a sump inside a building footprint is a real
+   clash rather than a sleeve. SUMPFAR is how far from a line a sump may sit
+   before the connection stops being obvious on the drawing; SILT is the ones
+   that take hillside runoff and therefore need a sump below the outlet. */
+const SUMP='Yard sump', SUMPFAR=2.0, SILTY=[[5.5,20.75],[15.8,19.9]], SILTR=2.5, KERB=609.85;
 /* Added material: the tree plan's cap inside a protection zone, the project's
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
 const BUCAP=100, BUFILL=400, BUSTEPS=[0,100,200,300,400,500], BURATE=60;
+/* What a finished surface is graded to. `want` is the gradient it is eased
+   toward, as 1 in N; `max` is the steepest it may be and still do its job;
+   `flat` is the flattest paving may be and still shed. A lawn reads level at
+   1 in 40 and reads like a slope at 1 in 20. A path at 1 in 20 is walked
+   without thinking about it, 1 in 14 is the ramp limit in AS 1428.1, and past
+   1 in 10 it wants steps. A gravel path is an infiltration surface, so it
+   wants to be near level: water it sheds is water it does not hold, and it is
+   judged end to end like a trough rather than on its graded line. */
+const GRADE={
+  'Dichondra lawn':     {want:40, max:20,  kind:'lawn'},
+  'Paving / terrace':   {want:80, max:40,  flat:150, kind:'paved'},
+  'Firepit terrace':    {want:80, max:40,  flat:150, kind:'paved'},
+  'Outdoor kitchen':    {want:80, max:40,  flat:150, kind:'paved'},
+  'Path, firm surface': {want:20, max:14,  kind:'walk'},
+  'Gravel path':        {want:40, max:20,  kind:'soak'}
+};
+/* Sandstone runs 2.3 tonnes the cubic metre, so a 750 mm wide log 500 mm high
+   weighs 860 kg a metre. Nothing places that by hand. No machine may track
+   into a protection zone either, so a run of block inside one has to be set
+   from outside it, and STONEREACH is the working reach that takes. It is here
+   to raise the question with the builder against the machine's own lift chart,
+   not to answer it. STONEHAND is a two person lift. */
+const STONEREACH=4.0, STONEHAND=0.06;
 const GROW={groundcover:3,grass:3,veggie:1,shrub:6,other:6,tree:12};
 /* her plant list came out of a spreadsheet, so names arrive half-cased and one is a pasted link */
 function DISP(n){ if(!n) return n;
@@ -686,10 +797,38 @@ class Component extends DCLogic {
     layers:{contour:true,grid:false,bld:true,tpz:true,srz:true,canopy:true,drain:true,labels:true},
     layersOpen:false,palTab:'plants',q:'',filt:{must:false,edible:false,local:false,hardy:false},armed:null,
     schemes:[],schemeId:null,sheetOpen:false,chat:[],askQ:'',busy:false,todos:[],savedAt:null,hud:'',refSec:{},expand:false,
-    issueFilter:'all',sunCache:{}};
+    issueFilter:'all',sunCache:{},notes:''};
 
-  componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz); this.wait(); }
-  componentWillUnmount(){ window.removeEventListener('resize',this._rz); }
+  componentDidMount(){ this.hist=[]; this.measure(); this._rz=()=>this.measure(); window.addEventListener('resize',this._rz);
+    this._kd=e=>this.onKey(e); window.addEventListener('keydown',this._kd); this.wait(); }
+  componentWillUnmount(){ window.removeEventListener('resize',this._rz); window.removeEventListener('keydown',this._kd); }
+  /* On a laptop the selection is a keyboard away from being nudged, and moving
+     something 50 mm with an arrow key is more accurate than any drag. Ignored
+     while typing, so the notes box and the ask box keep their arrow keys. */
+  onKey(e){
+    const t=e.target, tag=t&&t.tagName;
+    if(tag==='INPUT'||tag==='TEXTAREA'||(t&&t.isContentEditable)) return;
+    const s=this.state;
+    if((e.metaKey||e.ctrlKey)&&(e.key==='z'||e.key==='Z')){
+      e.preventDefault(); if(this.hist&&this.hist.length) this.commit(JSON.parse(this.hist.pop()),null); return; }
+    if(e.key==='Escape'){ if(s.armed) this.setState({armed:null}); else if(s.sel!=null) this.setState({sel:null},()=>this.draw()); return; }
+    if(s.screen!=='plan'||typeof s.sel!=='number') return;
+    const it=s.items.find(i=>i.u===s.sel); if(!it) return;
+    /* Locked is locked from the keyboard too, or the one key that deletes
+       without a confirmation would be the way every pipe went. */
+    if(it.lk) return;
+    if(e.key==='Backspace'||e.key==='Delete'){
+      e.preventDefault(); this.push(); this.commit(s.items.filter(i=>i.u!==s.sel),null); return; }
+    const step=e.shiftKey?0.5:SNAP;
+    const d={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,step],ArrowDown:[0,-step]}[e.key];
+    if(!d) return;
+    e.preventDefault();
+    /* one history entry for a run of nudges, not one per key press */
+    if(!this._nudging){ this.push(); this._nudging=true; }
+    clearTimeout(this._nt2); this._nt2=setTimeout(()=>{this._nudging=false;},700);
+    const r=Math.round, q=v=>r(v/SNAP)*SNAP;
+    this.commit(s.items.map(i=>i.u===s.sel?{...i,x:q(i.x+d[0]),y:q(i.y+d[1])}:i));
+  }
   /* Shown inside a device frame while it is being designed; opened on the iPad
      itself (from the home screen) it fills the screen and follows the device. */
   measure(){
@@ -697,7 +836,12 @@ class Component extends DCLogic {
     let standalone=false;
     try{ standalone=navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches; }catch(e){}
     const touch=(navigator.maxTouchPoints||0)>0;
-    const fill=standalone||(touch&&w<1440&&h<1240);
+    /* A laptop is a real place to use this, not a place to preview it, so a
+       pointer-driven window of any size fills rather than sitting inside a
+       drawing of an iPad. The frame stays for the small preview the design
+       tool renders. */
+    let fine=false; try{ fine=window.matchMedia('(pointer:fine)').matches; }catch(e){}
+    const fill=standalone||(touch&&w<1440&&h<1240)||(!touch&&fine&&w>=1000);
     const orient=fill?(w>=h?'landscape':'portrait'):this.state.orient;
     if(fill!==this.state.fill||orient!==this.state.orient){
       this.setState({fill:fill,orient:orient},()=>{ if(this.state.ready){ this.view={...this.presetViews().all}; setTimeout(()=>{this.fit();this.draw();},30); } });
@@ -719,7 +863,61 @@ class Component extends DCLogic {
   }
 
   /* ---------- data helpers ---------- */
-  RL(x,y){const C=this.C;return C[0]+C[1]*x+C[2]*y+C[3]*x*x+C[4]*x*y+C[5]*y*y;}
+  /* Ground level, taken straight from the surveyor's own surface.
+
+     Two earlier versions were worse. The first was one polynomial fitted
+     through the 0.25 m contour lines: 29 mm low on average against the spot
+     levels, 98 mm RMS, 314 mm at worst. The second read the spot levels off
+     the CAD file, but took each position from where the label was printed
+     rather than from the mark it labels. A label sits beside its mark. So
+     every point was about 0.66 m out, median, measured against the survey.
+     On a fall of 1 in 19 that is roughly 35 mm of level error per point. It
+     left the model 43 mm RMS from the surveyor's surface, 203 mm at worst.
+
+     The CAD file has the surveyor's own triangulation on layer SRF-VIEW:
+     126 points carrying true 3D coordinates, and the 196 faces they drew
+     between them. That is what SPOT and TRI now hold, placed in this frame by
+     a fit to the four boundary corners. The faces are listed first and 83
+     Delaunay triangles after them. So a surveyed face answers wherever there
+     is one, and the fill only covers what the surveyor did not level. That is
+     mostly the house footprint, where nobody was going to dig.
+
+     So RL is the survey, not a model of it. Exact at all 126 points and
+     within 5 mm of their surface everywhere else, that 5 mm being the cost of
+     storing levels to the centimetre the survey quotes them in. Past the last
+     point the old polynomial still answers, because an edge is better
+     extrapolated by a smooth surface than by the nearest triangle's slope.
+
+     Still not a set-out. That comes off the survey plan, datum A.H.D., origin
+     SR585 at RL 608.442, and the plan says no underground services have been
+     located. */
+  triZ(k,x,y){
+    const S=this.D.SPOT, t=this.D.TRI[k], a=S[t[0]], b=S[t[1]], c=S[t[2]];
+    const den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+    if(!den) return null;
+    const l1=((b[1]-c[1])*(x-c[0])+(c[0]-b[0])*(y-c[1]))/den;
+    const l2=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/den;
+    const l3=1-l1-l2;
+    if(l1<-1e-9||l2<-1e-9||l3<-1e-9) return null;
+    return l1*a[2]+l2*b[2]+l3*c[2];
+  }
+  RL(x,y){
+    const T=this.D&&this.D.TRI, S=this.D&&this.D.SPOT;
+    if(T&&S){
+      /* Samples arrive in runs along one item, so the triangle that answered
+         last almost always answers again. Checking it first turns a scan over
+         105 triangles into one test for most calls. */
+      if(this._tri!==undefined){ const z=this.triZ(this._tri,x,y); if(z!==null) return z; }
+      for(let k=0;k<T.length;k++){ const z=this.triZ(k,x,y); if(z!==null){ this._tri=k; return z; } }
+    }
+    const C=this.C; return C[0]+C[1]*x+C[2]*y+C[3]*x*x+C[4]*x*y+C[5]*y*y;
+  }
+  /* Site data draws a line until the layout takes it over. The pipes and the
+     berm were drawn out of DRAIN before they were elements, and a scheme saved
+     on the iPad before that still has to show them — so the site version is
+     drawn only while nothing in the layout is standing in for it. Asked by name
+     rather than by line, because both sets are seeded whole. */
+  owns(name){ return (this.state.items||[]).some(i=>i.n===name); }
   fy(y){return this.YTOP-y;}
   /* Landscape holds the handbook's framing — reserve left, Duffy Street right,
      consistent with every other drawing in the set. Portrait turns the plan
@@ -736,12 +934,24 @@ class Component extends DCLogic {
   /* With no argument this is her working layout. With one of the named schemes
      from the data it is that one instead — same row shape, plus the two extra
      columns for ground made up behind an item, which a starting layout has to
-     be able to say or the scheme arrives claiming work it does not do. */
+     be able to say or the scheme arrives claiming work it does not do, plus a
+     ninth for a curve. A trough on the contour is a bent line on the ground and
+     always was, so a starting layout has to be able to say so rather than only
+     ever arriving as a box for someone to bend by hand. The points are copied
+     rather than referenced: a drag writes into pts in place, and two devices
+     seeded from the same row must not end up sharing one array. */
   baseItems(def){
     const D=this.D; let uid=1, items=[];
     ((def&&def.items)||D.START).forEach(s=>{const i=this.mk(s[0],s[1],s[2],s[3],s[4],s[5],uid++);
-      if(i){ if(s[6]!=null){ i.bu=s[6]; i.bum=s[7]||'chip'; } items.push(i); }});
-    ((def&&def.plants)||D.STARTP||[]).forEach(s=>{const p=D.PLANTS.find(p=>p.id===s[0]); if(p){const i=this.mkPlant(p.n,s[1],s[2],uid++); if(i)items.push(i);}});
+      if(i){ if(s[6]!=null){ i.bu=s[6]; i.bum=s[7]||'chip'; }
+        if(s[8]&&s[8].length>1) i.pts=s[8].map(p=>[p[0],p[1]]);
+        items.push(i); }});
+    /* By id where the list has a usable one, by name otherwise: the ids came out
+       of a spreadsheet and are neither unique nor always filled in, so a scheme
+       that has to name a particular shrub says which one in words. */
+    ((def&&def.plants)||D.STARTP||[]).forEach(s=>{
+      const p=(s[0]?D.PLANTS.find(p=>p.id===s[0]):null)||D.PLANTS.find(p=>p.n===s[0]);
+      if(p){const i=this.mkPlant(p.n,s[1],s[2],uid++); if(i)items.push(i);}});
     return {items,uid};
   }
   seedScheme(id){ const d=(this.D.SCHEMES||[]).find(x=>x.id===id); return d?this.baseItems(d):null; }
@@ -756,7 +966,7 @@ class Component extends DCLogic {
       if(all.seeded.indexOf(sc.id)>=0) return;
       all.seeded.push(sc.id);
       const b=this.baseItems(sc);
-      all.schemes[sc.id]={name:sc.name,items:b.items,uid:b.uid,updated:Date.now()};
+      all.schemes[sc.id]={name:sc.name,items:b.items,uid:b.uid,notes:sc.notes||'',updated:Date.now()};
       if(!index.some(x=>x.id===sc.id)){ index=index.concat([{id:sc.id,name:sc.name,created:Date.now()}]); added=true; }
     });
     all.index=index;
@@ -766,13 +976,23 @@ class Component extends DCLogic {
   mk(name,x,y,w,h,rot,uid){
     const l=this.LIBM[name]; if(!l) return null;
     const c=HARDCOL[name]||['#dcd3c4','#82796a'];
-    const st=l[2]==='dig'?1:(l[2]==='pave'?2:3);
-    return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st,bu:0,bum:'chip'};
+    /* Digging is stage one because it decides where water goes, and so does a
+       swale, a mound, a mulch blanket and a gravel path laid on the contour —
+       none of which are excavations here. Where the library states a stage it
+       wins, and where it states a build-up the item arrives carrying it, so a
+       mound is priced and counted as the material it is actually made of. */
+    const st=l[9]||(l[2]==='dig'?1:(l[2]==='pave'?2:3));
+    /* Thirteenth column: does this element arrive locked. Site fabric does —
+       the pipes and the berm are on the plan to be read and measured, not to be
+       nudged while you are moving a bed next to them. The library decides how
+       one arrives; the item carries whether it is, so locking your own terrace
+       and unlocking a pipe both stick with the scheme. */
+    return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st,bu:l[10]||0,bum:l[11]||'chip',lk:l[12]?1:0,sharp:l[13]?1:0};
   }
   mkPlant(name,x,y,uid){
     const p=this.PL[name]; if(!p) return null;
     return {u:uid,t:'plant',pn:name,n:DISP(p.n),shape:'circ',cat:'light',x:x,y:y,w:p.w/2,h:0,rot:0,cost:p.cost,unit:'item',
-      fill:PLANTCOL[p.g]||'#8fa073',stroke:'#56633f',g:p.g,ht:p.h,tender:p.tender,st:3};
+      fill:PLANTCOL[p.g]||'#8fa073',stroke:'#56633f',g:p.g,ht:p.h,tender:p.tender,st:3,lk:0};
   }
   /* ---------- solar ---------- */
   sunpos(doy,hh){
@@ -784,7 +1004,23 @@ class Component extends DCLogic {
     const az=Math.atan2(-Math.sin(ha)*Math.cos(dec),Math.cos(la)*Math.sin(dec)-Math.sin(la)*Math.cos(dec)*Math.cos(ha));
     return {alt:alt*180/Math.PI,az:(az*180/Math.PI+360)%360};
   }
-  trans(t,doy){ return t[6]>0?t[6]:((doy>=152&&doy<=259)?0.72:0.15); }
+  /* How much light a canopy lets through on a given day. A number in the tree's
+     row is a canopy that never changes — the gum, permanently open at 0.55. A
+     name is a deciduous window from LEAF in the site data, and the windows differ
+     by what the tree is: in this climate the ornamental pear is in leaf from early
+     spring to late autumn, the ash a month less at each end, and the two street
+     trees less again. Between the four dates the canopy is ramped rather than
+     switched, because a tree leafing out shades progressively over a few weeks
+     and drops its leaves the same way. */
+  trans(t,doy){
+    const p=t[6];
+    if(typeof p==='number') return p>0?p:0.15;
+    const L=(this.D.LEAF||{})[p]; if(!L) return 0.15;
+    if(doy<=L.thin||doy>=L.full) return L.dense;
+    if(doy>=L.bare&&doy<=L.out) return L.open;
+    if(doy<L.bare) return L.dense+(L.open-L.dense)*(doy-L.thin)/(L.bare-L.thin);
+    return L.open+(L.dense-L.open)*(doy-L.out)/(L.full-L.out);
+  }
   blockTop(b){ return b[6]+(b[5]-b[6])*0.5; }
   sunlit(px,py,pz,alt,az,doy){
     const D=this.D;
@@ -816,11 +1052,64 @@ class Component extends DCLogic {
     this._sc=this._sc||{}; this._sc[key]=h; return h;
   }
   /* ---------- geometry ---------- */
-  corners(it){ if(it.shape==='circ') return null;
+  /* ---------- curved runs ----------
+     A path, a swale, an edge or a berm is almost never a rectangle on the
+     ground; it bends around a tree and follows a contour. An item carrying a
+     pts array is a run: a smooth line through those points, w metres wide,
+     with h ignored. The curve is Catmull-Rom, which passes exactly through
+     every point rather than near it, so a handle ends up where you put it —
+     the thing that makes dragging one feel predictable. Everything else in the
+     app asks geometry through area, centre, samples and corners, so teaching
+     those four about pts is what makes a run behave like any other item. */
+  isRun(it){ return !!(it&&it.pts&&it.pts.length>1); }
+  /* the centreline, sampled */
+  spline(pts,per){ per=per||10;
+    if(pts.length<2) return pts.slice();
+    const P=[pts[0]].concat(pts,[pts[pts.length-1]]), o=[];
+    for(let i=0;i<P.length-3;i++){ const a=P[i],b=P[i+1],c=P[i+2],d=P[i+3];
+      for(let j=0;j<per;j++){ const t=j/per, t2=t*t, t3=t2*t;
+        o.push([0.5*(2*b[0]+(-a[0]+c[0])*t+(2*a[0]-5*b[0]+4*c[0]-d[0])*t2+(-a[0]+3*b[0]-3*c[0]+d[0])*t3),
+                0.5*(2*b[1]+(-a[1]+c[1])*t+(2*a[1]-5*b[1]+4*c[1]-d[1])*t2+(-a[1]+3*b[1]-3*c[1]+d[1])*t3)]); } }
+    o.push(pts[pts.length-1]); return o; }
+  /* A run is a smooth line through its points, which is what a trough, a path
+     or an edge is, and is not what a pipe is. A pipe's corners are surveyed and
+     the spline rounds one off by the better part of a metre — enough to move a
+     line that is placed to stay clear of a protection zone. A sharp run keeps
+     its polyline exactly and is only densified along it, so the route is the
+     surveyed one, the handles are the corners themselves rather than fifty
+     points approximating them, and the zone tests still get a sample every half
+     metre instead of one per leg. */
+  sharpLine(pts,step){ const o=[]; step=step||0.5;
+    for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i];
+      const n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/step));
+      for(let k=0;k<n;k++) o.push([a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n]); }
+    o.push(pts[pts.length-1].slice()); return o; }
+  /* The one place that decides which of the two an item is. */
+  centreLine(it){ return it.sharp?this.sharpLine(it.pts):this.spline(it.pts); }
+  runLen(it){ const s=this.centreLine(it); let L=0;
+    for(let i=1;i<s.length;i++) L+=Math.hypot(s[i][0]-s[i-1][0],s[i][1]-s[i-1][1]);
+    return L; }
+  /* both edges of the ribbon, from the normal at each sample */
+  runEdges(it){ const s=this.centreLine(it), hw=it.w/2, L=[], R=[];
+    for(let i=0;i<s.length;i++){ const a=s[Math.max(0,i-1)], b=s[Math.min(s.length-1,i+1)];
+      let dx=b[0]-a[0], dy=b[1]-a[1]; const m=Math.hypot(dx,dy)||1; dx/=m; dy/=m;
+      L.push([s[i][0]-dy*hw, s[i][1]+dx*hw]); R.push([s[i][0]+dy*hw, s[i][1]-dx*hw]); }
+    return {mid:s,left:L,right:R}; }
+  /* the outline as one closed ring, which is both what is drawn and what is
+     tested against the protection zones */
+  runPoly(it){ const e=this.runEdges(it); return e.left.concat(e.right.reverse()); }
+  /* Length is what a run is priced and scheduled by, and a bent one is longer
+     than the box around it. One place to ask, so nothing quotes the other. */
+  linLen(it){ return this.isRun(it)?this.runLen(it):Math.max(it.w,it.h); }
+  corners(it){ if(it.shape==='circ'||this.isRun(it)) return null;
     const cx=it.x+it.w/2, cy=it.y+it.h/2, a=(it.rot||0)*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
     return [[-it.w/2,-it.h/2],[it.w/2,-it.h/2],[it.w/2,it.h/2],[-it.w/2,it.h/2]].map(p=>[cx+p[0]*ca-p[1]*sa,cy+p[0]*sa+p[1]*ca]); }
-  centre(it){ return it.shape==='circ'?[it.x,it.y]:[it.x+it.w/2,it.y+it.h/2]; }
+  centre(it){ if(this.isRun(it)){ const s=this.centreLine(it); return s[Math.floor(s.length/2)]; }
+    return it.shape==='circ'?[it.x,it.y]:[it.x+it.w/2,it.y+it.h/2]; }
   samples(it,n){ n=n||6; const o=[];
+    if(this.isRun(it)){ const e=this.runEdges(it);
+      for(let i=0;i<e.mid.length;i++){ o.push(e.mid[i]); o.push(e.left[i]); o.push(e.right[i]); }
+      return o; }
     if(it.shape==='circ'){ o.push([it.x,it.y]);
       for(let i=0;i<16;i++){const a=i/16*Math.PI*2;o.push([it.x+it.w*Math.cos(a),it.y+it.w*Math.sin(a)]);} return o; }
     const cs=this.corners(it);
@@ -829,7 +1118,7 @@ class Component extends DCLogic {
       const b=[cs[3][0]+(cs[2][0]-cs[3][0])*u,cs[3][1]+(cs[2][1]-cs[3][1])*u];
       o.push([a[0]+(b[0]-a[0])*v,a[1]+(b[1]-a[1])*v]); }
     return o; }
-  area(it){ return it.shape==='circ'?Math.PI*it.w*it.w:it.w*it.h; }
+  area(it){ return this.isRun(it)?this.runLen(it)*it.w:(it.shape==='circ'?Math.PI*it.w*it.w:it.w*it.h); }
   inPoly(p,poly){ let c=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){
     const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];
     if(((yi>p[1])!=(yj>p[1]))&&(p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi))c=!c;} return c; }
@@ -840,7 +1129,7 @@ class Component extends DCLogic {
       for(const t of D.TREES){ if(!t.ctrl) continue;
         const d2=(p[0]-t.x)**2+(p[1]-t.y)**2;
         if(d2<=t.srz*t.srz)srz.add(t.id); else if(d2<=t.ctrl*t.ctrl)tpz.add(t.id); }
-      for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) bld.add(b[0]);
+      if(!BURIED[it.n]) for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) bld.add(b[0]);
       if(!this.inPoly(p,BOUND)) out=true;
     }
     const m=[]; let lvl='g';
@@ -862,37 +1151,298 @@ class Component extends DCLogic {
     for(const p of pts){ const d=this.RL(p[0],p[1])-target; if(d>0){cut+=d;if(d>mx)mx=d;} else {fill-=d;if(-d>mn)mn=-d;} }
     const n=pts.length, a=this.area(it);
     return {cutV:cut/n*a,fillV:fill/n*a,maxCut:mx,maxFill:mn}; }
-  /* Everything else in the library she can carry. A block bench she cannot: half
-     a tonne a metre, so where a machine can stand is a question the layout has
-     to answer before the stone is ordered. */
+  /* ---------- levels ----------
+     What a builder is handed when he says give me the levels. Existing ground
+     comes off the survey; the finished surface is a string line along the
+     thing at one grade, which is how a digger actually sets one, and a stated
+     crossfall off it.
+
+     Only the part of a surface that is clear of every protection zone is
+     graded. Inside a zone the finished surface is the existing surface,
+     because the tree plan allows neither move: digging is hand or hydro only,
+     with an arborist present and the work in the approved scope, and added
+     material is capped at 100 mm of coarse woodchip, which is not something
+     grass grows in. So a lawn half inside a zone is graded over its clear half
+     and left as found over the other, and `miss` is how far apart the two
+     finish. A big `miss` means the surface is the wrong shape, not that the
+     levels are wrong. */
+  /* Chainage of the point on a line nearest p. Used to put a sample taken
+     across the width of something onto the string line running along it. */
+  chainOf(line,p){ let best=null, s=0;
+    for(let i=1;i<line.length;i++){ const a=line[i-1], b=line[i];
+      const vx=b[0]-a[0], vy=b[1]-a[1], L=vx*vx+vy*vy, d=Math.sqrt(L);
+      let t=L?((p[0]-a[0])*vx+(p[1]-a[1])*vy)/L:0; t=Math.max(0,Math.min(1,t));
+      const off=Math.hypot(p[0]-(a[0]+vx*t), p[1]-(a[1]+vy*t));
+      if(!best||off<best.off) best={off:off,s:s+t*d};
+      s+=d; }
+    return best||{off:0,s:0}; }
+  /* Every sample over a surface, with its level and whether it sits in a
+     protection zone. The structural root zone is inside the protection zone,
+     so one test answers both. */
+  levelPts(it,n){ const D=this.D, o=[];
+    for(const p of this.samples(it,n||8)){ let z=false;
+      for(const t of D.TREES){ if(!t.ctrl) continue;
+        if((p[0]-t.x)**2+(p[1]-t.y)**2<=t.ctrl*t.ctrl){ z=true; break; } }
+      o.push({x:p[0],y:p[1],z:this.RL(p[0],p[1]),free:!z}); }
+    return o; }
+  /* The line a surface is set out along. A run has only one, its own curve.
+     A rectangle has two, and the one that matters is whichever it actually
+     falls down: a terrace 10 m long in y and 4.5 m wide in x falls across its
+     width here, because y is the level direction on this block and x is the
+     fall line. Judging it along its longer side would call it flat. */
+  levelLine(it){
+    if(this.isRun(it)) return this.centreLine(it);
+    const cs=this.corners(it); if(!cs) return null;
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+    const drop=p=>Math.abs(this.RL(p[0][0],p[0][1])-this.RL(p[1][0],p[1][1]));
+    const A=[e[0],e[2]], B=[e[1],e[3]], L=drop(A)>=drop(B)?A:B, o=[];
+    for(let i=0;i<=20;i++) o.push([L[0][0]+(L[1][0]-L[0][0])*i/20, L[0][1]+(L[1][1]-L[0][1])*i/20]);
+    return o; }
+  levelPlan(it){
+    const g=GRADE[it&&it.n]; if(!g||it.t==='plant'||it.shape==='circ') return null;
+    const line=this.levelLine(it); if(!line||line.length<2) return null;
+    let len=0; for(let i=1;i<line.length;i++) len+=Math.hypot(line[i][0]-line[i-1][0],line[i][1]-line[i-1][1]);
+    if(len<0.5) return null;
+    const wide=this.area(it)/len;
+    const pts=this.levelPts(it,8).map(p=>{ p.s=this.chainOf(line,[p.x,p.y]).s; return p; });
+    const free=pts.filter(p=>p.free);
+    let hi=-1e9, lo=1e9; pts.forEach(p=>{ if(p.z>hi)hi=p.z; if(p.z<lo)lo=p.z; });
+    /* z = a + b·s, least squares. Fitted to the clear samples where there are
+       enough of them, to all of them where there are not: a surface with no
+       clear ground has no graded line, and the honest answer for it is the
+       ground it already has. */
+    const fit=ps=>{ const n=ps.length; let Ss=0,Sz=0,Sss=0,Ssz=0;
+      ps.forEach(p=>{Ss+=p.s;Sz+=p.z;Sss+=p.s*p.s;Ssz+=p.s*p.z;});
+      const den=n*Sss-Ss*Ss, b=Math.abs(den)>1e-9?(n*Ssz-Ss*Sz)/den:0;
+      return {a:(Sz-b*Ss)/n,b:b,cs:Ss/n}; };
+    /* Graded only where most of it can be. A surface a third clear grades that
+       third and leaves a step where the two meet, which is worse than leaving
+       the whole of it alone. */
+    const graded=free.length>=4&&free.length>=pts.length*0.6;
+    const f=fit(graded?free:pts);
+    /* A platform is eased toward the grade it wants, pivoting about the middle
+       so the cut and the fill balance. A path is not: how steep a path is comes
+       from where it runs, and easing one moves the ends it was drawn to meet.
+       So a path's finished line is its fitted line, bumps out, grade as found. */
+    const nat=Math.abs(f.b);
+    const k=(graded&&g.kind!=='walk'&&nat>1/g.want)?(1/g.want)/nat:1;
+    const nb=f.b*k, na=f.a+f.b*f.cs-nb*f.cs, at=s=>na+nb*s;
+    const cell=this.area(it)/(pts.length||1);
+    let cut=0,fill=0,mc=0,mf=0,miss=0;
+    pts.forEach(p=>{ const d=p.z-at(p.s);
+      if(!p.free||!graded){ if(Math.abs(d)>miss) miss=Math.abs(d); return; }
+      if(d>0){ cut+=d*cell; if(d>mc)mc=d; } else { fill-=d*cell; if(-d>mf)mf=-d; } });
+    const fin=Math.abs(nb), cf=this.contourFall(it);
+    const N=x=>x>1/500?1/x:Infinity, sN=n=>n===Infinity?'level':'1 in '+n.toFixed(0);
+    const zone=pts.length?1-free.length/pts.length:0;
+    const r={n:it.n,u:it.u,len:len,w:wide,area:this.area(it),kind:g.kind,graded:graded,
+      exLo:lo,exHi:hi,natN:N(nat),finN:N(fin),from:at(0),to:at(len),
+      cut:cut,fill:fill,maxCut:mc,maxFill:mf,zone:zone,miss:miss,
+      cross:cf?cf.across:0,a:line[0],b:line[line.length-1]};
+    /* One line for what it is, one for what to do about it. */
+    if(g.kind==='soak'){
+      /* Judged end to end, the way a trough is: what decides whether a gravel
+         path holds water is its high point against its low point, not the
+         grade of a line fitted through it. */
+      const hold=N(cf&&cf.len?cf.fall/cf.len:0); r.finN=hold;
+      if(hold>=g.want) r.lvl='g', r.msg='Lies at '+sN(hold)+' end to end, level enough to hold rather than drain.';
+      else if(hold>=g.max) r.lvl='a', r.msg='Lies at '+sN(hold)+' end to end. Water walks down it instead of soaking in. Follow the contour rather than the fall line, or step it.';
+      else r.lvl='r', r.msg='Lies at '+sN(hold)+' end to end, so it drains rather than holds, and gravel on that grade washes. Turn it onto the contour.';
+    } else if(g.kind==='walk'){
+      if(r.finN>=g.want) r.lvl='g', r.msg='Walks at '+sN(r.finN)+'. Gentle.';
+      else if(r.finN>=g.max) r.lvl='a', r.msg='Walks at '+sN(r.finN)+', inside the 1 in '+g.max+' ramp limit and not gentle. It runs down the fall line, and the block falls 1 in 19, so the route sets this rather than the machine. Turning it across the slope is the only thing that flattens it.';
+      else r.lvl='r', r.msg='Walks at '+sN(r.finN)+', steeper than the 1 in '+g.max+' ramp limit in AS 1428.1. Turn it across the slope, lengthen it, or make it steps.';
+    } else if(g.kind==='lawn'){
+      if(r.finN>=g.want) r.lvl='g', r.msg='Finishes at '+sN(r.finN)+', which reads level underfoot.';
+      else if(r.finN>=g.max) r.lvl='a', r.msg='Finishes at '+sN(r.finN)+'. Gently sloped rather than level. Flatter than that needs a shorter lawn along the fall line, or a step in it.';
+      else r.lvl='r', r.msg='Finishes at '+sN(r.finN)+', which reads as a slope. Shorten it along the fall line, or terrace it.';
+    } else {
+      if(r.finN<g.max) r.lvl='r', r.msg='Finishes at '+sN(r.finN)+', too steep to stand a table on. Cut it to a platform at 1 in '+g.want+'.';
+      else if(g.flat&&r.finN>g.flat) r.lvl='a', r.msg='Finishes at '+sN(r.finN)+', flat enough to pond. Give it 1 in '+g.want+' toward a garden edge.';
+      else r.lvl='g', r.msg='Finishes at '+sN(r.finN)+', which sheds without being felt.';
+    }
+    if(!graded) r.msg=r.msg.replace(/^(Finishes|Walks) at/,'Lies at');
+    if(!graded&&r.lvl==='g') r.msg+=' Left as found. '+Math.round(zone*100)+' per cent of it sits in a protection zone, and at this grade it wants nothing done to it.';
+    else if(!graded){ r.msg+=' Nothing here may be graded either: '+Math.round(zone*100)+' per cent of it sits in a protection zone, where the tree plan allows hand and hydro digging only, in the approved scope, and caps added material at '+BUCAP+' mm of coarse woodchip. So these are the levels it has, not levels to set out to.'; }
+    else if(zone>0.1){ if(miss>0.1&&r.lvl==='g') r.lvl='a';
+      r.msg+=' '+Math.round(zone*100)+' per cent of it sits in a protection zone and stays as found, and the graded part finishes '+(miss*1000).toFixed(0)+' mm away from it'+(miss>0.1?'. That is a step, so the shape is wrong rather than the levels: keep it to the ground that can be worked.':', which feathers out.'); }
+    return r;
+  }
+  /* The schedule itself, and what of it a machine may do. Cut and fill are
+     already the clear part only, so every cubic metre here is machine work;
+     the area left as found is the part that stays for hand work or for
+     nothing. */
+  levels(){ const rows=[]; let cut=0,fill=0,held=0;
+    for(const it of this.state.items){ const p=this.levelPlan(it); if(!p) continue;
+      rows.push(p); cut+=p.cut; fill+=p.fill; held+=p.area*p.zone; }
+    rows.sort((a,b)=>(b.cut+b.fill)-(a.cut+a.fill));
+    return {rows:rows,cut:cut,fill:fill,asFound:held,
+      bad:rows.filter(r=>r.lvl==='r').length,care:rows.filter(r=>r.lvl==='a').length}; }
+  /* How much of a's footprint b covers, in square metres. Sampled rather than
+     clipped: two curved ribbons have no closed form worth writing here, and
+     the number is used to stop a figure being counted twice rather than to
+     price anything. */
+  /* How far an excavator's arm has to reach to set a block, measured from the
+     nearest ground it may stand on. Every tree's protection zone is out, so
+     the answer is the distance from the far end of the run to the nearest
+     point outside all of them. Sampled on a metre grid, which is finer than
+     the question deserves. */
+  stoneReach(it){
+    const D=this.D, clear=[];
+    for(let x=0;x<=40;x++) for(let y=0;y<=21;y++){ let z=false;
+      for(const t of D.TREES){ if(!t.ctrl) continue;
+        if((x-t.x)**2+(y-t.y)**2<=t.ctrl*t.ctrl){ z=true; break; } }
+      if(!z) clear.push([x,y]); }
+    let worst=0;
+    for(const p of this.samples(it,4)){ let best=1e9;
+      for(const c of clear){ const d=(p[0]-c[0])**2+(p[1]-c[1])**2; if(d<best) best=d; }
+      best=Math.sqrt(best); if(best>worst) worst=best; }
+    return worst; }
+  overlapArea(a,b){
+    const pb=this.isRun(b)?this.runPoly(b):(b.shape==='circ'?null:this.corners(b));
+    if(!pb) return 0;
+    const pts=this.samples(a,10); let n=0;
+    for(const p of pts) if(this.inPoly(p,pb)) n++;
+    return pts.length?this.area(a)*n/pts.length:0; }
+  /* Everything else in the library she can carry. A block bench she cannot: over
+     half a tonne a metre, so where a machine can stand is a question the layout
+     has to answer before the stone is ordered. The logs are 500 mm, not the 450
+     this assumed — which also means filling to the top of one is 100 mm past the
+     project’s 400 mm fill limit outside a protection zone, and five times the
+     cap inside one. */
   stone(it){ if(!it||it.n!==BLOCK) return null;
-    const L=Math.max(it.w,it.h), b=Math.min(it.w,it.h);
+    const L=this.linLen(it), b=this.isRun(it)?it.w:Math.min(it.w,it.h);
     return {len:L,per:b*BLOCKH*STONET,total:L*b*BLOCKH*STONET}; }
   /* Ground raised behind an edge or over a bed. The app measures cut and fill
-     from the fitted surface, which is levelling — it says nothing about material
+     from the ground surface, which is levelling — it says nothing about material
      carted in and heaped up, and that is the move the tree plan actually caps.
      Declared per item rather than inferred, because only the person building it
      knows whether the ground behind a wall is being made up or left alone. */
   buildup(it){ const mm=(it&&it.t!=='plant'&&it.bu)||0; if(!mm) return null;
     return {mm:mm,mat:it.bum==='soil'?'soil':'chip',vol:this.area(it)*mm/1000}; }
+  /* What one surface holds before it overflows. A trough and a gravel path hold
+     it in the void between the stones, a mulch blanket in the chip itself, and
+     a mound holds whatever it was built out of — which is why its depth comes
+     from the build-up declared on the item rather than from the library. */
+  /* Fall from one end of an item's long axis to the other, and across it. What a
+     swale is checked on, and what tells you which way a mound should lie. */
+  /* The line an item runs along: the curve itself for a run, the long axis of
+     the box otherwise. A trough and a berm are both judged along it, and both
+     have to work for either shape, because Straighten is one tap away. */
+  midline(it){ if(this.isRun(it)) return this.centreLine(it);
+    const cs=this.corners(it); if(!cs) return null;
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+    const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const L=d(e[0],e[2])>=d(e[1],e[3])?[e[0],e[2]]:[e[1],e[3]], o=[];
+    for(let i=0;i<=20;i++) o.push([L[0][0]+(L[1][0]-L[0][0])*i/20, L[0][1]+(L[1][1]-L[0][1])*i/20]);
+    return o; }
+  /* Which way a berm sheds, and whether it covers what it stands in front of.
+     A low point in the middle of a berm is the failure that matters: water
+     gathers at it and stays, a metre from the wall the berm was built to keep
+     it away from. Water leaving past either end is the design working. */
+  bermShed(it){ const m=this.midline(it); if(!m||m.length<3) return null;
+    const z=m.map(p=>this.RL(p[0],p[1]));
+    let lo=0, hi=0;
+    for(let i=1;i<z.length;i++){ if(z[i]<z[lo])lo=i; if(z[i]>z[hi])hi=z[i]>z[hi]?i:hi; }
+    const f=lo/(z.length-1), ys=m.map(p=>p[1]);
+    const w=this.nearBuilding(it), b=w?this.D.BOXH.find(x=>x[0]===w.n):null;
+    const y0=Math.min.apply(null,ys), y1=Math.max.apply(null,ys);
+    return {sag:f>BERMSAG&&f<1-BERMSAG, at:f, len:this.linLen(it),
+      drop:z[hi]-z[lo], ends:z[hi]-Math.min(z[0],z[z.length-1]),
+      low:m[lo], end:z[0]<=z[z.length-1]?'east-north-east':'west-south-west',
+      wall:w, short:b?[Math.max(0,y0-b[2]),Math.max(0,b[4]-y1)]:null,
+      spare:b?[Math.max(0,b[2]-y0),Math.max(0,y1-b[4])]:null}; }
+  contourFall(it){
+    /* A bent trough has to be level along the whole of itself, not just end to
+       end, so the fall that matters is the highest point against the lowest. */
+    if(this.isRun(it)){ const e=this.runEdges(it); let hi=-1e9, lo=1e9;
+      for(const p of e.mid){ const z=this.RL(p[0],p[1]); if(z>hi)hi=z; if(z<lo)lo=z; }
+      const m=Math.floor(e.mid.length/2);
+      return {len:this.runLen(it),fall:hi-lo,
+        across:Math.abs(this.RL(e.left[m][0],e.left[m][1])-this.RL(e.right[m][0],e.right[m][1]))}; }
+    const cs=this.corners(it); if(!cs) return null;
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+    const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const long=d(e[0],e[2])>=d(e[1],e[3])?[e[0],e[2]]:[e[1],e[3]];
+    const cross=long[0]===e[0]?[e[1],e[3]]:[e[0],e[2]];
+    const fall=(p)=>Math.abs(this.RL(p[0][0],p[0][1])-this.RL(p[1][0],p[1][1]));
+    return {len:d(long[0],long[1]),fall:fall(long),across:fall(cross)}; }
+  storage(it){ const s=SOAK[it&&it.n]; if(!s||(it.t==='plant')) return null;
+    const d=s.d||((it.bu||0)/1000); if(!d) return null;
+    return {vol:this.area(it)*d*s.v,d:d,mat:s.mat,eng:!!s.min}; }
+  /* The water plan, added up off the plan itself. Everything that infiltrates
+     against the storm the pipes are sized on — 122 mm/h for five minutes, which
+     is 10.2 mm, or 8.2 m³ over the block. Held is first-flush storage into dry
+     ground: in sustained rain the chip is already wet and only the troughs and
+     the gravel are still taking water, which is why the two are counted apart. */
+  /* Two surfaces on one piece of ground hold what the deeper of them holds,
+     not the two added up. A gravel path laid along a trough is one gravel
+     filled trench, and counting the path's voids and the trough's voids over
+     the same square metre counts the same water twice. Deducted here rather
+     than left to the reader, because this total is what the Drainage page
+     measures the design storm against. */
+  doubled(){ const list=this.state.items.filter(i=>this.storage(i)), out=[];
+    for(let i=0;i<list.length;i++) for(let j=i+1;j<list.length;j++){
+      const A=list[i], B=list[j], a=this.storage(A), b=this.storage(B);
+      const ov=this.overlapArea(A,B); if(ov<0.05) continue;
+      out.push({a:A.n,b:B.n,area:ov,vol:ov*Math.min(a.d*SOAK[A.n].v,b.d*SOAK[B.n].v)}); }
+    return out; }
+  water(){ let held=0,eng=0,rows=[];
+    for(const it of this.state.items){ const st=this.storage(it); if(!st) continue;
+      held+=st.vol; if(st.eng) eng+=st.vol;
+      rows.push({n:it.n,area:this.area(it),d:st.d,vol:st.vol,eng:st.eng,mat:st.mat,
+        wall:st.eng?(this.nearBuilding(it)||{}).d:null}); }
+    rows.sort((a,b)=>b.vol-a.vol);
+    const dup=this.doubled(), twice=dup.reduce((t,d)=>t+d.vol,0);
+    held-=twice; eng=Math.max(0,eng-twice);
+    const storm=BLOCKM2*RAIN5/1000;
+    return {held:held,eng:eng,storm:storm,share:storm?held/storm:0,engShare:storm?eng/storm:0,
+      rows:rows,dup:dup,twice:twice}; }
   /* Nearest wall to anything on the plan, measured from the item's own footprint
      rather than its centre, so a long channel laid along a wall reads as touching
      it. Buildings are axis-aligned boxes; the item may be rotated, so it is
-     sampled the same way the protection-zone test samples it. */
+     sampled the same way the protection-zone test samples it. Buildings only,
+     not the driveway: what the soakage rule protects is a footing, and water
+     going into the ground beside a driveway hurts nothing. */
   nearBuilding(it){ let best=null;
-    for(const p of this.samples(it,4)) for(const b of this.BLDR){
+    for(const p of this.samples(it,4)) for(const b of this.D.BOXH){
       const dx=Math.max(b[1]-p[0],0,p[0]-b[3]), dy=Math.max(b[2]-p[1],0,p[1]-b[4]);
       const d=Math.hypot(dx,dy);
       if(!best||d<best.d) best={d:d,n:b[0]};
     }
     return best; }
+  /* A sump is only a sump while it can let go of what it catches, and here the
+     thing it lets go into is one of two lines: the DN150 spine down the side
+     strip or the DN100 north line to the sleeve under the garage. Measured
+     against whichever pipes the drawing actually has — the elements where the
+     layout carries them, the site lines where it does not — because a sump two
+     metres from nothing is a hole that fills up. */
+  sumpLines(){ const out=[];
+    if(this.owns(PIPE)){ for(const it of this.state.items){ if(it.n!==PIPE) continue;
+      const m=this.midline(it); if(m&&m.length>1) out.push(m); } }
+    if(!out.length){ const P=this.D.DRAIN; out.push(P.spine,P.north,P.court); }
+    return out; }
+  segD(p,a,b){ const vx=b[0]-a[0], vy=b[1]-a[1], L=vx*vx+vy*vy;
+    let t=L?((p[0]-a[0])*vx+(p[1]-a[1])*vy)/L:0; t=Math.max(0,Math.min(1,t));
+    return Math.hypot(p[0]-(a[0]+vx*t), p[1]-(a[1]+vy*t)); }
+  sumpCheck(it){
+    if(!it||it.n!==SUMP) return null;
+    const c=this.centre(it); let best=null;
+    for(const L of this.sumpLines()) for(let i=0;i<L.length-1;i++){
+      const d=this.segD(c,L[i],L[i+1]); if(best===null||d<best) best=d; }
+    const rl=this.RL(c[0],c[1]);
+    return {d:best===null?Infinity:best, rl:rl, kerb:rl-KERB,
+      silt:SILTY.some(s=>Math.hypot(c[0]-s[0],c[1]-s[1])<=SILTR)}; }
   /* Where the ground is free-draining sand a soak pit is the right answer, which
      is why one is recommended beside the firepit. Beside the house it is reactive
      clay and the wrong answer, and nothing in the layout says which is which
      except how far from a wall it sits. */
   soakCheck(it){
-    if(!it||!SOAKAGE[it.n]) return null;
-    const b=this.nearBuilding(it); if(!b||b.d>=SOAKMIN) return null;
+    const s=SOAK[it&&it.n]; if(!s||!s.min) return null;
+    const b=this.nearBuilding(it); if(!b||b.d>=s.min) return null;
     return {lvl:'r',d:b.d,n:b.n,
       msg:'Infiltrating water '+(b.d<0.05?'hard against':b.d.toFixed(1)+' m from')+' the '+b.n
         +'. The geotechnical report and the CSIRO guidance both warn against soaking water into reactive clay this close to footings, and the Class P movement figure is already spoken for. Within '+SOAKMIN+' m of a wall it has to be piped — a '+DRAIN+' to a sleeve, not a pit. Soakage belongs out in the free-draining sand of the back garden.'}; }
@@ -923,7 +1473,7 @@ class Component extends DCLogic {
   persist(){ try{
     const s=this.state, all=JSON.parse(localStorage.getItem(this.key())||'{}');
     all.schemes=all.schemes||{};
-    all.schemes[s.schemeId]={name:(s.schemes.find(x=>x.id===s.schemeId)||{}).name,items:s.items,uid:s.uid,updated:Date.now()};
+    all.schemes[s.schemeId]={name:(s.schemes.find(x=>x.id===s.schemeId)||{}).name,items:s.items,uid:s.uid,notes:s.notes||'',updated:Date.now()};
     all.index=s.schemes; all.activeId=s.schemeId; all.todos=s.todos;
     localStorage.setItem(this.key(),JSON.stringify(all));
     this.setState({savedAt:Date.now()});
@@ -932,7 +1482,7 @@ class Component extends DCLogic {
     const all=JSON.parse(localStorage.getItem(this.key())||'null');
     if(!all||!all.index||!all.activeId) return null;
     const cur=all.schemes[all.activeId]; if(!cur||!cur.items) return null;
-    return {items:cur.items,uid:cur.uid||cur.items.length+1,schemes:all.index,schemeId:all.activeId,todos:all.todos||[],
+    return {items:cur.items,uid:cur.uid||cur.items.length+1,schemes:all.index,schemeId:all.activeId,todos:all.todos||[],notes:cur.notes||'',
       chat:[{who:'app',text:'Ask anything about the block, the rules or your layout. I read the survey, the tree plan, the geotechnical classification and whatever is on the plan right now.'}]};
   }catch(e){ return null; } }
   push(){ this.hist=this.hist||[]; this.hist.push(JSON.stringify(this.state.items)); if(this.hist.length>50)this.hist.shift(); }
@@ -972,13 +1522,35 @@ class Component extends DCLogic {
       if(s.armed){ this.push(); const it=this.mkPlant(s.armed,snap(m[0]),snap(m[1]),s.uid);
         if(it){ const items=s.items.concat([it]); this.setState({uid:s.uid+1,armed:ev.shiftKey?s.armed:null});
           this.commit(items,it.u); } return; }
+      /* A point drags. The small one between two points becomes a point where
+         you take hold of it, so bending a run is one gesture rather than a mode
+         you enter first. */
+      const hp=ev.target.closest('.hP,.hA,.hW');
+      if(hp&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel);
+        if(it&&it.lk) return;
+        this.push();
+        if(hp.classList.contains('hW')){
+          this.drag={mode:'wide',it:it,m0:m,o:{w:it.w}};
+        } else {
+          let i=+hp.dataset.i;
+          if(hp.classList.contains('hA')){ const q=it.pts.slice(); q.splice(i,0,[m[0],m[1]]); it.pts=q; }
+          this.drag={mode:'pt',it:it,i:i,m0:m,o:{p:it.pts[i].slice()}};
+        }
+        el.setPointerCapture(ev.pointerId); this.draw(); return; }
       const h=ev.target.closest('.hS,.hT,.hR');
-      if(h&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel); this.push();
+      if(h&&s.sel!=null){ const it=s.items.find(i=>i.u===s.sel);
+        if(it&&it.lk) return;
+        this.push();
         this.drag={mode:h.classList.contains('hS')?'size':h.classList.contains('hT')?'rot':'rad',it:it,m0:m,o:{x:it.x,y:it.y,w:it.w,h:it.h,rot:it.rot||0}};
         el.setPointerCapture(ev.pointerId); return; }
       const t=ev.target.closest('.mv');
-      if(t){ const it=s.items.find(i=>i.u===+t.dataset.u); this.push();
-        this.drag={mode:'move',it:it,m0:m,o:{x:it.x,y:it.y}}; el.setPointerCapture(ev.pointerId);
+      if(t){ const it=s.items.find(i=>i.u===+t.dataset.u);
+        /* Locked still selects — reading a pipe and unlocking it both start
+           with tapping it. It just does not take hold. */
+        if(it&&it.lk){ this.setState({sel:it.u},()=>this.draw()); return; }
+        this.push();
+        this.drag={mode:'move',it:it,m0:m,o:{x:it.x,y:it.y,pts:this.isRun(it)?it.pts.map(p=>p.slice()):null}};
+        el.setPointerCapture(ev.pointerId);
         this.setState({sel:it.u},()=>this.draw()); return; }
       const tr=ev.target.closest('.thit');
       if(tr){ this.setState({sel:'tree'+tr.dataset.t},()=>this.draw()); return; }
@@ -996,7 +1568,12 @@ class Component extends DCLogic {
       if(pts.size||ev.pointerType==='mouse')
         showHud('x '+m[0].toFixed(2)+'  y '+m[1].toFixed(2)+' m · ground '+this.RL(m[0],m[1]).toFixed(2)+' m AHD');
       if(this.drag){ const it=this.drag.it, dx=m[0]-this.drag.m0[0], dy=m[1]-this.drag.m0[1], o=this.drag.o;
-        if(this.drag.mode==='move'){ it.x=snap(o.x+dx); it.y=snap(o.y+dy); }
+        if(this.drag.mode==='pt'){ it.pts[this.drag.i]=[snap(m[0]),snap(m[1])]; }
+        else if(this.drag.mode==='wide'){ const c=this.centre(it);
+          it.w=Math.max(0.2,snap(2*Math.hypot(m[0]-c[0],m[1]-c[1]))); }
+        else if(this.drag.mode==='move'){
+          if(this.isRun(it)&&o.pts) it.pts=o.pts.map(p=>[snap(p[0]+dx),snap(p[1]+dy)]);
+          else { it.x=snap(o.x+dx); it.y=snap(o.y+dy); } }
         else if(this.drag.mode==='rad'){ it.w=Math.max(0.15,snap(Math.hypot(m[0]-it.x,m[1]-it.y))); }
         else if(this.drag.mode==='size'){ it.w=Math.max(0.3,snap(o.w+dx)); it.h=Math.max(0.3,snap(o.h+dy)); }
         else if(this.drag.mode==='rot'){ const c=this.centre(it); it.rot=Math.round((Math.atan2(m[0]-c[0],m[1]-c[1])*180/Math.PI)/5)*5; }
@@ -1012,13 +1589,41 @@ class Component extends DCLogic {
       if(pts.size){ this.pan=null; return; }
       stopDrag(); this.pan=null;
       if(!ev||ev.pointerType!=='mouse') hideHud(); };
+    el.addEventListener('dblclick',ev=>{
+      const hp=ev.target.closest('.hP'); if(!hp) return;
+      const it=this.state.items.find(i=>i.u===this.state.sel);
+      if(!this.isRun(it)||it.lk||it.pts.length<=2) return;
+      ev.preventDefault(); this.push();
+      const q=it.pts.slice(); q.splice(+hp.dataset.i,1);
+      this.commit(this.state.items.map(i=>i.u===it.u?{...i,pts:q}:i)); });
     el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
     el.addEventListener('pointerleave',ev=>{ if(ev.pointerType==='mouse') hideHud(); });
+    /* A trackpad speaks two dialects through the same event. A pinch arrives as
+       a wheel with ctrlKey set, which macOS synthesises; two fingers sliding
+       arrive as a plain wheel with both deltas. Treating every wheel as zoom —
+       which is right for a mouse — makes a trackpad lurch in and out whenever
+       you meant to move sideways, so they are handled apart. Zoom is
+       exponential in the delta rather than a fixed step, because a pinch fires
+       a stream of small ones and a mouse notch fires a single large one, and
+       both should feel the same. */
     el.addEventListener('wheel',ev=>{ ev.preventDefault();
-      const r=el.getBoundingClientRect(), fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
-      const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h, k=ev.deltaY>0?1.1:1/1.1;
-      this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
-      this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); },{passive:false});
+      const r=el.getBoundingClientRect();
+      if(ev.ctrlKey||ev.metaKey||(!ev.deltaX&&ev.shiftKey)){
+        const fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
+        const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h;
+        const k=Math.exp(Math.max(-0.4,Math.min(0.4,ev.deltaY*0.012)));
+        this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
+        this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); return;
+      }
+      if(ev.deltaMode===0&&!ev.deltaX&&Math.abs(ev.deltaY)>=48){
+        /* a mouse notch, not a trackpad slide: zoom, as a mouse should */
+        const fx=(ev.clientX-r.left)/r.width, fyy=(ev.clientY-r.top)/r.height;
+        const ux=this.view.x+fx*this.view.w, uy=this.view.y+fyy*this.view.h, k=ev.deltaY>0?1.1:1/1.1;
+        this.view.w=Math.min(90,Math.max(5,this.view.w*k)); this.fit(true);
+        this.view.x=ux-fx*this.view.w; this.view.y=uy-fyy*this.view.h; this.draw(); return;
+      }
+      this.view.x+=ev.deltaX/r.width*this.view.w;
+      this.view.y+=ev.deltaY/r.height*this.view.h; this.draw(); },{passive:false});
   }
   /* Zooming sets the width and the height follows it. A preset or a resize
      instead has a rectangle it must show, so there the view widens when the
@@ -1042,12 +1647,34 @@ class Component extends DCLogic {
       if(it.t==='plant') s+='<circle cx="'+it.x+'" cy="'+this.fy(it.y)+'" r="0.09" fill="#56633f"/>';
       return s;
     }
+    if(this.isRun(it))
+      return '<path class="mv" data-u="'+it.u+'" d="'+this.polyD(this.runPoly(it))+'" stroke-linejoin="round" '+st+'/>';
     const c=this.centre(it);
     return '<g transform="rotate('+(-(it.rot||0))+' '+c[0]+' '+this.fy(c[1])+')"><rect class="mv" data-u="'+it.u+'" x="'+it.x+'" y="'+this.fy(it.y+it.h)+'" width="'+it.w+'" height="'+it.h+'" rx="'+(it.cat==='soft'?0.3:0.12)+'" '+st+'/></g>';
   }
+  /* a ring of plan points as an svg path, y flipped once, here */
+  polyD(pts){ return pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(3)+' '+this.fy(p[1]).toFixed(3)).join(' ')+'Z'; }
   handles(it){ if(!it) return '';
     const c=this.centre(it);
-    const dot=(x,y,cls,f)=>'<circle class="'+cls+'" cx="'+x+'" cy="'+this.fy(y)+'" r="0.34" fill="'+f+'" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>';
+    /* A locked item selected shows an outline and no dots. Nothing to grab is
+       the message, and an empty selection would instead read as a bug. */
+    if(it.lk){ const d=this.isRun(it)?this.polyD(this.runPoly(it))
+        :(it.shape==='circ'?null:this.polyD(this.corners(it)));
+      const st='fill="none" stroke="'+COL.tpz+'" stroke-width="2.5" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"';
+      return d?'<path '+st+' d="'+d+'"/>'
+              :'<circle cx="'+it.x+'" cy="'+this.fy(it.y)+'" r="'+(it.w+0.25)+'" '+st+'/>'; }
+    const dot=(x,y,cls,f,r,extra)=>'<circle class="'+cls+'" '+(extra||'')+' cx="'+x+'" cy="'+this.fy(y)+'" r="'+(r||0.34)+'" fill="'+f+'" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>';
+    if(this.isRun(it)){
+      /* One handle a point, and a smaller one between each pair that becomes a
+         point the moment you drag it — the same two moves PowerPoint gives you,
+         without a mode to be in. Double-tap a point to take it out again. */
+      let g='';
+      it.pts.forEach((p,i)=>{ g+=dot(p[0],p[1],'hP',COL.tpz,0.34,'data-i="'+i+'"'); });
+      for(let i=0;i<it.pts.length-1;i++){ const a=it.pts[i], b=it.pts[i+1];
+        g+=dot((a[0]+b[0])/2,(a[1]+b[1])/2,'hA','#fff',0.22,'data-i="'+(i+1)+'"'); }
+      const e=this.runEdges(it), m=Math.floor(e.mid.length/2);
+      g+=dot(e.left[m][0],e.left[m][1],'hW',COL.water,0.26);
+      return g; }
     if(it.shape==='circ') return dot(it.x+it.w,it.y,'hR',COL.tpz);
     const cs=this.corners(it), p=cs[2], a=(it.rot||0)*Math.PI/180;
     const rx=c[0]-Math.sin(a)*(it.h/2+0.9), ry=c[1]+Math.cos(a)*(it.h/2+0.9);
@@ -1095,12 +1722,17 @@ class Component extends DCLogic {
       const P=D.DRAIN, line=(pts,st)=>'<path d="'+pts.map((p,i)=>(i?'L':'M')+p[0]+' '+this.fy(p[1])).join('')+'" '+st+'/>';
       g+=line(P.overland,'fill="none" stroke="'+COL.water+'" stroke-width="11" opacity="0.16" '+nss);
       g+=line(P.swale,'fill="none" stroke="'+COL.water+'" stroke-width="5" opacity="0.45" '+nss);
-      g+=line(P.berm,'fill="none" stroke="'+COL.tpz+'" stroke-width="4" stroke-dasharray="5 3" opacity="0.6" '+nss);
       g+=line(P.sleeve,'fill="none" stroke="'+COL.water+'" stroke-width="7" opacity="0.22" '+nss);
-      g+=line(P.spine,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
-      g+=line(P.north,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
-      g+=line(P.court,'fill="none" stroke="'+COL.water+'" stroke-width="2.2" stroke-dasharray="6 4" '+nss);
-      g+=P.pits.map(p=>'<circle cx="'+p[1]+'" cy="'+this.fy(p[2])+'" r="0.3" fill="'+COL.water+'" stroke="#fff" stroke-width="1.4" '+nss+'/>').join('');
+      /* The sleeve highlight and the corridor are annotation on the lines rather
+         than objects, so they are drawn either way. The pits stopped being
+         annotation the moment a sump became an element, so they follow the same
+         rule as the berm and the lines: drawn only while nothing stands in. */
+      if(!this.owns(BERM)) g+=line(P.berm,'fill="none" stroke="'+COL.tpz+'" stroke-width="4" stroke-dasharray="5 3" opacity="0.6" '+nss);
+      if(!this.owns(PIPE)){
+        g+=line(P.spine,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
+        g+=line(P.north,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
+        g+=line(P.court,'fill="none" stroke="'+COL.water+'" stroke-width="2.2" stroke-dasharray="6 4" '+nss); }
+      if(!this.owns(SUMP)) g+=P.pits.map(p=>'<circle cx="'+p[1]+'" cy="'+this.fy(p[2])+'" r="0.3" fill="'+COL.water+'" stroke="#fff" stroke-width="1.4" '+nss+'/>').join('');
     }
     if(L.tpz) g+=D.TREES.map(t=>t.ctrl?'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.ctrl+'" fill="'+COL.tpz+'" fill-opacity="0.07" stroke="'+COL.tpz+'" stroke-width="1.1" stroke-dasharray="7 4" '+nss+'/>':'').join('');
     if(L.srz) g+=D.TREES.map(t=>'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.srz+'" fill="'+COL.srz+'" fill-opacity="0.26"/>').join('');
@@ -1144,7 +1776,7 @@ class Component extends DCLogic {
       tx+='<text x="'+(v.x+14*mpp)+'" y="'+(v.y+v.h-12*mpp)+'" font-size="'+F(12)+'" fill="#82796a">← Mount Ainslie reserve, south-south-east</text>';
       tx+='<text x="'+(v.x+v.w-14*mpp)+'" y="'+(v.y+v.h-12*mpp)+'" font-size="'+F(12)+'" text-anchor="end" fill="#82796a">Duffy Street, north-north-west →</text>';
     }
-    el.innerHTML='<svg width="100%" height="100%" viewBox="'+v.x+' '+v.y+' '+v.w+' '+v.h+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
+    el.innerHTML='<svg class="plan" width="100%" height="100%" viewBox="'+v.x+' '+v.y+' '+v.w+' '+v.h+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
       +'<rect x="'+(v.x-5)+'" y="'+(v.y-5)+'" width="'+(v.w+10)+'" height="'+(v.h+10)+'" fill="'+COL.paper+'"/>'
       /* Labels sit over the things they name, so they must not take the touch:
          tapping a bed's name has to reach the bed, not land on the text. */
@@ -1152,15 +1784,19 @@ class Component extends DCLogic {
       +'<g pointer-events="none">'+tx+'</g></svg>';
   }
   /* ---------- derived ---------- */
-  quantities(){ let pave=0,soft=0,lin=0,plants=0,cost=0,mulch=0,added=0; const byg={};
+  quantities(){ let pave=0,soft=0,lin=0,pipe=0,plants=0,cost=0,mulch=0,added=0; const byg={};
     for(const it of this.state.items){ const a=this.area(it);
       if(it.t==='plant'){plants++;cost+=it.cost;byg[it.g]=(byg[it.g]||0)+1;}
       else if(it.unit==='m2'){ if(it.cat==='soft'){soft+=a; if(it.n.indexOf('Mulch')>=0)mulch+=a*0.1;} else pave+=a; cost+=a*it.cost; }
-      else if(it.unit==='lin'){ const L=Math.max(it.w,it.h); lin+=L; cost+=L*it.cost; }
+      /* Buried line is linear metres too, and eighty metres of it landing in
+         "walls and edges" would make that number say nothing. Counted apart,
+         and carrying no cost here because the drainage is its own trade —
+         Works → Drainage is where the pipe sizes and falls are priced. */
+      else if(it.unit==='lin'){ const L=this.linLen(it); if(BURIED[it.n]) pipe+=L; else lin+=L; cost+=L*it.cost; }
       else cost+=it.cost;
       /* carted in and heaped up, so it is priced and counted like anything else */
       const bu=this.buildup(it); if(bu){ added+=bu.vol; cost+=bu.vol*BURATE; } }
-    return {pave,soft,lin,plants,cost,mulch,added,byg}; }
+    return {pave,soft,lin,pipe,plants,cost,mulch,added,byg}; }
   issues(){
     const s=this.state, out=[];
     for(const it of s.items){
@@ -1177,23 +1813,94 @@ class Component extends DCLogic {
       /* The grate is the whole design: a long run so partial blockage still
          drains, and clearing it is the one job here that has consequences
          inside the house if it is skipped. */
-      if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' — '+Math.max(it.w,it.h).toFixed(1)+' m of grate to keep clear',
+      if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of grate to keep clear',
         body:'Long channel rather than a single square grate, so a partial blockage still leaves capacity, with a litter sump below the outlet you can reach and a spare pipe laid in the same trench while it is open. Clear it each autumn. In the courtyard it is the one piece of maintenance where skipping a year puts water inside the house.'});
       const bc=this.buildCheck(it,ck);
       if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' — ground raised '+bc.mm+' mm behind it',body:bc.msg});
       const stone=this.stone(it);
-      if(stone){ const zoned=ck.srz.size||ck.tpz.size;
+      if(stone){ const zoned=ck.srz.size||ck.tpz.size, reach=zoned?this.stoneReach(it):0;
         out.push({sev:zoned?'care':'note',u:it.u,title:it.n+' weighs about '+stone.total.toFixed(1)+' tonnes',
           body:'One course '+(Math.min(it.w,it.h)*1000).toFixed(0)+' mm deep is roughly '+stone.per.toFixed(1)+' t a metre, so none of it is hand work: the blocks come off a crane truck or are set with an excavator, and the only way in is the crossover and driveway at the street end.'
-            +(zoned?' This run sits inside a protection zone, where neither may track. Either the arm reaches it from ground outside the zone, or the run moves clear — settle that with the arborist before the stone is ordered.'
+            +(zoned?' This run sits inside a protection zone, where neither may track, so it has to be set from outside one. The farthest part of it is '+reach.toFixed(1)+' m from the nearest ground a machine may stand on, and the lift there is '+stone.per.toFixed(1)+' t. Put that pair to the builder against the machine\u2019s own lift chart before the stone is ordered'+(reach>STONEREACH?': past about '+STONEREACH.toFixed(0)+' m a small excavator will not hold half a tonne, and the answer is to shorten the run to the ground the arm reaches.':'.')
                    :' Check the machine can reach the line without tracking over a protection zone to get there.')}); }
+      /* How steep the thing you walk on or sit on finishes, and what a machine
+         may do about it. The verdict is the same one the Levels page prints,
+         so the two cannot disagree. */
+      const lp=this.levelPlan(it);
+      if(lp&&lp.lvl!=='g') out.push({sev:lp.lvl==='r'?'stop':'care',u:it.u,
+        title:it.n+' \u2014 '+(lp.graded?'finishes at':'lies at')+' 1 in '+(lp.finN===Infinity?'\u221e':lp.finN.toFixed(0)),body:lp.msg});
+      /* A gravel path laid along a trough is one trench, not two things on one
+         piece of ground. Worth saying because nothing else on the plan tests
+         for overlap, and because the pair only works where the path is level
+         along itself: a dished trough with a walking surface in it is a flat
+         bottomed gravel trench, and it holds what the gravel holds. */
+      if(it.n===SWALE) for(const o of s.items){
+        if(o===it||!GRADE[o.n]) continue;
+        const ov=this.overlapArea(o,it); if(ov<0.2) continue;
+        const cf=this.contourFall(it), gp=o.n==='Gravel path';
+        out.push({sev:gp?'note':'care',u:o.u,title:o.n+' lies on '+it.n+' over '+ov.toFixed(1)+' m\u00b2',
+          body:gp
+            ? 'That can be done, and it is one trench rather than two: excavate the trough to '+(SOAK[SWALE].d*1000).toFixed(0)+' mm, fill it with clean aggregate, and finish the top '+(SOAK['Gravel path'].d*1000).toFixed(0)+' mm as the walking gravel, flush with the ground either side. The dish goes; what holds the water is the voids. Two conditions: the path has to run along the trough rather than across it, and the trough has to stay level along itself, which this one is to '+(cf?(cf.fall*1000).toFixed(0):'?')+' mm against the '+(LEVELTOL*1000).toFixed(0)+' mm limit. The Drainage page counts the shared ground once.'
+            : 'A firm surface is not an infiltration surface, so laying one over the trough takes the trough out of service for that '+ov.toFixed(1)+' m\u00b2 and adds nothing back. Either move the path off it, or make it a Gravel path and build the two as one trench.'}); }
+      /* The one thing a swale has to be. Turned the wrong way it is a drain
+         pointed at the house rather than a store, and on this block the two
+         directions differ by a factor of seven. */
+      if(it.n===SWALE){ const cf=this.contourFall(it);
+        if(cf&&cf.fall>LEVELTOL&&cf.fall>=cf.across) out.push({sev:'stop',u:it.u,title:it.n+' is not on the contour',
+          body:'It falls '+(cf.fall*1000).toFixed(0)+' mm from one end to the other, so it would run water along itself instead of holding it. Turned to lie the other way it falls about '+(cf.across*1000).toFixed(0)+' mm over the same ground. Contours here run across the block, not down it.'});
+        else if(cf) out.push({sev:'note',u:it.u,title:it.n+' — '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
+          body:'On the contour, so it fills along its whole length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing — the levels here are triangulated survey points, good near a measured level and softer between. Rock the inlet, and leave a level spill at the low end so an overflow leaves the way you chose.'}); }
+      /* What a pipe is judged on is its route, not its level: clause 6.5.2 rules
+         out a new service through a protection zone unless the tree plan says
+         so, which is the whole reason the sleeves are cast under the slab. */
+      if(it.n===PIPE){ const under=new Set();
+        for(const p of this.samples(it,4)) for(const b of this.BLDR)
+          if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) under.add(b[0]);
+        let deep=0;
+        for(const p of this.samples(it,4)) for(const t of this.D.TREES){ if(!t.ctrl) continue;
+          const d=t.ctrl-Math.hypot(p[0]-t.x,p[1]-t.y); if(d>deep) deep=d; }
+        const zoned=[...ck.srz,...ck.tpz], u=under.size?' It runs under the '+[...under].join(' and the ')+', which is what the cast-in sleeves are for — laid while the slab is formed and a serious problem afterwards.':'';
+        if(zoned.length) out.push({sev:'care',u:it.u,title:it.n+' crosses the protection zone of tree '+zoned.join(', '),
+          body:'It reaches '+(deep*1000).toFixed(0)+' mm inside the zone at its closest. Clause 6.5.2 rules out an additional service through a protection zone unless the tree plan specifies it, so this route needs the plan amended before it is dug, and then hand or hydro excavation with the arborist present. The sleeves cast under the garage slab are the route that avoids all of that.'
+            +(deep<0.25?' At this depth it is a graze rather than a crossing, and well inside what the survey can resolve — worth confirming the zone radius on site before moving anything.':'')+u});
+        else out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of line',
+          body:'Clear of every protection zone, so no tree approval and no supervision, which is the reason for this route rather than the short one.'+u+' Falls and pipe sizes are in Works → Drainage; this line is the route on the ground.'}); }
+      /* The pits, which is what the builder is asking for when he says yard
+         sumps. Falls are never the question on a block that drops 2.08 m; the
+         questions are whether this one reaches a line, and whether it is one of
+         the two catching hillside runoff and therefore needing a silt trap. */
+      if(it.n===SUMP){ const sc=this.sumpCheck(it);
+        if(sc.d>SUMPFAR) out.push({sev:'care',u:it.u,title:it.n+' is '+sc.d.toFixed(1)+' m from the nearest line',
+          body:'A sump collects water and hands it to a pipe, so it has to fall to one, and nothing on this drawing runs within '+SUMPFAR.toFixed(1)+' m of it. As drawn it is a hole that fills up. Either move it onto a line, or draw the '+PIPE+' that serves it — the falls are in Works → Drainage.'});
+        else out.push({sev:'note',u:it.u,title:it.n+' — ground '+sc.rl.toFixed(2)+' m, '+sc.kerb.toFixed(2)+' m above the kerb',
+          body:'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the kerb at '+KERB.toFixed(2)+'. Gravity is never the constraint on this block — it drops 2.08 m at 1 in 19 — the route past the protection zones is. Set the invert off the survey plan — datum A.H.D., origin SR585 at RL 608.442 — rather than off this drawing, and give it a removable grate rated for whatever crosses it.'});
+        if(sc.silt) out.push({sev:'note',u:it.u,title:it.n+' — this is one that needs a silt trap',
+          body:'It takes runoff off the reserve, which arrives orange and heavily silted. A sump below the outlet with a removable grate turns that into shovelling sand out of a box once a year before winter, instead of clearing it out of the pipe under the garage slab where you cannot reach it.'}); }
+      /* The two things a berm has to be, and neither is level. */
+      if(it.n===BERM){ const bs=this.bermShed(it);
+        if(bs&&bs.sag) out.push({sev:'care',u:it.u,title:it.n+' has a low point in the middle of it',
+          body:'The ground under it dips '+(bs.drop*1000).toFixed(0)+' mm about '+(bs.at*100).toFixed(0)+' per cent along, near x '+bs.low[0].toFixed(1)+', y '+bs.low[1].toFixed(1)+'. Water turned aside by the berm runs to that dip and stays there rather than leaving along the face, which is the one place it must not stand'+(bs.wall?' — '+bs.wall.d.toFixed(1)+' m from the '+bs.wall.n:'')+'. Carry the crest through the dip, or move the run to ground that sheds.'});
+        else if(bs) out.push({sev:'note',u:it.u,title:it.n+' — '+bs.len.toFixed(1)+' m, shedding '+(bs.ends*1000).toFixed(0)+' mm to its ends',
+          body:'A berm is the opposite of a trough: it is built to send water somewhere, so it wants fall along itself, and it has it. Sheet flow crossing the woodland floor is turned along the face and let go past the '+(bs.end)+' end rather than continuing into the wall. Wide and rounded rather than sharp, so it overtops evenly along its length instead of breaching at one point.'
+            +(bs.wall&&bs.short?(bs.short[0]+bs.short[1]>0.05
+              ? ' It stops '+Math.max(bs.short[0],bs.short[1]).toFixed(1)+' m short of the '+bs.wall.n+'’s corner, so water walks round the end of it — run it past both corners.'
+              : ' It stands across the whole of the '+bs.wall.n+'’s uphill wall, with '+bs.spare[0].toFixed(1)+' m spare at one end and '+bs.spare[1].toFixed(1)+' m at the other.'):'')}); }
       if(it.n==='Sunken firepit'){ const d=it.x-it.w;
         if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
           body:'The ACT rule is three metres of clearance on the reserve side. Moving it about '+Math.max(0.5,3-d).toFixed(1)+' m toward the street fixes that, but pushes it toward the gum\u2019s protection zone.'}); }
       const inCorridor=this.samples(it,4).some(p=>p[1]>=0.5&&p[1]<=3.0);
-      if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
+      /* A sump is the exception the corridor rule needs. Everything else in the
+         corridor obstructs it; a sump with its lid flush takes water out of it,
+         which is why the spine and five of the eight pits sit there by design.
+         Flush is the whole of the condition — a raised surround is a weir. */
+      if(inCorridor&&it.n===SUMP) out.push({sev:'note',u:it.u,title:it.n+' sits in the overland flow path, which is where it belongs',
+        body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops, and a pit that drains it is the one thing that should be there. Set the grate flush with the finished surface: a raised surround, or a lid standing proud of the grass, turns it into a weir across the corridor. Nothing else may narrow the route around it.'});
+      else if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
         body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. Anything here needs a formed route around it along the fence — a drainage change, not yet priced.'});
     }
+    const w=this.water();
+    if(w.held>0.05) out.push({sev:'note',title:'The shaping holds '+w.held.toFixed(1)+' m³ of rain',
+      body:'Every trough, gravel path, mulched bed and mound on the plan adds up to '+Math.round(w.held*1000).toLocaleString()+' litres held where it falls, against the '+w.storm.toFixed(1)+' m³ the design storm puts on the whole block in five minutes — '+Math.round(w.share*100)+'% of it. That is first-flush storage into dry ground. Once the chip is wet only the troughs and the gravel are still taking water, and that part is '+Math.round(w.engShare*100)+'%. None of it replaces the piped system; it decides how much never reaches it.'});
     const q=this.quantities();
     if(q.cost>BUDGET) out.push({sev:'care',title:'Over the ten thousand',body:'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+', which is $'+Math.round(q.cost-BUDGET).toLocaleString()+' past the budget. Staging it is the answer, not cutting it.'});
     (this.state.todos||[]).forEach((t,i)=>out.push({sev:'note',title:'From a conversation',body:t}));
@@ -1202,7 +1909,7 @@ class Component extends DCLogic {
   }
   /* ---------- ask ---------- */
   factSheet(){
-    const q=this.quantities(), iss=this.issues();
+    const q=this.quantities(), iss=this.issues(), w=this.water();
     const items=this.state.items.map(i=>{ const bu=this.buildup(i);
       return i.n+' at ('+i.x.toFixed(1)+','+i.y.toFixed(1)+')'+(i.t==='plant'?'':' '+i.w.toFixed(1)+'x'+i.h.toFixed(1)+'m')
         +(bu?' [ground made up '+bu.mm+' mm in '+(bu.mat==='soil'?'soil':'coarse woodchip')+']':''); }).join('; ');
@@ -1213,15 +1920,19 @@ class Component extends DCLogic {
     'Soil: 100 mm of loose silty sand over clayey sand and sandy clay, refusal at 1.0-1.1 m; free-draining sand where she gardens, reactive clay where the house sits. Class P site because of the trees; the 20-40 mm movement figure assumes the pear stays.',
     'The walking path behind the rear fence sits on a raised man-made bank that holds hillside water back. It protects the block most of the time but concentrates risk into a rarer, larger event. The overland flow corridor along the side boundary (y 0.5-3.0) must stay clear and continuous to the street; capacity 236 L/s.',
     'Trees: 1 brittle gum (trunk 1.97 m from the rear boundary, structural root zone crosses it, so no channel can follow that boundary past it), 2 Manchurian pear (RETAIN, hand excavation approved), 3 liquidambar, 4 and 5 velvet ash street trees (public).',
-    'Sun hours [21 Dec, 21 Sep, 21 Jun]: rear pocket 7.4/7.3/4.5, east-north-east side strip 8.1/6.5/4.0, paved terrace 11.0/3.9/0.0, under trees 1 and 2 2.9/1.9/1.4, back garden average 5.8/4.4/2.2, front garden average 4.3/3.4/2.3, courtyard 5.7/3.1/0.0.',
+    'Sun hours [21 Dec, 21 Sep, 21 Jun]: rear pocket 7.0/6.7/4.0, east-north-east side strip 8.3/6.5/3.9, paved terrace 10.9/4.1/0.0, under trees 1 and 2 3.8/3.0/1.8, back garden average 5.8/4.3/2.2, front garden average 4.5/3.4/2.0, courtyard 5.7/2.9/0.1.',
+    'Trees 2, 3, 4 and 5 are deciduous and each has its own leaf window for this climate. Tree 2, ornamental pear: buds break 1 Sep, full canopy 1 Oct, thinning from 1 May, bare 5 Jun. Tree 3, ash window: 1 Oct, 5 Nov, 5 May, 10 Jun. Trees 4 and 5, street shade trees: 25 Sep, 25 Oct, 20 Apr, 25 May. Tree 1 is an evergreen gum. Full shade therefore runs about November to March, but April is still a full-canopy month and the pear is dense from early October. The front garden is shaded through the whole growing season and open from May to September, which is backwards for anything grown for a crop.',
     'Drainage: DN150 spine at 1 in 19, capacity 45.2 L/s against 5.32 design flow; DN100 north line sleeved under the garage; corner swale is the only stretch of rear boundary outside the gum protection zone.',
     'Cut over 500 mm or fill over 400 mm triggers a site reclassification.',
     'Inside a tree protection zone the plan permits building up where it forbids digging, but caps added material at 100 mm, hand placed, arborist supervising, and asks for coarse woodchip rather than soil, because soil over a root plate reduces the air reaching the roots. Anything deeper than 50 mm counts as excavation.',
     'The block is inside the ACT mapped bushfire prone area. Bushfire construction compliance is already dealt with and the certifier is satisfied; do not reopen it. Landscape only: the ACT rule is three metres clearance to the reserve for a firepit.',
     'Budget about $10,000 over 6-12 months, staged, her own labour, hand-dug. A contractor does the stormwater.',
     'Decisions made: keep the pear; no pond (snakes); the area off the house is paved with an outdoor kitchen, not a deck; lawn beats vegetables (toddler); vegetables become planters on the paving; natives only from here; front garden gets mounds and two fruit trees only, quince and pomegranate; the courtyard maple is gone; the driveway takes the sunniest front ground so nothing goes there.',
+    'Water shaping: swales are level troughs on the contour with a mound on the downhill side, running across the block because the fall is 1 in 19 along it and 1 in 132 across it. Almost nothing here can be dug \u2014 inside a protection zone the trough is formed by raising its shoulders in 100 mm of coarse woodchip, and only the rear pocket is clear enough for soil. Gravel paths are part of the same system: laid level on 150 mm of aggregate they hold about 50 litres a square metre. Anything that puts water into the ground stays 3 m clear of a wall.',
+    'NOTES ON THIS SCHEME: '+((this.state.notes||'').trim()||'none written.'),
     'CURRENT LAYOUT: '+items,
     'CURRENT TOTAL: $'+Math.round(q.cost).toLocaleString()+' of $10,000. '+q.plants+' plants, '+q.pave.toFixed(0)+' m2 paving, '+q.soft.toFixed(0)+' m2 soft surface, '+q.mulch.toFixed(1)+' m3 mulch at 100 mm.',
+    'WATER HELD BY THE SHAPING AS DRAWN: '+w.held.toFixed(1)+' m3 into dry ground, of which '+w.eng.toFixed(1)+' m3 is troughs and gravel that keep working once the mulch is wet. The 5 minute 1 in 10 year storm puts '+w.storm.toFixed(1)+' m3 on the block, so '+Math.round(w.share*100)+'% of it never reaches a pipe.',
     'LIVE PROBLEM LIST: '+(iss.length?iss.map(i=>i.sev+': '+i.title+' — '+i.body).join(' | '):'nothing clashing.')].join('\n');
   }
   async ask(text){
@@ -1246,7 +1957,7 @@ class Component extends DCLogic {
     if(s.includes('firepit')) return 'As drawn the firepit sits '+((this.state.items.find(i=>i.n==='Sunken firepit')||{x:3,w:0.85}).x-0.85).toFixed(1)+' m from the reserve boundary. The ACT rule is three metres. Moving it toward the street fixes it until you reach the gum\u2019s protection zone.';
     if(s.includes('mulch')) return 'At 100 mm you need '+q.mulch.toFixed(1)+' m³ for the mulched beds as drawn. Coarse 25 mm chip, not fine or shredded, so it knits together on the slope.';
     if(s.includes('cost')||s.includes('budget')||s.includes('stage')) return 'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+' of the $10,000, materials only with your labour, and it excludes the stormwater contractor.';
-    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 10.6 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 7.9 hours in summer, 6.5 at the equinox, 3.8 in midwinter. Under trees 1 and 2 it is 3.8 hours even in summer. The full table is on the Site screen, under Sun.';
+    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 10.9 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 8.3 hours in summer, 6.5 at the equinox, 3.9 in midwinter. Under trees 1 and 2 it is 3.8 hours even in summer. Trees 2 to 5 are deciduous on their own dates \u2014 full canopy from about November to March, April included, and bare through winter. The full table is on the Site screen, under Sun.';
     return 'The site knowledge is here but the answering model is unavailable in this preview. The figures behind every screen are the same ones in the handbook: 807 m², a 2.08 m fall to the street, 52% of the open back garden inside protection zones, and $'+Math.round(q.cost).toLocaleString()+' spent of $10,000.';
   }
   scrollChat(){ const el=this.chatEl; if(el) el.scrollTop=el.scrollHeight; }
@@ -1274,7 +1985,7 @@ class Component extends DCLogic {
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
-        canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
+        notes:'',notesHint:'',onNotes:()=>{},pushGist:()=>{},gistLabel:'',build:'',canvasRef:el=>{this.canvas=el;},hudRef:()=>{},bloomRef:()=>{},earthRef:()=>{},waterRef:()=>{},isPlan:true,hud:'',sideCol:'flex:0 0 84px;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;padding:14px 0 12px;gap:4px',headRow:'flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:13px 20px 11px',isExpanded:false,notExpanded:true,expandLabel:'',toggleExpand:()=>{},palGroups:[],selRows:[],qtyRows:[],issueCount:'0',
         navPlan:blank,navChecks:blank,navStages:blank,navAsk:blank,
         bezel:'position:relative;border-radius:34px;padding:13px;background:linear-gradient(160deg,#3a352c,#221f19);width:1366px;height:1024px',
         screen:'width:1340px;height:998px;border-radius:23px;overflow:hidden;background:var(--color-bg);display:flex;flex-direction:column;position:relative',
@@ -1314,7 +2025,7 @@ class Component extends DCLogic {
       const k=b[0], plain=k==='p'||k==='h'||k==='note';
       const w=b[2]||[];
       return {
-        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth',
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isLevels:k==='levels', isWater:k==='water',
         x:plain?b[1]:'',
         items:k==='ul'?b[1].map(t=>({x:t})):[],
         head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
@@ -1338,9 +2049,10 @@ class Component extends DCLogic {
     } else if(sel){
       const c=this.centre(sel), ck=this.checks(sel);
       selKicker=sel.t==='plant'?'Plant':'Hard element'; selName=sel.n;
-      selRows=[{k:'Size',v:(sel.shape==='circ'?(2*sel.w).toFixed(2)+' m across':sel.w.toFixed(2)+' × '+sel.h.toFixed(2)+' m')+' · '+this.area(sel).toFixed(1)+' m²'},
+      selRows=[{k:'Size',v:(this.isRun(sel)?this.runLen(sel).toFixed(2)+' m long × '+sel.w.toFixed(2)+' m wide, '+sel.pts.length+' points'
+          :(sel.shape==='circ'?(2*sel.w).toFixed(2)+' m across':sel.w.toFixed(2)+' × '+sel.h.toFixed(2)+' m'))+' · '+this.area(sel).toFixed(1)+' m²'},
         {k:'Ground level',v:this.RL(c[0],c[1]).toFixed(2)+' m AHD'},
-        {k:'From the reserve',v:(sel.x-(sel.shape==='circ'?sel.w:0)).toFixed(1)+' m'}];
+        {k:'From the reserve',v:(this.isRun(sel)?Math.min.apply(null,sel.pts.map(p=>p[0]))-sel.w/2:sel.x-(sel.shape==='circ'?sel.w:0)).toFixed(1)+' m'}];
       if(sel.t==='plant'){ const p=this.PL[sel.pn]||{w:sel.w*2,h:sel.ht};
         selRows.push({k:'Mature size',v:p.w+' m wide, '+p.h+' m tall'+(sel.tender?' · frost tender':'')}); }
       else if(sel.cat==='dig'||sel.cat==='pave'){ const cf=this.cutfill(sel);
@@ -1360,10 +2072,40 @@ class Component extends DCLogic {
         style:'padding:7px 13px;border-radius:999px;border:1.5px solid '+(danger?'var(--color-accent-300)':'var(--color-neutral-300)')
           +';font-size:12.5px;font-weight:600;cursor:pointer;background:#fff;white-space:nowrap;color:'
           +(danger?'var(--color-accent-700)':'var(--color-neutral-700)')});
+      /* One switch, and while it is on it is the only thing offered. Half the
+         value of a lock is that the destructive actions are not sitting next to
+         it waiting to be tapped instead. */
+      const lockAct=act(sel.lk?'Unlock':'Lock',()=>{ this.push();
+        this.commit(s.items.map(i=>i.u===sel.u?{...i,lk:sel.lk?0:1}:i),sel.u); });
+      if(sel.lk){ selActions=[lockAct]; }
+      else{
       selActions=[
-        act('Copy',()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);})];
-      if(sel.shape!=='circ') selActions.push(act('Rotate 90°',()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}));
+        act('Copy',()=>{this.push();const n=JSON.parse(JSON.stringify(sel));n.u=s.uid;n.x+=1;n.y-=1;
+          if(n.pts) n.pts=n.pts.map(q=>[q[0]+1,q[1]-1]);
+          this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);})];
+      /* Straight is where a run starts, because that is what you can place with
+         one drag. Curve it seeds three points down its long axis — ends and a
+         middle — and from then on it is handles. Straighten drops back to the
+         box that contains it, so nothing is one-way. */
+      if(sel.t!=='plant'&&sel.shape!=='circ'){
+        if(!this.isRun(sel)) selActions.push(act('Curve it',()=>{ this.push();
+          const c=this.centre(sel), a=(sel.rot||0)*Math.PI/180, L=Math.max(sel.w,sel.h)/2;
+          const ux=(sel.h>=sel.w?-Math.sin(a):Math.cos(a)), uy=(sel.h>=sel.w?Math.cos(a):Math.sin(a));
+          const pts=[[c[0]-ux*L,c[1]-uy*L],[c[0],c[1]],[c[0]+ux*L,c[1]+uy*L]].map(p=>[Math.round(p[0]/SNAP)*SNAP,Math.round(p[1]/SNAP)*SNAP]);
+          this.commit(s.items.map(i=>i.u===sel.u?{...i,pts:pts,w:Math.min(sel.w,sel.h),rot:0}:i),sel.u); }));
+        else selActions.push(act('Straighten',()=>{ this.push();
+          const xs=sel.pts.map(p=>p[0]), ys=sel.pts.map(p=>p[1]);
+          const x0=Math.min.apply(null,xs), x1=Math.max.apply(null,xs);
+          const y0=Math.min.apply(null,ys), y1=Math.max.apply(null,ys);
+          const n={...sel}; delete n.pts;
+          n.x=x0-(x1-x0<sel.w?sel.w/2:0); n.y=y0-(y1-y0<sel.w?sel.w/2:0);
+          n.w=Math.max(sel.w,x1-x0); n.h=Math.max(sel.w,y1-y0);
+          this.commit(s.items.map(i=>i.u===sel.u?n:i),sel.u); }));
+      }
+      if(sel.shape!=='circ'&&!this.isRun(sel)) selActions.push(act('Rotate 90°',()=>{this.push();sel.rot=((sel.rot||0)+90)%360;this.commit(s.items.slice());}));
+      selActions.push(lockAct);
       selActions.push(act('Delete',()=>{this.push();this.commit(s.items.filter(i=>i.u!==sel.u),null);},true));
+      }
     }
     /* Cut and fill are computed; this one has to be told, so it is the only
        thing in the inspector you set rather than read. Hard elements only —
@@ -1432,11 +2174,13 @@ class Component extends DCLogic {
 
     const stages=[1,2,3].map(n=>{
       const list=s.items.filter(i=>(i.st||3)===n);
-      const cost=list.reduce((a,i)=>a+(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?Math.max(i.w,i.h)*i.cost:i.cost)),0);
+      /* linLen, not max(w,h): a bent run's length is the curve, and reading w
+         off one gives 0.3 m of stormwater line and a swale that costs nothing. */
+      const cost=list.reduce((a,i)=>a+(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?this.linLen(i)*i.cost:i.cost)),0);
       return {when:STAGEDEF[n].when,title:STAGEDEF[n].title,why:STAGEDEF[n].why,
         cost:'$'+Math.round(cost).toLocaleString(),count:list.length+' items',
         bar:'height:100%;width:'+Math.min(100,cost/BUDGET*100*2.2)+'%;background:'+(n===1?'var(--color-accent)':(n===2?'var(--color-accent-2-500)':'var(--color-neutral-500)')),
-        items:list.map(i=>({name:i.n,cost:'$'+Math.round(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?Math.max(i.w,i.h)*i.cost:i.cost)).toLocaleString(),
+        items:list.map(i=>({name:i.n,cost:'$'+Math.round(i.unit==='m2'?this.area(i)*i.cost:(i.unit==='lin'?this.linLen(i)*i.cost:i.cost)).toLocaleString(),
           dot:'flex:0 0 12px;height:12px;border-radius:'+(i.shape==='circ'?'999px':'4px')+';background:'+i.fill+';border:1.5px solid '+i.stroke,
           move:()=>{ this.push(); const items=s.items.map(x=>x.u===i.u?{...x,st:(x.st||3)%3+1}:x); this.commit(items); }}))};
     });
@@ -1472,6 +2216,13 @@ class Component extends DCLogic {
           const btn=el.querySelector('[data-earth-print]');
           if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','earth'); };
         }catch(e){ el.textContent=''; } },
+      levelsRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ el.innerHTML=window.PRINTSHEET.levelsView(this);
+          const btn=el.querySelector('[data-levels-print]');
+          if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','levels'); };
+        }catch(e){ el.textContent=''; } },
+      waterRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ el.innerHTML=window.PRINTSHEET.waterView(this); }catch(e){ el.textContent=''; } },
       bloomRef:el=>{ if(!el||!window.PRINTSHEET) return;
         try{ const c=window.PRINTSHEET.bloomChart(this);
           el.innerHTML=c.empty
@@ -1486,6 +2237,9 @@ class Component extends DCLogic {
       savedLabel:s.savedAt?'Saved '+new Date(s.savedAt).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}):'Saving as you work',
       openSchemes:()=>this.setState({sheetOpen:true}), closeSheet:()=>this.setState({sheetOpen:false}),
       stop:ev=>{if(ev&&ev.stopPropagation)ev.stopPropagation();}, sheetOpen:s.sheetOpen, schemeList:schemeList,
+      notes:s.notes||'', notesHint:'What this scheme is for, what you changed, what to decide next.',
+      onNotes:ev=>{ const v=ev&&ev.target?ev.target.value:''; this.setState({notes:v},()=>{ clearTimeout(this._nt); this._nt=setTimeout(()=>this.persist(),600); }); },
+      build:BUILD, pushGist:()=>this.pushGist(), gistLabel:(this.gistCfg().id?'Push to gist':'Set up gist'),
       newScheme:()=>this.newScheme(),
       backup:()=>this.backup(), restore:()=>this.restore(),
       undo:()=>{ if(!this.hist||!this.hist.length) return; const items=JSON.parse(this.hist.pop()); this.commit(items,null); },
@@ -1549,6 +2303,7 @@ class Component extends DCLogic {
       barStyle:'height:100%;width:'+Math.min(100,q.cost/BUDGET*100)+'%;background:'+(q.cost>BUDGET?'#a8332a':'var(--color-accent-2-500)'),
       qtyRows:[{k:'Paving and terrace',v:q.pave.toFixed(1)+' m²'},{k:'Soft surfaces',v:q.soft.toFixed(1)+' m²'},
         {k:'Walls and edges',v:q.lin.toFixed(1)+' m'},{k:'Mulch at 100 mm',v:q.mulch.toFixed(1)+' m³'}]
+        .concat(q.pipe>0?[{k:'Drainage line',v:q.pipe.toFixed(1)+' m'}]:[])
         .concat(q.added>0?[{k:'Ground made up',v:q.added.toFixed(1)+' m³'}]:[])
         .concat([{k:'Plants',v:String(q.plants)}]),
       issueCount:String(iss.length), issueSummary:stops?stops+(stops===1?' hard clash':' hard clashes')+' and '+(iss.length-stops)+' to watch':(iss.length?'Nothing hard, '+iss.length+' to watch':'Nothing clashing'),
@@ -1573,18 +2328,19 @@ class Component extends DCLogic {
   switchScheme(id){ if(id===this.state.schemeId){ this.setState({sheetOpen:false}); return; }
     this.persist();
     try{ const all=JSON.parse(localStorage.getItem(this.key())||'{}'); const sc=(all.schemes||{})[id];
-      if(sc&&sc.items){ this.setState({schemeId:id,items:sc.items,uid:sc.uid||sc.items.length+1,sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); return; } }catch(e){}
-    const b=this.seedScheme(id)||this.baseItems(); this.setState({schemeId:id,items:b.items,uid:b.uid,sel:null,sheetOpen:false},()=>{this.draw();this.persist();});
+      if(sc&&sc.items){ this.setState({schemeId:id,items:sc.items,uid:sc.uid||sc.items.length+1,notes:sc.notes||'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); return; } }catch(e){}
+    const d=(this.D.SCHEMES||[]).find(x=>x.id===id);
+    const b=this.seedScheme(id)||this.baseItems(); this.setState({schemeId:id,items:b.items,uid:b.uid,notes:(d&&d.notes)||'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();});
   }
   newScheme(){ const id='s'+Date.now(), b=this.baseItems();
     this.persist();
     this.setState({schemes:this.state.schemes.concat([{id:id,name:'Scheme '+(this.state.schemes.length+1),created:Date.now()}]),
-      schemeId:id,items:b.items,uid:b.uid,sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
+      schemeId:id,items:b.items,uid:b.uid,notes:'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
   dupScheme(id){ const src=this.state.schemeId===id?this.state.items:(()=>{try{return (JSON.parse(localStorage.getItem(this.key())||'{}').schemes||{})[id].items;}catch(e){return this.state.items;}})();
     const nid='s'+Date.now(), name=(this.state.schemes.find(x=>x.id===id)||{name:'Scheme'}).name+' copy';
     this.persist();
     this.setState({schemes:this.state.schemes.concat([{id:nid,name:name,created:Date.now()}]),schemeId:nid,
-      items:JSON.parse(JSON.stringify(src)),sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
+      items:JSON.parse(JSON.stringify(src)),notes:this.state.notes||'',sel:null,sheetOpen:false},()=>{this.draw();this.persist();}); }
   delScheme(id){ const rest=this.state.schemes.filter(x=>x.id!==id); if(!rest.length) return;
     if(id===this.state.schemeId){ this.setState({schemes:rest},()=>this.switchScheme(rest[0].id)); }
     else this.setState({schemes:rest},()=>this.persist()); }
@@ -1599,6 +2355,60 @@ class Component extends DCLogic {
     const all=JSON.parse(localStorage.getItem(this.key())||'{}');
     return JSON.stringify({app:'234-duffy-studio',version:1,exported:Date.now(),
       index:all.index||this.state.schemes,schemes:all.schemes||{},todos:all.todos||[]},null,1); }
+  /* ---------- push to a gist ----------
+     The backup file, kept in a private gist so it can be read from a laptop or
+     handed to Claude without AirDropping anything. A fine-grained token with
+     gist write scope is pasted once and stays in this browser's local storage
+     next to the schemes themselves; it never leaves the device except to
+     api.github.com. This is the one place the app talks to the internet, and it
+     only does so when this button is pressed. Revoke the token on GitHub to
+     turn it off, and the app keeps working exactly as before. */
+  /* One file per scheme rather than one file for everything. A single 200 kB
+     blob is rendered truncated by GitHub and the newest scheme is at the end of
+     it, which is the one worth reading; split up, each file is a few kB and can
+     be opened, diffed or quoted on its own. index.json carries the list. */
+  gistFiles(){ this.persist();
+    const all=JSON.parse(localStorage.getItem(this.key())||'{}');
+    const index=all.index||this.state.schemes||[], schemes=all.schemes||{}, files={}, used={};
+    files['index.json']={content:JSON.stringify({app:'234-duffy-studio',version:2,
+      exported:Date.now(),index:index,todos:all.todos||[]},null,1)};
+    index.forEach(s=>{ const sc=schemes[s.id]; if(!sc||!sc.items) return;
+      let base=String(s.name||s.id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,44)||String(s.id);
+      if(used[base]) base+='-'+s.id; used[base]=1;
+      files[base+'.json']={content:JSON.stringify({id:s.id,name:s.name,updated:sc.updated||null,
+        uid:sc.uid||null,notes:sc.notes||'',items:sc.items},null,1)}; });
+    return files; }
+  gistCfg(){ try{ return JSON.parse(localStorage.getItem('duffy-gist')||'{}'); }catch(e){ return {}; } }
+  saveGistCfg(c){ try{ localStorage.setItem('duffy-gist',JSON.stringify(c)); }catch(e){} }
+  async pushGist(){
+    const cfg=this.gistCfg();
+    if(!cfg.token){
+      const t=window.prompt('Paste a GitHub token with gist write access.\n\nMake one at github.com/settings/tokens — fine-grained, no repository access, Account permissions → Gists: read and write. It is kept on this device only.');
+      if(!t||!t.trim()) return; cfg.token=t.trim(); this.saveGistCfg(cfg);
+    }
+    this.toast('Pushing…');
+    const files=this.gistFiles();
+    /* a scheme deleted here is deleted there: a null file is how the API removes one */
+    (cfg.files||[]).forEach(f=>{ if(!files[f]) files[f]=null; });
+    const body={description:'234 Duffy schemes — '+this.stamp(),public:false,files:files};
+    const url=cfg.id?'https://api.github.com/gists/'+cfg.id:'https://api.github.com/gists';
+    try{
+      const r=await fetch(url,{method:cfg.id?'PATCH':'POST',
+        headers:{'Authorization':'Bearer '+cfg.token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+        body:JSON.stringify(body)});
+      if(r.status===401||r.status===403){ delete cfg.token; this.saveGistCfg(cfg);
+        this.toast('GitHub rejected the token. Tap again to paste a new one.'); return; }
+      if(r.status===404&&cfg.id){ delete cfg.id; this.saveGistCfg(cfg);
+        this.toast('That gist is gone. Tap again to make a new one.'); return; }
+      if(!r.ok){ this.toast('GitHub said '+r.status+'. Nothing was sent.'); return; }
+      const j=await r.json();
+      cfg.id=j.id; cfg.url=j.html_url; cfg.at=Date.now();
+      cfg.files=Object.keys(files).filter(f=>files[f]); this.saveGistCfg(cfg);
+      try{ await navigator.clipboard.writeText(j.html_url); }catch(e){}
+      this.setState({},()=>{});
+      this.toast('Pushed. Link copied: '+j.html_url);
+    }catch(e){ this.toast('Could not reach GitHub. Check the signal and try again.'); }
+  }
   async backup(){
     const name='234-duffy-schemes-'+this.stamp()+'.json', text=this.backupData();
     /* The share sheet is the only route to Files or AirDrop from a home-screen

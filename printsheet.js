@@ -71,12 +71,14 @@ window.PRINTSHEET = (function () {
     };
     g += line(P2.overland, 'stroke="#33646b" stroke-width="' + L(2.6) + '" opacity="0.12"');
     g += line(P2.swale, 'stroke="#33646b" stroke-width="' + L(1.3) + '" opacity="0.32"');
-    g += line(P2.berm, 'stroke="#b2622d" stroke-width="' + L(0.5) + '" stroke-dasharray="' + L(1.6) + ' ' + L(1) + '" opacity="0.65"');
-    g += line(P2.spine, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
-    g += line(P2.north, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
+    if (!app.owns('Diversion berm')) g += line(P2.berm, 'stroke="#b2622d" stroke-width="' + L(0.5) + '" stroke-dasharray="' + L(1.6) + ' ' + L(1) + '" opacity="0.65"');
+    if (!app.owns('Stormwater line')) {
+      g += line(P2.spine, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
+      g += line(P2.north, 'stroke="#33646b" stroke-width="' + L(0.45) + '"');
+    }
     g += line(P2.sleeve, 'stroke="#33646b" stroke-width="' + L(1.5) + '" opacity="0.2"');
-    g += line(P2.court, 'stroke="#33646b" stroke-width="' + L(0.4) + '" stroke-dasharray="' + L(1.4) + ' ' + L(0.9) + '"');
-    g += P2.pits.map(function (p) {
+    if (!app.owns('Stormwater line')) g += line(P2.court, 'stroke="#33646b" stroke-width="' + L(0.4) + '" stroke-dasharray="' + L(1.4) + ' ' + L(0.9) + '"');
+    if (!app.owns('Yard sump')) g += P2.pits.map(function (p) {
       return '<circle cx="' + p[1] + '" cy="' + app.fy(p[2]) + '" r="' + (0.28) + '" fill="#33646b" stroke="#fff" stroke-width="' + L(0.3) + '"/>';
     }).join('');
 
@@ -90,6 +92,7 @@ window.PRINTSHEET = (function () {
     var soft = items.filter(function (i) { return i.t === 'plant'; });
     var shape = function (it, fillOp) {
       var st = 'fill="' + it.fill + '" fill-opacity="' + fillOp + '" stroke="' + it.stroke + '" stroke-width="' + L(0.28) + '"';
+      if (app.isRun && app.isRun(it)) return '<path d="' + app.polyD(app.runPoly(it)) + '" stroke-linejoin="round" ' + st + '/>';
       if (it.shape === 'circ') return '<circle cx="' + it.x + '" cy="' + app.fy(it.y) + '" r="' + app.growR(it, s.years) + '" ' + st + '/>';
       var cx = it.x + it.w / 2, cy = it.y + it.h / 2;
       return '<rect x="' + (-it.w / 2) + '" y="' + (-it.h / 2) + '" width="' + it.w + '" height="' + it.h + '" ' + st
@@ -160,7 +163,7 @@ window.PRINTSHEET = (function () {
 
   /* What a machine operator has to know before he arrives: where he may not dig
      at all, where only a shovel is allowed, how deep each thing goes, and how
-     much comes out. The levels are a fitted surface, not a survey pickup — that
+     much comes out. The levels are the surveyor's own surface, not a set-out pickup, so that
      caveat is printed on the sheet, not buried here. */
 
   var BOUND = [[0, 0], [39.999, 0], [39.999, 21.333], [4.343, 21.333]];
@@ -169,7 +172,10 @@ window.PRINTSHEET = (function () {
      does — the handbook calls it a 450 mm cut, which is also what keeps it under
      the 500 mm that would force a site reclassification. Everything else is
      levelling of the existing surface, and anything needing a depth decided on
-     site is left blank rather than guessed. */
+     site is left blank rather than guessed. A yard sump is the clearest case of
+     that: how deep it goes is set by the invert of the line it joins, which
+     comes off the stormwater contractor's set and not off anything here, so it
+     stays blank and the schedule asks for it rather than inventing it. */
   var DIG_DEPTH = {'Sunken firepit': 0.45};
 
   function inBound(x, y) {
@@ -207,7 +213,8 @@ window.PRINTSHEET = (function () {
         var it = k.it, cf = app.cutfill(it), c = app.centre(it), meth = digMethod(app, it);
         var depth = DIG_DEPTH[it.n] || 0;
         return {no: k.no, name: it.n, it: it,
-          size: it.shape === 'circ' ? n1(it.w * 2) + ' m dia' : n1(it.w) + ' × ' + n1(it.h) + ' m',
+          size: app.isRun && app.isRun(it) ? n1(app.runLen(it)) + ' m × ' + n1(it.w) + ' m'
+            : it.shape === 'circ' ? n1(it.w * 2) + ' m dia' : n1(it.w) + ' × ' + n1(it.h) + ' m',
           area: app.area(it), rl: app.RL(c[0], c[1]),
           cut: cf.cutV, fill: cf.fillV, maxCut: cf.maxCut * 1000, maxFill: cf.maxFill * 1000,
           depth: depth, digV: depth * app.area(it),
@@ -261,18 +268,21 @@ window.PRINTSHEET = (function () {
       return '<rect x="' + d[1] + '" y="' + app.fy(d[4]) + '" width="' + (d[3] - d[1]) + '" height="' + (d[4] - d[2]) + '" fill="#e6dbc4" stroke="#a89878" stroke-width="' + L(0.3) + '"/>';
     }).join('');
 
-    /* the swale and the bund: the actual shaping work, not editor items */
+    /* the rear swale: still site data rather than an editor item. The berm
+       beside it may be either, so it is drawn here only while the layout has
+       no element standing in for it — otherwise it arrives twice. */
     var line = function (pts, st) {
       return '<path d="' + pts.map(function (q, i) { return (i ? 'L' : 'M') + q[0] + ' ' + app.fy(q[1]); }).join('') + '" fill="none" ' + st + '/>';
     };
     g += line(D.DRAIN.swale, 'stroke="#33646b" stroke-width="' + L(2.2) + '" opacity="0.5" stroke-linecap="round"');
-    g += line(D.DRAIN.berm, 'stroke="#b2622d" stroke-width="' + L(1.6) + '" opacity="0.5" stroke-linecap="round"');
+    if (!app.owns('Diversion berm')) g += line(D.DRAIN.berm, 'stroke="#b2622d" stroke-width="' + L(1.6) + '" opacity="0.5" stroke-linecap="round"');
 
     /* every excavation, keyed and shaded by what may touch it */
     earthRows(app).forEach(function (r) {
       var it = r.it, col = r.meth.rank === 0 ? '#a8332a' : r.meth.rank === 1 ? '#b2622d' : '#33646b';
       var st = 'fill="' + col + '" fill-opacity="0.16" stroke="' + col + '" stroke-width="' + L(0.55) + '"';
-      if (it.shape === 'circ') g += '<circle cx="' + it.x + '" cy="' + app.fy(it.y) + '" r="' + it.w + '" ' + st + '/>';
+      if (app.isRun && app.isRun(it)) g += '<path d="' + app.polyD(app.runPoly(it)) + '" stroke-linejoin="round" ' + st + '/>';
+      else if (it.shape === 'circ') g += '<circle cx="' + it.x + '" cy="' + app.fy(it.y) + '" r="' + it.w + '" ' + st + '/>';
       else {
         var cx = it.x + it.w / 2, cy = it.y + it.h / 2;
         g += '<rect x="' + (-it.w / 2) + '" y="' + (-it.h / 2) + '" width="' + it.w + '" height="' + it.h + '" ' + st
@@ -308,9 +318,12 @@ window.PRINTSHEET = (function () {
     return {
       hard: hard.map(function (k) {
         var it = k.it, size, qty;
-        if (it.shape === 'circ') { size = n1(it.w * 2) + ' m diameter'; qty = n1(app.area(it)) + ' m²'; }
+        if (app.isRun && app.isRun(it)) { size = n1(app.runLen(it)) + ' m curved run, ' + n1(it.w) + ' m wide'; qty = n1(app.area(it)) + ' m²'; }
+        else if (it.shape === 'circ') { size = n1(it.w * 2) + ' m diameter'; qty = n1(app.area(it)) + ' m²'; }
         else { size = n1(it.w) + ' × ' + n1(it.h) + ' m'; qty = it.unit === 'lin' ? n1(Math.max(it.w, it.h)) + ' m' : n1(app.area(it)) + ' m²'; }
-        return {no: k.no, name: it.n, size: size, qty: it.unit === 'item' ? '1 item' : qty, cost: it.unit === 'm2' ? app.area(it) * it.cost : it.unit === 'lin' ? Math.max(it.w, it.h) * it.cost : it.cost};
+        var lin = app.linLen ? app.linLen(it) : Math.max(it.w, it.h);
+        if (app.isRun && app.isRun(it) && it.unit === 'lin') qty = n1(lin) + ' m';
+        return {no: k.no, name: it.n, size: size, qty: it.unit === 'item' ? '1 item' : qty, cost: it.unit === 'm2' ? app.area(it) * it.cost : it.unit === 'lin' ? lin * it.cost : it.cost};
       }),
       plants: order.map(function (n) {
         var r = byName[n], p = app.PL[n] || {}, b = (window.BLOOM || {})[n];
@@ -446,7 +459,7 @@ window.PRINTSHEET = (function () {
 
   /* The excavation schedule, shared by the printed sheet and the Works screen so
      the two can never quote different volumes. */
-  var WARN = '<b>Levels are indicative, not setting-out.</b> They come from a surface fitted to the 0.25 m contour survey \u2014 mean error \u221220 mm, RMS 129 mm. Establish a benchmark on site and confirm every level with a level before cutting. Nothing here overrides the tree management plan.';
+  var WARN = '<b>Levels are indicative, not setting-out.</b> They are the surveyor\u2019s own triangulated surface: 126 measured ground points, exact where they measured, interpolated between, and an older fitted surface past the last point. Set out from the survey plan, datum A.H.D., origin SR585 RL 608.442, and confirm on site. No underground services have been located.';
 
   function earthLegend() {
     return [
@@ -520,6 +533,16 @@ window.PRINTSHEET = (function () {
       + '<tr><td>Mulch blanket</td><td>100 mm coarse 25 mm chip across the boundary in front of the gum. Spread, not graded in</td></tr>'
       + '</tbody></table>'
 
+      + '<h3 class="ps-h3">Contour troughs and mounds</h3>'
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Direction</td><td>across the block, not down it — 1 in 19 along the fall, 1 in 132 across it</td></tr>'
+      + '<tr><td>Trough section</td><td>1.0–1.4 m wide, 250 mm invert to crest, batters about 1 in 4</td></tr>'
+      + '<tr><td>Method inside a zone</td><td>shoulders raised in coarse woodchip. The invert is not cut — no excavation, no compaction</td></tr>'
+      + '<tr><td>Method clear of a zone</td><td>may be cut instead, spoil to the mound. Only the rear pocket qualifies</td></tr>'
+      + '<tr><td>Level</td><td>set out with a water level on the day. Over 100 mm end to end it is a drain, not a store</td></tr>'
+      + '<tr><td>Standoff</td><td>3 m minimum from any wall for anything holding water in the ground</td></tr>'
+      + '</tbody></table>'
+
       + '<h3 class="ps-h3">Rules that bind the machine</h3><ul class="ps-ul">'
       + '<li><b>Nothing deeper than 50 mm inside a protection zone</b> counts as excavation. Hand dig, hydro-excavate or bore. No root over 30 mm may be cut, and a locating trench is dug along the line nearest the tree first.</li>'
       + '<li><b>Nothing at all inside a structural root zone</b>, by any method.</li>'
@@ -527,7 +550,8 @@ window.PRINTSHEET = (function () {
       + '<li><b>Keep cut under 500 mm and fill under 400 mm.</b> Beyond that the site classification has to be reassessed. The deepest thing here is the firepit at about 450 mm.</li>'
       + '<li><b>Near footings:</b> no trench below a 30° line from the footing edge, 45° in clay. Any permanent excavation deeper than 600 mm must be retained or battered.</li>'
       + '<li><b>No tracking or spoil stockpiles inside a protection zone.</b> Ground protection is rumble boards over 200 mm of coarse woodchip, cellular geotextile, or rated mats.</li>'
-      + '<li><b>Keep the overland flow path along the side boundary clear</b> — no spoil heap, no plant, no materials, at any stage.</li>'
+      + '<li><b>Keep the overland flow path along the side boundary clear</b> — no spoil heap, no plant, no materials, at any stage. No trough or mound crosses it either.</li>'
+      + '<li><b>Nothing that puts water into the ground within 3 m of a wall.</b> Troughs, gravel paths and soak pits all stand off; mulch and mounds sit on the surface and do not.</li>'
       + '</ul>'
 
       + '<h3 class="ps-h3">Confirm before the machine arrives</h3><ul class="ps-ul">'
@@ -536,6 +560,189 @@ window.PRINTSHEET = (function () {
       + '<li>Service locations — dial before you dig — and the garage slab sleeves cast before the slab goes down.</li>'
       + '<li>Where spoil is stockpiled and where it goes.</li>'
       + '</ul>';
+  }
+
+  /* --------------------------------------------------------------- levels ---
+
+     The sheet the builder asked for. Earthworks says what may be dug; this says
+     what the ground finishes at. One string line along each surface, the RL at
+     each end of it, the grade between them, and the cut and fill that takes.
+
+     Only the surfaces that are mostly clear of a protection zone carry set-out
+     levels. The rest are printed as found, in grey, because inside a zone the
+     finished surface is the existing surface and a level there would be an
+     instruction nobody may follow. */
+
+  function levelRows(app) {
+    var keys = {}, list = keyList(app);
+    list.forEach(function (k) { keys[k.it.u] = k.no; });
+    return app.levels().rows.map(function (r) {
+      r.no = keys[r.u] || '';
+      r.it = app.state.items.find(function (i) { return i.u === r.u; });
+      return r;
+    });
+  }
+
+  function levelSvg(app, P) {
+    var D = app.D, e = planExtent();
+    var availW = P.w - P.m * 2, availH = P.h - P.m * 2 - P.head - P.foot;
+    var scale = pickScale(availW, availH), mmPerM = 1000 / scale;
+    var L = function (mm) { return (mm / mmPerM).toFixed(4); };
+    var T = function (mm) { return (mm / mmPerM).toFixed(3); };
+    var g = '';
+
+    g += '<rect x="' + e.x + '" y="' + e.y + '" width="' + e.w + '" height="' + e.h + '" fill="' + PAPER + '"/>';
+    g += '<g fill="none" stroke="#e7e0d0" stroke-width="' + L(0.18) + '">'
+      + D.CONT.map(function (d) { return '<path d="' + d + '"/>'; }).join('') + '</g>';
+
+    /* the ground a machine may stand on, which is what decides every level here */
+    g += D.TREES.map(function (t) {
+      if (!t.ctrl) return '';
+      return '<circle cx="' + t.x + '" cy="' + app.fy(t.y) + '" r="' + t.ctrl + '" fill="#b2622d" fill-opacity="0.07" stroke="#b2622d" stroke-width="' + L(0.35) + '" stroke-dasharray="' + L(2) + ' ' + L(1.2) + '"/>';
+    }).join('');
+
+    g += D.BLDS.map(function (b) {
+      return '<path d="' + b.d + '" fill="#ece6da" stroke="#8d8474" stroke-width="' + L(0.35) + '"'
+        + (b.k === 'existing' ? '' : ' stroke-dasharray="' + L(1.5) + ' ' + L(1) + '"') + '/>';
+    }).join('');
+    g += (D.DRIVE || []).map(function (d) {
+      return '<rect x="' + d[1] + '" y="' + app.fy(d[4]) + '" width="' + (d[3] - d[1]) + '" height="' + (d[4] - d[2]) + '" fill="#e6dbc4" stroke="#a89878" stroke-width="' + L(0.3) + '"/>';
+    }).join('');
+
+    /* the overland flow corridor, because a level set across it is a weir */
+    g += '<rect x="0" y="' + app.fy(3.0) + '" width="40" height="2.5" fill="#33646b" fill-opacity="0.07"/>';
+
+    levelRows(app).forEach(function (r) {
+      var it = r.it, col = !r.graded ? MUT : r.lvl === 'r' ? '#a8332a' : r.lvl === 'a' ? '#b2622d' : '#33646b';
+      var st = 'fill="' + col + '" fill-opacity="' + (r.graded ? 0.13 : 0.05) + '" stroke="' + col + '" stroke-width="' + L(0.5) + '"'
+        + (r.graded ? '' : ' stroke-dasharray="' + L(1.2) + ' ' + L(1) + '"');
+      if (app.isRun(it)) g += '<path d="' + app.polyD(app.runPoly(it)) + '" stroke-linejoin="round" ' + st + '/>';
+      else {
+        var cx = it.x + it.w / 2, cy = it.y + it.h / 2;
+        g += '<rect x="' + (-it.w / 2) + '" y="' + (-it.h / 2) + '" width="' + it.w + '" height="' + it.h + '" ' + st
+          + ' transform="translate(' + cx + ' ' + app.fy(cy) + ') rotate(' + (-(it.rot || 0)) + ')"/>';
+      }
+      /* the string line, with its level written at each end and an arrow down it */
+      var a = r.a, b = r.b;
+      g += '<path d="M' + a[0] + ' ' + app.fy(a[1]) + 'L' + b[0] + ' ' + app.fy(b[1]) + '" stroke="' + col + '" stroke-width="' + L(0.45) + '" stroke-dasharray="' + L(0.9) + ' ' + L(0.7) + '" fill="none"/>';
+      [[a, r.from], [b, r.to]].forEach(function (q) {
+        g += '<circle cx="' + q[0][0] + '" cy="' + app.fy(q[0][1]) + '" r="' + T(0.7) + '" fill="' + col + '"/>'
+          + '<text x="' + (q[0][0] + Number(T(1.1))) + '" y="' + (app.fy(q[0][1]) - Number(T(0.9))) + '" font-size="' + T(2.3) + '" font-weight="' + (r.graded ? 700 : 400) + '" fill="' + col + '">' + q[1].toFixed(2) + '</text>';
+      });
+      var c = app.centre(it), kx = c[0], ky = app.fy(c[1]);
+      g += '<circle cx="' + kx + '" cy="' + ky + '" r="' + T(2.1) + '" fill="#fff" stroke="' + col + '" stroke-width="' + L(0.35) + '"/>'
+        + '<text x="' + kx + '" y="' + (ky + Number(T(1))) + '" font-size="' + T(2.7) + '" font-weight="700" text-anchor="middle" fill="' + col + '">' + r.no + '</text>';
+    });
+
+    g += '<path d="' + D.BNDP + '" fill="none" stroke="' + INK + '" stroke-width="' + L(0.7) + '"/>';
+    g += D.TREES.map(function (t) {
+      return '<circle cx="' + t.x + '" cy="' + app.fy(t.y) + '" r="0.42" fill="#8c491a" stroke="#fff" stroke-width="' + L(0.35) + '"/>'
+        + '<text x="' + t.x + '" y="' + (app.fy(t.y) + Number(T(1.05))) + '" font-size="' + T(2.7) + '" font-weight="700" text-anchor="middle" fill="#fff">' + t.id + '</text>';
+    }).join('');
+
+    return {svg: '<svg viewBox="' + e.x + ' ' + e.y + ' ' + e.w + ' ' + e.h + '" width="' + n1(e.w * mmPerM) + 'mm" height="' + n1(e.h * mmPerM) + 'mm">' + g + '</svg>',
+      scale: scale};
+  }
+
+  function levelLegend() {
+    return [
+      ['#33646b', 'Finishes at the grade it should. Set out to the levels shown'],
+      ['#b2622d', 'Finishes flatter or steeper than it wants. Read the schedule'],
+      ['#a8332a', 'Wrong grade for what it is. Change the shape, not the levels'],
+      [MUT, 'Left as found: mostly inside a protection zone, so not set out'],
+      ['zone', 'Tree protection zone \u2014 no machine, no cut, 100 mm of chip at most'],
+      ['flow', 'Overland flow corridor \u2014 nothing set out here may dam it']
+    ].map(function (l) {
+      var sw = l[0] === 'zone' ? '<span class="ps-sw" style="border-top:0.6mm dashed #b2622d"></span>'
+        : l[0] === 'flow' ? '<span class="ps-sw" style="background:#33646b;opacity:0.18"></span>'
+        : '<span class="ps-sw" style="background:' + l[0] + '"></span>';
+      return '<div class="ps-lg">' + sw + '<span>' + esc(l[1]) + '</span></div>';
+    }).join('');
+  }
+
+  function levelTable(app) {
+    var rows = levelRows(app), lv = app.levels();
+    var grade = function (n) { return n === Infinity ? 'level' : '1 in ' + Math.round(n); };
+    var body = rows.map(function (r) {
+      var cls = !r.graded ? 'ps-hand' : r.lvl === 'r' ? 'ps-no-dig' : '';
+      return '<tr class="' + cls + '"><td class="ps-no">' + r.no + '</td><td>' + esc(r.n) + '</td>'
+        + '<td>' + n1(r.len) + ' \u00d7 ' + n1(r.w) + ' m</td>'
+        + '<td class="ps-num">' + r.exLo.toFixed(2) + '\u2013' + r.exHi.toFixed(2) + '</td>'
+        + '<td class="ps-num">' + (r.graded ? '<b>' + r.from.toFixed(2) + ' \u2192 ' + r.to.toFixed(2) + '</b>' : '<span class="ps-mut">as found</span>') + '</td>'
+        + '<td class="ps-num">' + grade(r.finN) + '</td>'
+        + '<td class="ps-num">' + (r.cut >= 0.05 ? n1(r.cut) : '\u2014') + '</td>'
+        + '<td class="ps-num">' + (r.fill >= 0.05 ? n1(r.fill) : '\u2014') + '</td>'
+        + '<td class="ps-num">' + (r.graded ? Math.round(Math.max(r.maxCut, r.maxFill) * 1000) : '\u2014') + '</td></tr>'
+        + '<tr><td></td><td colspan="8" class="ps-mut">' + esc(r.msg) + '</td></tr>';
+    }).join('');
+    return '<h3 class="ps-h3">Finished levels, surface by surface</h3>'
+      + '<table class="ps-tbl"><thead><tr><th>No.</th><th>Surface</th><th>Size</th>'
+      + '<th class="ps-num">Existing RL</th><th class="ps-num">Finished RL</th><th class="ps-num">Grade</th>'
+      + '<th class="ps-num">Cut m\u00b3</th><th class="ps-num">Fill m\u00b3</th><th class="ps-num">Deepest mm</th></tr></thead>'
+      + '<tbody>' + (body || '<tr><td colspan="9" class="ps-mut">Nothing on the plan is a surface with a level to set.</td></tr>') + '</tbody></table>'
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Machine cut, all surfaces</td><td class="ps-num">' + n1(lv.cut) + ' m\u00b3</td></tr>'
+      + '<tr><td>Machine fill, all surfaces</td><td class="ps-num">' + n1(lv.fill) + ' m\u00b3</td></tr>'
+      + '<tr class="ps-tot"><td>Left as found, inside a protection zone</td><td class="ps-num">' + n1(lv.asFound) + ' m\u00b2</td></tr>'
+      + '</tbody></table>'
+      + '<p class="ps-fine"><b>Finished RL</b> is one string line along the surface, read at the two ends marked on the drawing, and the grade is the fall between them. '
+      + 'Cut and fill balance about the middle of each surface, so nothing here needs importing or carting away. '
+      + '<b>Deepest mm</b> is the worst single cut or fill on that surface, which is what decides whether an edge has to retain. '
+      + 'A row printed <i>as found</i> is mostly inside a protection zone: those levels describe the ground, they are not levels to work to.</p>';
+  }
+
+  function levelNotes(app) {
+    var w = app.water(), dup = w.dup || [];
+    return '<h3 class="ps-h3">What counts as level</h3>'
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Lawn</td><td>1 in 40 reads level underfoot. 1 in 20 reads as a slope</td></tr>'
+      + '<tr><td>Paving and terrace</td><td>1 in 80 sheds without being felt. Flatter than 1 in 150 ponds, steeper than 1 in 40 will not hold a table</td></tr>'
+      + '<tr><td>Path</td><td>1 in 20 is walked without thinking about it. 1 in 14 is the ramp limit in AS 1428.1. Past 1 in 10 it wants steps</td></tr>'
+      + '<tr><td>Gravel path and trough</td><td>judged end to end, not on a grade: over 100 mm from high point to low it drains instead of holding</td></tr>'
+      + '<tr><td>Crossfall on a path</td><td>1 in 50 to one side, so it sheds rather than puddles</td></tr>'
+      + '</tbody></table>'
+
+      + '<h3 class="ps-h3">Why most of the block has no set-out level</h3><ul class="ps-ul">'
+      + '<li>Inside a tree protection zone the finished surface <b>is</b> the existing surface. Digging there is hand or hydro only, with the arborist present and the work in the approved scope, and added material is capped at 100 mm of coarse woodchip, which is not something grass grows in.</li>'
+      + '<li>So a surface that is mostly inside a zone is printed as found. Grading the clear part of it and leaving the rest builds a step where the two meet, which is worse than leaving all of it alone.</li>'
+      + '<li>The overland flow corridor along the side boundary, y 0.5 to 3.0 m on the plan, takes the reserve bank if it overtops. A level platform may sit in it; a retaining edge across it may not, unless a formed route past the end of it is built at the same time.</li>'
+      + '<li>Nothing that infiltrates comes within 3 m of a wall, whatever its level.</li>'
+      + '</ul>'
+
+      + '<h3 class="ps-h3">Setting out on the day</h3><ul class="ps-ul">'
+      + '<li>Peg the two ends of each string line marked on the drawing, to the RLs in the schedule, and run a line between them.</li>'
+      + '<li>Feather every graded surface out into the ground beside it over about 2 m. No lip, and nothing across the flow corridor.</li>'
+      + '<li>Strip and stack the topsoil before cutting, and put it back on top. The cut and fill figures are the shaping, not the topsoil.</li>'
+      + '<li>Set the sandstone while the machine is on site. One course 500 mm high is 0.6 to 0.9 tonnes a metre depending on its width, and there is no second visit in which to lift it.</li>'
+      + '</ul>'
+
+      + (dup.length ? '<h3 class="ps-h3">Surfaces sharing one piece of ground</h3><table class="ps-tbl"><tbody>'
+          + dup.map(function (d) {
+            return '<tr><td>' + esc(d.a) + ' and ' + esc(d.b) + '</td><td class="ps-num">' + n1(d.area) + ' m\u00b2</td>'
+              + '<td class="ps-num">' + Math.round(d.vol * 1000) + ' L counted once</td></tr>';
+          }).join('')
+          + '</tbody></table><p class="ps-fine">A gravel path laid along a trough is one gravel filled trench, not two things stacked. Build it as a single excavation and finish the walking gravel flush with the ground either side. The Drainage page deducts the shared ground so the total is not counted twice.</p>' : '');
+  }
+
+  function levelSheets(app, P, size, stamp, scheme) {
+    var draw = levelSvg(app, P);
+    var h = '<section class="ps-sheet ps-earth">'
+      + sheetHead(P, 'Levels', 'What the ground finishes at, and what the machine takes to get there \u2014 ' + scheme, stamp)
+      + '<div class="ps-warn">' + WARN + '</div>'
+      + '<div class="ps-plan">' + draw.svg + '</div>'
+      + '<div class="ps-foot"><div class="ps-legend">' + levelLegend() + '</div>'
+      + '<div class="ps-scalebar">' + scaleBar(draw.scale)
+      + '<div class="ps-note" style="max-width:96mm">Scale 1:' + draw.scale + ' at ' + size
+      + '. Each surface carries one string line with its finished level at both ends.</div></div>'
+      + '<div class="ps-north">' + northArrow(app) + '<div class="ps-nlab">Duffy Street is<br>north-north-west</div></div>'
+      + '</div></section>';
+    h += '<section class="ps-sheet ps-earth">'
+      + sheetHead(P, 'Levels schedule', 'Existing and finished, by the numbers on the drawing \u2014 ' + scheme, stamp)
+      + '<div class="ps-cols ps-cols-earth">'
+      + '<div>' + levelTable(app) + '</div>'
+      + '<div>' + levelNotes(app) + '</div>'
+      + '</div></section>';
+    return h;
   }
 
   /* The two sheets the digger gets. Deliberately separable from the design set:
@@ -626,6 +833,7 @@ window.PRINTSHEET = (function () {
       + '<tr><td>Paving and terrace</td><td class="ps-num">' + n1(q.pave) + ' m²</td></tr>'
       + '<tr><td>Soft surfaces</td><td class="ps-num">' + n1(q.soft) + ' m²</td></tr>'
       + '<tr><td>Walls and edges</td><td class="ps-num">' + n1(q.lin) + ' m</td></tr>'
+      + (q.pipe > 0 ? '<tr><td>Drainage line</td><td class="ps-num">' + n1(q.pipe) + ' m</td></tr>' : '')
       + '<tr><td>Mulch at 100 mm</td><td class="ps-num">' + n1(q.mulch) + ' m³</td></tr>'
       + '<tr><td>Plants</td><td class="ps-num">' + q.plants + '</td></tr>'
       + '<tr class="ps-tot"><td>Materials total, your labour</td><td class="ps-num">' + money(q.cost) + '</td></tr>'
@@ -670,7 +878,10 @@ window.PRINTSHEET = (function () {
       + '</section>';
 
     var earth = earthSheets(app, P, size, stamp, scheme);
-    return which === 'earth' ? earth : earth + h;
+    var lev = levelSheets(app, P, size, stamp, scheme);
+    if (which === 'earth') return earth;
+    if (which === 'levels') return lev;
+    return lev + earth + h;
   }
 
   /* --------------------------------------------------------------- styles --- */
@@ -734,7 +945,7 @@ window.PRINTSHEET = (function () {
   function open(app, size, which) {
     close();
     size = (size === 'A4' || size === 'A3') ? size : 'A3';
-    which = which === 'earth' ? 'earth' : 'all';
+    which = (which === 'earth' || which === 'levels') ? which : 'all';
     var P = PAGE[size];
     var st = document.createElement('style');
     st.id = 'ps-style'; st.textContent = css(P, size);
@@ -745,6 +956,7 @@ window.PRINTSHEET = (function () {
     root.innerHTML =
       '<div id="ps-toolbar" style="position:sticky;top:0;z-index:2;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px;background:rgba(40,38,33,.94)">'
       + '<button data-ps="all" style="' + btn(which === 'all') + '">Whole set</button>'
+      + '<button data-ps="levels" style="' + btn(which === 'levels') + '">Levels only</button>'
       + '<button data-ps="earth" style="' + btn(which === 'earth') + '">Earthworks only</button>'
       + '<span style="width:10px"></span>'
       + '<button data-ps="A4" style="' + btn(size === 'A4') + '">A4</button>'
@@ -760,7 +972,7 @@ window.PRINTSHEET = (function () {
       var a = t.getAttribute('data-ps');
       if (a === 'close') { close(); return; }
       if (a === 'print') { window.print(); return; }
-      if (a === 'all' || a === 'earth') { open(app, size, a); return; }
+      if (a === 'all' || a === 'earth' || a === 'levels') { open(app, size, a); return; }
       open(app, a, which);
       });
     return root;
@@ -801,5 +1013,54 @@ window.PRINTSHEET = (function () {
       + '</div>';
   }
 
-  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView};
+  function levelsView(app) {
+    var P = {w: 250, h: 150, m: 0, head: 0, foot: 0};
+    var draw = levelSvg(app, P);
+    return '<div class="ps-screen">'
+      + '<div class="ps-warn">' + WARN + '</div>'
+      + '<div class="ps-screen-plan">' + draw.svg.replace('<svg ', '<svg style="width:100%;height:auto;display:block" ') + '</div>'
+      + '<div class="ps-screen-legend">' + levelLegend() + '</div>'
+      + levelTable(app)
+      + levelNotes(app)
+      + '<button data-levels-print="1" class="ps-print-btn">Print these two sheets</button>'
+      + '</div>';
+  }
+
+  /* ---------------------------------------------------------------- water --- */
+
+  /* The half of the drainage design that is not a pipe. Every surface on the plan
+     that puts water into the ground, what it holds, and — for the three that
+     concentrate it — how far it is standing off a wall. Read off the plan, so it
+     answers for the layout as it is now rather than for the one in the handbook. */
+  function waterView(app) {
+    var w = app.water();
+    if (!w.rows.length) {
+      return '<div class="ps-screen"><p class="ps-fine">Nothing on the plan is holding water yet. '
+        + 'Swales, gravel paths, mulched beds and mounds all count here; add one and this fills in.</p></div>';
+    }
+    var rows = w.rows.map(function (r) {
+      var stand = r.eng ? (r.wall == null ? '—'
+        : n1(r.wall) + ' m' + (r.wall < 3 ? ' <b>too close</b>' : '')) : 'on the surface';
+      return '<tr><td>' + esc(r.n) + '</td><td class="ps-num">' + n1(r.area) + '</td>'
+        + '<td class="ps-num">' + Math.round(r.d * 1000) + '</td>'
+        + '<td class="ps-num">' + Math.round(r.vol * 1000).toLocaleString('en-AU') + '</td>'
+        + '<td>' + esc(r.mat) + '</td><td class="ps-num">' + stand + '</td></tr>';
+    }).join('');
+    return '<div class="ps-screen">'
+      + '<table class="ps-tbl"><thead><tr><th>Surface</th><th class="ps-num">Area m²</th>'
+      + '<th class="ps-num">Depth mm</th><th class="ps-num">Holds L</th><th>Made of</th>'
+      + '<th class="ps-num">Off the wall</th></tr></thead><tbody>' + rows + '</tbody></table>'
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Held where it falls</td><td class="ps-num">' + Math.round(w.held * 1000).toLocaleString('en-AU') + ' L</td></tr>'
+      + '<tr><td>Of that, still working once the mulch is wet</td><td class="ps-num">' + Math.round(w.eng * 1000).toLocaleString('en-AU') + ' L</td></tr>'
+      + '<tr><td>Design storm over the whole block, 5 min, 1 in 10 yr</td><td class="ps-num">' + Math.round(w.storm * 1000).toLocaleString('en-AU') + ' L</td></tr>'
+      + '<tr class="ps-tot"><td>Share of that storm never reaching a pipe</td><td class="ps-num">' + Math.round(w.share * 100) + '%</td></tr>'
+      + '</tbody></table>'
+      + '<p class="ps-fine">Depth is the working depth of the material, not how deep it is dug: a trough ponds 250 mm at its invert over a battered section, a gravel path is the void in its 150 mm base, and a mound or a mulch blanket holds what the chip itself holds. '
+      + 'These are first-flush figures into dry ground. In sustained rain the chip is already wet and only the troughs and the gravel are still taking water, which is the second line above. '
+      + 'None of it replaces the piped system, and none of it is allowed to change the fact that the overland flow path stays clear — it decides how much of ordinary rain never reaches a pipe at all.</p>'
+      + '</div>';
+  }
+
+  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, levelsView: levelsView, waterView: waterView};
 })();
