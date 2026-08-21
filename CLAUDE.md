@@ -67,6 +67,13 @@ the build-up depth is read as a rotation and the cost and volume come out `NaN`.
 Circles (`Planting mound`, plants) take a radius in `w` and `0` in `h`.
 Plant ids are neither unique nor always filled in, so prefer the exact name.
 
+## Writing
+
+`STYLE.md` is how the words here should read, and it applies to scheme notes,
+the handbook, Checks messages, this file and commit messages. Shorter than your
+first draft, no em dashes, no line built to land, and every number saying where
+it came from.
+
 ## Notes on a scheme
 
 Every scheme carries a `notes` string, shown in the Notes card under the plan and
