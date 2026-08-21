@@ -27,7 +27,7 @@ devices keep serving the old copy from disk. See the last note in this file.
 | File | What it is |
 | --- | --- |
 | `index.html` | The app — plan editor, checks, stages, the reference sections, ask |
-| `site-data.js` | The site: boundaries, contours, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
+| `site-data.js` | The site: boundaries, contours, the 59 surveyed spot levels and their triangulation, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
 | `handbook.js` | The reference half: the Site, Works and Risks sections, as blocks the app renders |
 | `bloom.js` | Flowering month and flower colour per plant — horticultural, not survey |
 | `printsheet.js` | The printable set: plan, schedules and bloom calendar, drawn in mm at a true scale |
@@ -36,7 +36,7 @@ devices keep serving the old copy from disk. See the last note in this file.
 | `vendor/` | React and the two typefaces, served from here rather than a CDN |
 | `sw.js` | Service worker: caches the app so it opens with no signal |
 | `manifest.webmanifest`, `apple-touch-icon.png`, `icon-512.png` | Home-screen name and icon |
-| `offline/234-duffy-offline.html` | The whole app inlined into one file — AirDrop it and it works with no network |
+| `offline/234-duffy-offline.html` | The whole app inlined into one file — AirDrop it and it works with no network. **Stale: built 14 August 2026 and not rebuilt since**, so it has none of the curved runs, the locks, the sumps or the survey levels. It is bundler output, not a hand-assembled inline, so regenerating it means running that tool again |
 | `source/` | The original handbook and project data the site file was extracted from |
 | `CLAUDE.md` | How to add a scheme, publish, and check it — the parts that are easy to get wrong |
 
@@ -96,8 +96,25 @@ there and every screen follows.
   over; **Print → Earthworks only** is the same thing from the print dialog. The screen
   and the sheets are built from one set of functions, so they cannot quote different
   numbers, and method comes from the same protection-zone test the Checks screen runs.
-  Levels are indicative — the fitted surface has an RMS of 129 mm — and that is a red
-  strip at the top, not fine print.
+  Levels are indicative — exact where the surveyor measured, 73 mm RMS between — and
+  that is a red strip at the top, not fine print. The strip names the datum and carries
+  the survey's own warning that no underground services have been located.
+- **Ground level comes from the survey, not from a curve through it.** `RL()` used to be
+  one polynomial fitted to the surveyed 0.25 m contour lines, which made it the weakest
+  number in the app: against the surveyor's own spot levels it ran 29 mm low on average,
+  98 mm RMS and 314 mm out at its worst — in the rear corner, the one place a level lawn
+  is buildable. The spot levels, which are the accurate part of any survey, are used now.
+  `SPOT` carries 59 ground levels lifted out of the surveyor's CAD file and put in this
+  frame by fitting the four boundary corners, 2.8 mm residual; `TRI` is their Delaunay
+  triangulation. Over 92 per cent of the block the answer is a plane through three
+  measured points — exact at a surveyed point, interpolating between, and 73 mm RMS
+  against a point it has not seen. Past the last measured level the old fitted surface
+  still answers, because an edge is better extrapolated by a smooth surface than by the
+  nearest triangle's slope. None of it is set-out: that comes off the survey plan, datum
+  A.H.D., origin SR585 at RL 608.442, and a level trough is still set out with a water
+  level on the day. The spot levels are drawn beside their marks rather than on them, so
+  each carries perhaps half a metre of its own position error — this is a better model,
+  not a pickup.
 - The bloom calendar plots mature height against month, the bar's thickness being the
   plant's mature spread and its colour the flower's own. Flowering months and colours
   live in `bloom.js` and are the one part of the app that is judgement rather than
