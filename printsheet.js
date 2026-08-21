@@ -163,7 +163,7 @@ window.PRINTSHEET = (function () {
 
   /* What a machine operator has to know before he arrives: where he may not dig
      at all, where only a shovel is allowed, how deep each thing goes, and how
-     much comes out. The levels are a fitted surface, not a survey pickup — that
+     much comes out. The levels are triangulated survey points, not a set-out pickup — that
      caveat is printed on the sheet, not buried here. */
 
   var BOUND = [[0, 0], [39.999, 0], [39.999, 21.333], [4.343, 21.333]];
@@ -459,7 +459,7 @@ window.PRINTSHEET = (function () {
 
   /* The excavation schedule, shared by the printed sheet and the Works screen so
      the two can never quote different volumes. */
-  var WARN = '<b>Levels are indicative, not setting-out.</b> They come from a surface fitted to the 0.25 m contour survey \u2014 mean error \u221220 mm, RMS 129 mm. Establish a benchmark on site and confirm every level with a level before cutting. Nothing here overrides the tree management plan.';
+  var WARN = '<b>Levels are indicative, not setting-out.</b> They come from 59 surveyed ground levels, triangulated \u2014 exact where the surveyor measured, 73 mm RMS between, and the old fitted surface beyond the last point. Set out from the survey plan, datum A.H.D., origin SR585 RL 608.442, and confirm on site. No underground services have been located.';
 
   function earthLegend() {
     return [

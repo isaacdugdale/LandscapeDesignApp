@@ -179,12 +179,7 @@ window.HANDBOOK = [
     ['Site photographs, April 2025, September 2025 and August 2026','The reserve strip, the raised path formation, and runoff behaviour in rain']
   ],[1.5,1.15]],
   ['p','The block’s position, 35.25622°S 149.15585°E, is derived from the borehole coordinates in the geotechnical report, converted from MGA zone 55. It is used for the solar calculations and the design rainfall lookup.'],
-  ['note','Levels come from a surface fitted to the surveyed 0.25 m contours, checked against ten independent spot levels: mean error −20 mm, RMS 129 mm. Sound for grades, feasibility and design decisions, not for setting out. Use a level on site before digging a trench or pouring an apron.']
-]},
-
-/* ---------------------------------------------------------- earthworks --- */
-{id:'earthworks', group:'works', nav:'Earthworks', title:'Earthworks and levels', sub:'What can be dug, what cannot, and to what depth', blocks:[
-  ['p','This is the first thing the garden needs from anyone with a machine, and it is built from whatever is on the plan right now. The same two sheets print from the button at the bottom — hand those over and keep the rest of the set.'],
+  ['note','Levels now come from the survey itself rather than from a surface fitted through its contours. Fifty-nine ground spot levels were lifted out of the surveyor\u2019s CAD file and triangulated, so over 92 per cent of the block the app reads a plane through three measured points: exact at a surveyed point, and 73 mm RMS against a point it has not seen, from 98 mm before. The old fitted surface still answers at the edges, beyond the last measured level. None of it is set-out \u2014 that comes off the survey plan, datum A.H.D., origin SR585 at RL 608.442 \u2014 and a level trough is still set out with a water level on the day.']
   ['earth','']
 ]},
 

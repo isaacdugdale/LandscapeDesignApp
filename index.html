@@ -658,7 +658,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v23';
+const BUILD='v24';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -712,13 +712,16 @@ const BLOCKM2=807, RAIN5=10.2;
 /* A single course of rough-sawn block, and sandstone runs about 2.3 tonnes the
    cubic metre. The two numbers live here once so the Checks screen and the
    inspector cannot quote different weights. */
-const BLOCK='Sandstone block edge', BLOCKH=0.45, STONET=2.3;
+const BLOCK='Sandstone block edge', BLOCKH=0.50, STONET=2.3;
 /* A swale is only a swale while it is level along its own length. The block falls
    1 in 19 one way and 1 in 132 the other, so this is really a test of whether the
    thing has been turned the right way round: it fails when it drops more than
    100 mm end to end and drops more along its length than across its width. A short
    trough on gently curving ground can read close to either way, and the fitted
-   surface is only good to about 130 mm, so a tighter test would cry wolf. */
+   surface was only good to about 130 mm, so a tighter test would have cried
+     wolf. The levels are triangulated survey points now and better than that,
+     but the tolerance stays where it is: what it really guards against is a
+     short trough on gently curving ground reading either way round. */
 const SWALE='Swale, on contour', MOUND='Mound, built up', LEVELTOL=0.10;
 /* A berm is the opposite instruction to a trough, which is why it is its own
    element rather than a mound with a job description. A trough is judged on
@@ -833,7 +836,48 @@ class Component extends DCLogic {
   }
 
   /* ---------- data helpers ---------- */
-  RL(x,y){const C=this.C;return C[0]+C[1]*x+C[2]*y+C[3]*x*x+C[4]*x*y+C[5]*y*y;}
+  /* Ground level. This used to be one polynomial fitted through the surveyed
+     0.25 m contour lines, and it was the weakest number in the app: measured
+     against the surveyor's own spot levels it ran 29 mm low on average, 98 mm
+     RMS, and 314 mm out at its worst — in the rear corner, which is the one
+     place a level lawn is buildable. The spot levels, which are the accurate
+     part of any survey, had never been used.
+
+     They are used now. SPOT carries 59 ground levels lifted out of the
+     surveyor's CAD file and put in this frame by fitting the four boundary
+     corners (2.8 mm residual); TRI is their Delaunay triangulation, which is
+     what a survey package would call a TIN and what a level model actually is.
+     Inside the hull — 92% of the block — the answer is a plane through three
+     measured points, so at a surveyed point it is exact and between them it
+     interpolates. Leave-one-out against the survey: 73 mm RMS, 4 mm bias,
+     160 mm worst, from 98 / 29 / 314.
+
+     Outside the hull the polynomial still answers, because an edge is better
+     extrapolated by a smooth surface than by the nearest triangle's slope.
+     The label positions carry maybe half a metre of their own error — a spot
+     level is drawn beside its mark, not on it — so this is a better model, not
+     a set-out. That still comes off the survey, from SR585 at RL 608.442. */
+  triZ(k,x,y){
+    const S=this.D.SPOT, t=this.D.TRI[k], a=S[t[0]], b=S[t[1]], c=S[t[2]];
+    const den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);
+    if(!den) return null;
+    const l1=((b[1]-c[1])*(x-c[0])+(c[0]-b[0])*(y-c[1]))/den;
+    const l2=((c[1]-a[1])*(x-c[0])+(a[0]-c[0])*(y-c[1]))/den;
+    const l3=1-l1-l2;
+    if(l1<-1e-9||l2<-1e-9||l3<-1e-9) return null;
+    return l1*a[2]+l2*b[2]+l3*c[2];
+  }
+  RL(x,y){
+    const T=this.D&&this.D.TRI, S=this.D&&this.D.SPOT;
+    if(T&&S){
+      /* Samples arrive in runs along one item, so the triangle that answered
+         last almost always answers again. Checking it first turns a scan over
+         105 triangles into one test for most calls. */
+      if(this._tri!==undefined){ const z=this.triZ(this._tri,x,y); if(z!==null) return z; }
+      for(let k=0;k<T.length;k++){ const z=this.triZ(k,x,y); if(z!==null){ this._tri=k; return z; } }
+    }
+    const C=this.C; return C[0]+C[1]*x+C[2]*y+C[3]*x*x+C[4]*x*y+C[5]*y*y;
+  }
   /* Site data draws a line until the layout takes it over. The pipes and the
      berm were drawn out of DRAIN before they were elements, and a scheme saved
      on the iPad before that still has to show them — so the site version is
@@ -1073,14 +1117,17 @@ class Component extends DCLogic {
     for(const p of pts){ const d=this.RL(p[0],p[1])-target; if(d>0){cut+=d;if(d>mx)mx=d;} else {fill-=d;if(-d>mn)mn=-d;} }
     const n=pts.length, a=this.area(it);
     return {cutV:cut/n*a,fillV:fill/n*a,maxCut:mx,maxFill:mn}; }
-  /* Everything else in the library she can carry. A block bench she cannot: half
-     a tonne a metre, so where a machine can stand is a question the layout has
-     to answer before the stone is ordered. */
+  /* Everything else in the library she can carry. A block bench she cannot: over
+     half a tonne a metre, so where a machine can stand is a question the layout
+     has to answer before the stone is ordered. The logs are 500 mm, not the 450
+     this assumed — which also means filling to the top of one is 100 mm past the
+     project’s 400 mm fill limit outside a protection zone, and five times the
+     cap inside one. */
   stone(it){ if(!it||it.n!==BLOCK) return null;
     const L=this.linLen(it), b=this.isRun(it)?it.w:Math.min(it.w,it.h);
     return {len:L,per:b*BLOCKH*STONET,total:L*b*BLOCKH*STONET}; }
   /* Ground raised behind an edge or over a bed. The app measures cut and fill
-     from the fitted surface, which is levelling — it says nothing about material
+     from the ground surface, which is levelling — it says nothing about material
      carted in and heaped up, and that is the move the tree plan actually caps.
      Declared per item rather than inferred, because only the person building it
      knows whether the ground behind a wall is being made up or left alone. */
@@ -1580,7 +1627,7 @@ class Component extends DCLogic {
         if(cf&&cf.fall>LEVELTOL&&cf.fall>=cf.across) out.push({sev:'stop',u:it.u,title:it.n+' is not on the contour',
           body:'It falls '+(cf.fall*1000).toFixed(0)+' mm from one end to the other, so it would run water along itself instead of holding it. Turned to lie the other way it falls about '+(cf.across*1000).toFixed(0)+' mm over the same ground. Contours here run across the block, not down it.'});
         else if(cf) out.push({sev:'note',u:it.u,title:it.n+' — '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
-          body:'On the contour, so it fills along its whole length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing — the fitted surface is only good to about 130 mm. Rock the inlet, and leave a level spill at the low end so an overflow leaves the way you chose.'}); }
+          body:'On the contour, so it fills along its whole length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing — the levels here are triangulated survey points, good near a measured level and softer between. Rock the inlet, and leave a level spill at the low end so an overflow leaves the way you chose.'}); }
       /* What a pipe is judged on is its route, not its level: clause 6.5.2 rules
          out a new service through a protection zone unless the tree plan says
          so, which is the whole reason the sleeves are cast under the slab. */
@@ -1604,7 +1651,7 @@ class Component extends DCLogic {
         if(sc.d>SUMPFAR) out.push({sev:'care',u:it.u,title:it.n+' is '+sc.d.toFixed(1)+' m from the nearest line',
           body:'A sump collects water and hands it to a pipe, so it has to fall to one, and nothing on this drawing runs within '+SUMPFAR.toFixed(1)+' m of it. As drawn it is a hole that fills up. Either move it onto a line, or draw the '+PIPE+' that serves it — the falls are in Works → Drainage.'});
         else out.push({sev:'note',u:it.u,title:it.n+' — ground '+sc.rl.toFixed(2)+' m, '+sc.kerb.toFixed(2)+' m above the kerb',
-          body:'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the kerb at '+KERB.toFixed(2)+'. Gravity is never the constraint on this block — it drops 2.08 m at 1 in 19 — the route past the protection zones is. Set the invert off the surveyor’s levels rather than this surface, which is only good to about 130 mm, and give it a removable grate rated for whatever crosses it.'});
+          body:'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the kerb at '+KERB.toFixed(2)+'. Gravity is never the constraint on this block — it drops 2.08 m at 1 in 19 — the route past the protection zones is. Set the invert off the survey plan — datum A.H.D., origin SR585 at RL 608.442 — rather than off this drawing, and give it a removable grate rated for whatever crosses it.'});
         if(sc.silt) out.push({sev:'note',u:it.u,title:it.n+' — this is one that needs a silt trap',
           body:'It takes runoff off the reserve, which arrives orange and heavily silted. A sump below the outlet with a removable grate turns that into shovelling sand out of a box once a year before winter, instead of clearing it out of the pipe under the garage slab where you cannot reach it.'}); }
       /* The two things a berm has to be, and neither is level. */
