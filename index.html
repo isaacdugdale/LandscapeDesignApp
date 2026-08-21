@@ -658,7 +658,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v25';
+const BUILD='v26';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -836,27 +836,34 @@ class Component extends DCLogic {
   }
 
   /* ---------- data helpers ---------- */
-  /* Ground level. This used to be one polynomial fitted through the surveyed
-     0.25 m contour lines, and it was the weakest number in the app: measured
-     against the surveyor's own spot levels it ran 29 mm low on average, 98 mm
-     RMS, and 314 mm out at its worst — in the rear corner, which is the one
-     place a level lawn is buildable. The spot levels, which are the accurate
-     part of any survey, had never been used.
+  /* Ground level, taken straight from the surveyor's own surface.
 
-     They are used now. SPOT carries 59 ground levels lifted out of the
-     surveyor's CAD file and put in this frame by fitting the four boundary
-     corners (2.8 mm residual); TRI is their Delaunay triangulation, which is
-     what a survey package would call a TIN and what a level model actually is.
-     Inside the hull — 92% of the block — the answer is a plane through three
-     measured points, so at a surveyed point it is exact and between them it
-     interpolates. Leave-one-out against the survey: 73 mm RMS, 4 mm bias,
-     160 mm worst, from 98 / 29 / 314.
+     Two earlier versions were worse. The first was one polynomial fitted
+     through the 0.25 m contour lines: 29 mm low on average against the spot
+     levels, 98 mm RMS, 314 mm at worst. The second read the spot levels off
+     the CAD file, but took each position from where the label was printed
+     rather than from the mark it labels. A label sits beside its mark. So
+     every point was about 0.66 m out, median, measured against the survey.
+     On a fall of 1 in 19 that is roughly 35 mm of level error per point. It
+     left the model 43 mm RMS from the surveyor's surface, 203 mm at worst.
 
-     Outside the hull the polynomial still answers, because an edge is better
+     The CAD file has the surveyor's own triangulation on layer SRF-VIEW:
+     126 points carrying true 3D coordinates, and the 196 faces they drew
+     between them. That is what SPOT and TRI now hold, placed in this frame by
+     a fit to the four boundary corners. The faces are listed first and 83
+     Delaunay triangles after them. So a surveyed face answers wherever there
+     is one, and the fill only covers what the surveyor did not level. That is
+     mostly the house footprint, where nobody was going to dig.
+
+     So RL is the survey, not a model of it. Exact at all 126 points and
+     within 5 mm of their surface everywhere else, that 5 mm being the cost of
+     storing levels to the centimetre the survey quotes them in. Past the last
+     point the old polynomial still answers, because an edge is better
      extrapolated by a smooth surface than by the nearest triangle's slope.
-     The label positions carry maybe half a metre of their own error — a spot
-     level is drawn beside its mark, not on it — so this is a better model, not
-     a set-out. That still comes off the survey, from SR585 at RL 608.442. */
+
+     Still not a set-out. That comes off the survey plan, datum A.H.D., origin
+     SR585 at RL 608.442, and the plan says no underground services have been
+     located. */
   triZ(k,x,y){
     const S=this.D.SPOT, t=this.D.TRI[k], a=S[t[0]], b=S[t[1]], c=S[t[2]];
     const den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);

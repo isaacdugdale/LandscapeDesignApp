@@ -27,7 +27,7 @@ devices keep serving the old copy from disk. See the last note in this file.
 | File | What it is |
 | --- | --- |
 | `index.html` | The app — plan editor, checks, stages, the reference sections, ask |
-| `site-data.js` | The site: boundaries, contours, the 59 surveyed spot levels and their triangulation, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
+| `site-data.js` | The site: boundaries, contours, the surveyor's 126 ground levels and their triangulation, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
 | `handbook.js` | The reference half: the Site, Works and Risks sections, as blocks the app renders |
 | `bloom.js` | Flowering month and flower colour per plant — horticultural, not survey |
 | `printsheet.js` | The printable set: plan, schedules and bloom calendar, drawn in mm at a true scale |
@@ -99,22 +99,22 @@ there and every screen follows.
   Levels are indicative — exact where the surveyor measured, 73 mm RMS between — and
   that is a red strip at the top, not fine print. The strip names the datum and carries
   the survey's own warning that no underground services have been located.
-- **Ground level comes from the survey, not from a curve through it.** `RL()` used to be
-  one polynomial fitted to the surveyed 0.25 m contour lines, which made it the weakest
-  number in the app: against the surveyor's own spot levels it ran 29 mm low on average,
-  98 mm RMS and 314 mm out at its worst — in the rear corner, the one place a level lawn
-  is buildable. The spot levels, which are the accurate part of any survey, are used now.
-  `SPOT` carries 59 ground levels lifted out of the surveyor's CAD file and put in this
-  frame by fitting the four boundary corners, 2.8 mm residual; `TRI` is their Delaunay
-  triangulation. Over 92 per cent of the block the answer is a plane through three
-  measured points — exact at a surveyed point, interpolating between, and 73 mm RMS
-  against a point it has not seen. Past the last measured level the old fitted surface
-  still answers, because an edge is better extrapolated by a smooth surface than by the
-  nearest triangle's slope. None of it is set-out: that comes off the survey plan, datum
-  A.H.D., origin SR585 at RL 608.442, and a level trough is still set out with a water
-  level on the day. The spot levels are drawn beside their marks rather than on them, so
-  each carries perhaps half a metre of its own position error — this is a better model,
-  not a pickup.
+- **Ground level is the surveyor's own surface.** Not a model fitted to the
+  survey, and not the survey read off its printed labels. The CAD file carries
+  Brian Milburn's triangulation on layer `SRF-VIEW`. That is 126 measured
+  ground points with true coordinates, and the 196 faces drawn between them.
+  `SPOT` and `TRI` hold exactly that. Placing it in this frame is a fit to the
+  four boundary corners, which land within 8 mm of the surveyed dimensions and
+  give 806.9 m² against the plan's 807 m². Surveyed faces are listed first, so
+  one answers wherever it exists. 83 Delaunay triangles fill the rest, which is
+  mostly the house footprint, where no levels were taken. So `RL` is exact at
+  every surveyed point. Between them it sits within 5 mm of the surveyor's
+  surface, and that 5 mm is the cost of storing levels to the centimetre the
+  survey quotes. Past the last measured point the older fitted surface still
+  answers, because an edge extrapolates better from a smooth surface than from
+  the nearest triangle's slope. None of it is set-out. That comes off the
+  survey plan, datum A.H.D., origin SR585 at RL 608.442, and the plan records
+  that no underground services have been located.
 - The bloom calendar plots mature height against month, the bar's thickness being the
   plant's mature spread and its colour the flower's own. Flowering months and colours
   live in `bloom.js` and are the one part of the app that is judgement rather than
