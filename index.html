@@ -658,7 +658,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v22';
+const BUILD='v23';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -676,7 +676,7 @@ const HARDCOL={
   'Raised veg bed':['#ccdbb2','#56633f'],'Shed':['#dcd3c4','#645c50'],'Water tank':['#cfd9d3','#33646b'],
   'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Planting mound':['#dcc9a8','#8c491a'],
   'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50'],
-  'Channel drain':['#b9ccd1','#33646b'],
+  'Channel drain':['#b9ccd1','#33646b'],'Yard sump':['#b9ccd1','#33646b'],
   'Swale, on contour':['#cfd9d3','#33646b'],'Mound, built up':['#dcc9a8','#8c491a'],
   /* the tan the dotted line was drawn in, so it stays the thing you recognise */
   'Diversion berm':['#e6d6bb','#b2622d'],'Stormwater line':['#b9ccd1','#33646b'],
@@ -736,6 +736,18 @@ const BERM='Diversion berm', BERMSAG=0.15;
    amended. Nothing else in the library goes under a building, so the exemption
    is named here rather than guessed from the category. */
 const PIPE='Stormwater line', BURIED={'Stormwater line':1};
+/* The pits. Eight of them were drawn out of DRAIN.pits as annotation — dots on
+   the lines, there to be read and impossible to move — and the builder asking
+   for yard sumps is asking about exactly those. A sump is the opposite element
+   to a soak pit and deliberately absent from SOAK: it is a box that collects
+   water and hands it to a pipe, so nothing about it belongs within the 3 m
+   standoff test, and the one thing that would make it wrong here is putting one
+   somewhere it cannot fall to a line. Unlike a pipe it is NOT buried — its
+   grate is the ground surface, so a sump inside a building footprint is a real
+   clash rather than a sleeve. SUMPFAR is how far from a line a sump may sit
+   before the connection stops being obvious on the drawing; SILT is the ones
+   that take hillside runoff and therefore need a sump below the outlet. */
+const SUMP='Yard sump', SUMPFAR=2.0, SILTY=[[5.5,20.75],[15.8,19.9]], SILTR=2.5, KERB=609.85;
 /* Added material: the tree plan's cap inside a protection zone, the project's
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
@@ -1152,6 +1164,28 @@ class Component extends DCLogic {
       if(!best||d<best.d) best={d:d,n:b[0]};
     }
     return best; }
+  /* A sump is only a sump while it can let go of what it catches, and here the
+     thing it lets go into is one of two lines: the DN150 spine down the side
+     strip or the DN100 north line to the sleeve under the garage. Measured
+     against whichever pipes the drawing actually has — the elements where the
+     layout carries them, the site lines where it does not — because a sump two
+     metres from nothing is a hole that fills up. */
+  sumpLines(){ const out=[];
+    if(this.owns(PIPE)){ for(const it of this.state.items){ if(it.n!==PIPE) continue;
+      const m=this.midline(it); if(m&&m.length>1) out.push(m); } }
+    if(!out.length){ const P=this.D.DRAIN; out.push(P.spine,P.north,P.court); }
+    return out; }
+  segD(p,a,b){ const vx=b[0]-a[0], vy=b[1]-a[1], L=vx*vx+vy*vy;
+    let t=L?((p[0]-a[0])*vx+(p[1]-a[1])*vy)/L:0; t=Math.max(0,Math.min(1,t));
+    return Math.hypot(p[0]-(a[0]+vx*t), p[1]-(a[1]+vy*t)); }
+  sumpCheck(it){
+    if(!it||it.n!==SUMP) return null;
+    const c=this.centre(it); let best=null;
+    for(const L of this.sumpLines()) for(let i=0;i<L.length-1;i++){
+      const d=this.segD(c,L[i],L[i+1]); if(best===null||d<best) best=d; }
+    const rl=this.RL(c[0],c[1]);
+    return {d:best===null?Infinity:best, rl:rl, kerb:rl-KERB,
+      silt:SILTY.some(s=>Math.hypot(c[0]-s[0],c[1]-s[1])<=SILTR)}; }
   /* Where the ground is free-draining sand a soak pit is the right answer, which
      is why one is recommended beside the firepit. Beside the house it is reactive
      clay and the wrong answer, and nothing in the layout says which is which
@@ -1439,14 +1473,16 @@ class Component extends DCLogic {
       g+=line(P.overland,'fill="none" stroke="'+COL.water+'" stroke-width="11" opacity="0.16" '+nss);
       g+=line(P.swale,'fill="none" stroke="'+COL.water+'" stroke-width="5" opacity="0.45" '+nss);
       g+=line(P.sleeve,'fill="none" stroke="'+COL.water+'" stroke-width="7" opacity="0.22" '+nss);
-      /* The sleeve highlight, the pits and the corridor are annotation on the
-         lines rather than objects, so they are drawn either way. */
+      /* The sleeve highlight and the corridor are annotation on the lines rather
+         than objects, so they are drawn either way. The pits stopped being
+         annotation the moment a sump became an element, so they follow the same
+         rule as the berm and the lines: drawn only while nothing stands in. */
       if(!this.owns(BERM)) g+=line(P.berm,'fill="none" stroke="'+COL.tpz+'" stroke-width="4" stroke-dasharray="5 3" opacity="0.6" '+nss);
       if(!this.owns(PIPE)){
         g+=line(P.spine,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
         g+=line(P.north,'fill="none" stroke="'+COL.water+'" stroke-width="2.6" '+nss);
         g+=line(P.court,'fill="none" stroke="'+COL.water+'" stroke-width="2.2" stroke-dasharray="6 4" '+nss); }
-      g+=P.pits.map(p=>'<circle cx="'+p[1]+'" cy="'+this.fy(p[2])+'" r="0.3" fill="'+COL.water+'" stroke="#fff" stroke-width="1.4" '+nss+'/>').join('');
+      if(!this.owns(SUMP)) g+=P.pits.map(p=>'<circle cx="'+p[1]+'" cy="'+this.fy(p[2])+'" r="0.3" fill="'+COL.water+'" stroke="#fff" stroke-width="1.4" '+nss+'/>').join('');
     }
     if(L.tpz) g+=D.TREES.map(t=>t.ctrl?'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.ctrl+'" fill="'+COL.tpz+'" fill-opacity="0.07" stroke="'+COL.tpz+'" stroke-width="1.1" stroke-dasharray="7 4" '+nss+'/>':'').join('');
     if(L.srz) g+=D.TREES.map(t=>'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.srz+'" fill="'+COL.srz+'" fill-opacity="0.26"/>').join('');
@@ -1560,6 +1596,17 @@ class Component extends DCLogic {
             +(deep<0.25?' At this depth it is a graze rather than a crossing, and well inside what the survey can resolve — worth confirming the zone radius on site before moving anything.':'')+u});
         else out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of line',
           body:'Clear of every protection zone, so no tree approval and no supervision, which is the reason for this route rather than the short one.'+u+' Falls and pipe sizes are in Works → Drainage; this line is the route on the ground.'}); }
+      /* The pits, which is what the builder is asking for when he says yard
+         sumps. Falls are never the question on a block that drops 2.08 m; the
+         questions are whether this one reaches a line, and whether it is one of
+         the two catching hillside runoff and therefore needing a silt trap. */
+      if(it.n===SUMP){ const sc=this.sumpCheck(it);
+        if(sc.d>SUMPFAR) out.push({sev:'care',u:it.u,title:it.n+' is '+sc.d.toFixed(1)+' m from the nearest line',
+          body:'A sump collects water and hands it to a pipe, so it has to fall to one, and nothing on this drawing runs within '+SUMPFAR.toFixed(1)+' m of it. As drawn it is a hole that fills up. Either move it onto a line, or draw the '+PIPE+' that serves it — the falls are in Works → Drainage.'});
+        else out.push({sev:'note',u:it.u,title:it.n+' — ground '+sc.rl.toFixed(2)+' m, '+sc.kerb.toFixed(2)+' m above the kerb',
+          body:'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the kerb at '+KERB.toFixed(2)+'. Gravity is never the constraint on this block — it drops 2.08 m at 1 in 19 — the route past the protection zones is. Set the invert off the surveyor’s levels rather than this surface, which is only good to about 130 mm, and give it a removable grate rated for whatever crosses it.'});
+        if(sc.silt) out.push({sev:'note',u:it.u,title:it.n+' — this is one that needs a silt trap',
+          body:'It takes runoff off the reserve, which arrives orange and heavily silted. A sump below the outlet with a removable grate turns that into shovelling sand out of a box once a year before winter, instead of clearing it out of the pipe under the garage slab where you cannot reach it.'}); }
       /* The two things a berm has to be, and neither is level. */
       if(it.n===BERM){ const bs=this.bermShed(it);
         if(bs&&bs.sag) out.push({sev:'care',u:it.u,title:it.n+' has a low point in the middle of it',
@@ -1573,7 +1620,13 @@ class Component extends DCLogic {
         if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
           body:'The ACT rule is three metres of clearance on the reserve side. Moving it about '+Math.max(0.5,3-d).toFixed(1)+' m toward the street fixes that, but pushes it toward the gum\u2019s protection zone.'}); }
       const inCorridor=this.samples(it,4).some(p=>p[1]>=0.5&&p[1]<=3.0);
-      if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
+      /* A sump is the exception the corridor rule needs. Everything else in the
+         corridor obstructs it; a sump with its lid flush takes water out of it,
+         which is why the spine and five of the eight pits sit there by design.
+         Flush is the whole of the condition — a raised surround is a weir. */
+      if(inCorridor&&it.n===SUMP) out.push({sev:'note',u:it.u,title:it.n+' sits in the overland flow path, which is where it belongs',
+        body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops, and a pit that drains it is the one thing that should be there. Set the grate flush with the finished surface: a raised surround, or a lid standing proud of the grass, turns it into a weir across the corridor. Nothing else may narrow the route around it.'});
+      else if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
         body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. Anything here needs a formed route around it along the fence — a drainage change, not yet priced.'});
     }
     const w=this.water();

@@ -134,6 +134,22 @@ there and every screen follows.
   a terrace you have settled can be locked out of the way of your own elbows. The
   library's thirteenth column is what *arrives* locked; the item carries whether it
   *is*, so both choices save with the scheme.
+- **The pits are elements now too.** Eight of them — `S0` to `S3` down the DN150 spine in
+  the side strip, `D1` on its branch, `P0` at the foot of the corner swale, `P1` at the head
+  of the sleeve under the garage, `P3` at the driveway — were dots drawn out of `DRAIN.pits`,
+  readable and untouchable. **Yard sump** is that thing as an element: selectable, costed at
+  $180 each, and checked. It arrives locked like the rest of the site fabric. Deliberately
+  *not* in `SOAK`, because a sump and a soak pit are opposite answers — one hands water to a
+  pipe, the other puts it in the ground and keeps 3 m off every wall — so sumps add nothing
+  to what the shaping holds on the Drainage page. And unlike a `Stormwater line` a sump is
+  *not* buried: its grate is the ground surface, so one inside a building footprint is a real
+  clash rather than a sleeve. The Checks screen asks it whether it reaches a line, since a
+  sump that falls to nothing is a hole that fills up; whether it is one of the two taking
+  runoff off the reserve and therefore needing a silt trap; and it inverts the overland-flow
+  rule, because a pit draining that corridor belongs there so long as its lid sits flush — a
+  raised surround is a weir. Depth stays off the earthworks schedule: it is set by the invert
+  of the line the sump joins, which is the stormwater contractor's number, not this app's.
+
 - A scheme saved before those elements existed still has to show the pipes, so the
   site version of a line is drawn only while nothing in the layout stands in for it
   — `owns()` decides, by element name, in the app and on both printed sheets. The

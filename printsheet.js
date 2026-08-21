@@ -78,7 +78,7 @@ window.PRINTSHEET = (function () {
     }
     g += line(P2.sleeve, 'stroke="#33646b" stroke-width="' + L(1.5) + '" opacity="0.2"');
     if (!app.owns('Stormwater line')) g += line(P2.court, 'stroke="#33646b" stroke-width="' + L(0.4) + '" stroke-dasharray="' + L(1.4) + ' ' + L(0.9) + '"');
-    g += P2.pits.map(function (p) {
+    if (!app.owns('Yard sump')) g += P2.pits.map(function (p) {
       return '<circle cx="' + p[1] + '" cy="' + app.fy(p[2]) + '" r="' + (0.28) + '" fill="#33646b" stroke="#fff" stroke-width="' + L(0.3) + '"/>';
     }).join('');
 
@@ -172,7 +172,10 @@ window.PRINTSHEET = (function () {
      does — the handbook calls it a 450 mm cut, which is also what keeps it under
      the 500 mm that would force a site reclassification. Everything else is
      levelling of the existing surface, and anything needing a depth decided on
-     site is left blank rather than guessed. */
+     site is left blank rather than guessed. A yard sump is the clearest case of
+     that: how deep it goes is set by the invert of the line it joins, which
+     comes off the stormwater contractor's set and not off anything here, so it
+     stays blank and the schedule asks for it rather than inventing it. */
   var DIG_DEPTH = {'Sunken firepit': 0.45};
 
   function inBound(x, y) {
