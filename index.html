@@ -472,6 +472,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
                 <div ref="{{ earthRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
 
+              <sc-if value="{{ b.isLevels }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ levelsRef }}" style="margin:4px 0 10px"></div>
+              </sc-if>
+
               <sc-if value="{{ b.isWater }}" hint-placeholder-val="{{ false }}">
                 <div ref="{{ waterRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
@@ -658,7 +662,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v26';
+const BUILD='v27';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -755,6 +759,29 @@ const SUMP='Yard sump', SUMPFAR=2.0, SILTY=[[5.5,20.75],[15.8,19.9]], SILTR=2.5,
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
 const BUCAP=100, BUFILL=400, BUSTEPS=[0,100,200,300,400,500], BURATE=60;
+/* What a finished surface is graded to. `want` is the gradient it is eased
+   toward, as 1 in N; `max` is the steepest it may be and still do its job;
+   `flat` is the flattest paving may be and still shed. A lawn reads level at
+   1 in 40 and reads like a slope at 1 in 20. A path at 1 in 20 is walked
+   without thinking about it, 1 in 14 is the ramp limit in AS 1428.1, and past
+   1 in 10 it wants steps. A gravel path is an infiltration surface, so it
+   wants to be near level: water it sheds is water it does not hold, and it is
+   judged end to end like a trough rather than on its graded line. */
+const GRADE={
+  'Dichondra lawn':     {want:40, max:20,  kind:'lawn'},
+  'Paving / terrace':   {want:80, max:40,  flat:150, kind:'paved'},
+  'Firepit terrace':    {want:80, max:40,  flat:150, kind:'paved'},
+  'Outdoor kitchen':    {want:80, max:40,  flat:150, kind:'paved'},
+  'Path, firm surface': {want:20, max:14,  kind:'walk'},
+  'Gravel path':        {want:40, max:20,  kind:'soak'}
+};
+/* Sandstone runs 2.3 tonnes the cubic metre, so a 750 mm wide log 500 mm high
+   weighs 860 kg a metre. Nothing places that by hand. No machine may track
+   into a protection zone either, so a run of block inside one has to be set
+   from outside it, and STONEREACH is the working reach that takes. It is here
+   to raise the question with the builder against the machine's own lift chart,
+   not to answer it. STONEHAND is a two person lift. */
+const STONEREACH=4.0, STONEHAND=0.06;
 const GROW={groundcover:3,grass:3,veggie:1,shrub:6,other:6,tree:12};
 /* her plant list came out of a spreadsheet, so names arrive half-cased and one is a pasted link */
 function DISP(n){ if(!n) return n;
@@ -1124,6 +1151,160 @@ class Component extends DCLogic {
     for(const p of pts){ const d=this.RL(p[0],p[1])-target; if(d>0){cut+=d;if(d>mx)mx=d;} else {fill-=d;if(-d>mn)mn=-d;} }
     const n=pts.length, a=this.area(it);
     return {cutV:cut/n*a,fillV:fill/n*a,maxCut:mx,maxFill:mn}; }
+  /* ---------- levels ----------
+     What a builder is handed when he says give me the levels. Existing ground
+     comes off the survey; the finished surface is a string line along the
+     thing at one grade, which is how a digger actually sets one, and a stated
+     crossfall off it.
+
+     Only the part of a surface that is clear of every protection zone is
+     graded. Inside a zone the finished surface is the existing surface,
+     because the tree plan allows neither move: digging is hand or hydro only,
+     with an arborist present and the work in the approved scope, and added
+     material is capped at 100 mm of coarse woodchip, which is not something
+     grass grows in. So a lawn half inside a zone is graded over its clear half
+     and left as found over the other, and `miss` is how far apart the two
+     finish. A big `miss` means the surface is the wrong shape, not that the
+     levels are wrong. */
+  /* Chainage of the point on a line nearest p. Used to put a sample taken
+     across the width of something onto the string line running along it. */
+  chainOf(line,p){ let best=null, s=0;
+    for(let i=1;i<line.length;i++){ const a=line[i-1], b=line[i];
+      const vx=b[0]-a[0], vy=b[1]-a[1], L=vx*vx+vy*vy, d=Math.sqrt(L);
+      let t=L?((p[0]-a[0])*vx+(p[1]-a[1])*vy)/L:0; t=Math.max(0,Math.min(1,t));
+      const off=Math.hypot(p[0]-(a[0]+vx*t), p[1]-(a[1]+vy*t));
+      if(!best||off<best.off) best={off:off,s:s+t*d};
+      s+=d; }
+    return best||{off:0,s:0}; }
+  /* Every sample over a surface, with its level and whether it sits in a
+     protection zone. The structural root zone is inside the protection zone,
+     so one test answers both. */
+  levelPts(it,n){ const D=this.D, o=[];
+    for(const p of this.samples(it,n||8)){ let z=false;
+      for(const t of D.TREES){ if(!t.ctrl) continue;
+        if((p[0]-t.x)**2+(p[1]-t.y)**2<=t.ctrl*t.ctrl){ z=true; break; } }
+      o.push({x:p[0],y:p[1],z:this.RL(p[0],p[1]),free:!z}); }
+    return o; }
+  /* The line a surface is set out along. A run has only one, its own curve.
+     A rectangle has two, and the one that matters is whichever it actually
+     falls down: a terrace 10 m long in y and 4.5 m wide in x falls across its
+     width here, because y is the level direction on this block and x is the
+     fall line. Judging it along its longer side would call it flat. */
+  levelLine(it){
+    if(this.isRun(it)) return this.centreLine(it);
+    const cs=this.corners(it); if(!cs) return null;
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+    const drop=p=>Math.abs(this.RL(p[0][0],p[0][1])-this.RL(p[1][0],p[1][1]));
+    const A=[e[0],e[2]], B=[e[1],e[3]], L=drop(A)>=drop(B)?A:B, o=[];
+    for(let i=0;i<=20;i++) o.push([L[0][0]+(L[1][0]-L[0][0])*i/20, L[0][1]+(L[1][1]-L[0][1])*i/20]);
+    return o; }
+  levelPlan(it){
+    const g=GRADE[it&&it.n]; if(!g||it.t==='plant'||it.shape==='circ') return null;
+    const line=this.levelLine(it); if(!line||line.length<2) return null;
+    let len=0; for(let i=1;i<line.length;i++) len+=Math.hypot(line[i][0]-line[i-1][0],line[i][1]-line[i-1][1]);
+    if(len<0.5) return null;
+    const wide=this.area(it)/len;
+    const pts=this.levelPts(it,8).map(p=>{ p.s=this.chainOf(line,[p.x,p.y]).s; return p; });
+    const free=pts.filter(p=>p.free);
+    let hi=-1e9, lo=1e9; pts.forEach(p=>{ if(p.z>hi)hi=p.z; if(p.z<lo)lo=p.z; });
+    /* z = a + b·s, least squares. Fitted to the clear samples where there are
+       enough of them, to all of them where there are not: a surface with no
+       clear ground has no graded line, and the honest answer for it is the
+       ground it already has. */
+    const fit=ps=>{ const n=ps.length; let Ss=0,Sz=0,Sss=0,Ssz=0;
+      ps.forEach(p=>{Ss+=p.s;Sz+=p.z;Sss+=p.s*p.s;Ssz+=p.s*p.z;});
+      const den=n*Sss-Ss*Ss, b=Math.abs(den)>1e-9?(n*Ssz-Ss*Sz)/den:0;
+      return {a:(Sz-b*Ss)/n,b:b,cs:Ss/n}; };
+    /* Graded only where most of it can be. A surface a third clear grades that
+       third and leaves a step where the two meet, which is worse than leaving
+       the whole of it alone. */
+    const graded=free.length>=4&&free.length>=pts.length*0.6;
+    const f=fit(graded?free:pts);
+    /* A platform is eased toward the grade it wants, pivoting about the middle
+       so the cut and the fill balance. A path is not: how steep a path is comes
+       from where it runs, and easing one moves the ends it was drawn to meet.
+       So a path's finished line is its fitted line, bumps out, grade as found. */
+    const nat=Math.abs(f.b);
+    const k=(graded&&g.kind!=='walk'&&nat>1/g.want)?(1/g.want)/nat:1;
+    const nb=f.b*k, na=f.a+f.b*f.cs-nb*f.cs, at=s=>na+nb*s;
+    const cell=this.area(it)/(pts.length||1);
+    let cut=0,fill=0,mc=0,mf=0,miss=0;
+    pts.forEach(p=>{ const d=p.z-at(p.s);
+      if(!p.free||!graded){ if(Math.abs(d)>miss) miss=Math.abs(d); return; }
+      if(d>0){ cut+=d*cell; if(d>mc)mc=d; } else { fill-=d*cell; if(-d>mf)mf=-d; } });
+    const fin=Math.abs(nb), cf=this.contourFall(it);
+    const N=x=>x>1/500?1/x:Infinity, sN=n=>n===Infinity?'level':'1 in '+n.toFixed(0);
+    const zone=pts.length?1-free.length/pts.length:0;
+    const r={n:it.n,u:it.u,len:len,w:wide,area:this.area(it),kind:g.kind,graded:graded,
+      exLo:lo,exHi:hi,natN:N(nat),finN:N(fin),from:at(0),to:at(len),
+      cut:cut,fill:fill,maxCut:mc,maxFill:mf,zone:zone,miss:miss,
+      cross:cf?cf.across:0,a:line[0],b:line[line.length-1]};
+    /* One line for what it is, one for what to do about it. */
+    if(g.kind==='soak'){
+      /* Judged end to end, the way a trough is: what decides whether a gravel
+         path holds water is its high point against its low point, not the
+         grade of a line fitted through it. */
+      const hold=N(cf&&cf.len?cf.fall/cf.len:0); r.finN=hold;
+      if(hold>=g.want) r.lvl='g', r.msg='Lies at '+sN(hold)+' end to end, level enough to hold rather than drain.';
+      else if(hold>=g.max) r.lvl='a', r.msg='Lies at '+sN(hold)+' end to end. Water walks down it instead of soaking in. Follow the contour rather than the fall line, or step it.';
+      else r.lvl='r', r.msg='Lies at '+sN(hold)+' end to end, so it drains rather than holds, and gravel on that grade washes. Turn it onto the contour.';
+    } else if(g.kind==='walk'){
+      if(r.finN>=g.want) r.lvl='g', r.msg='Walks at '+sN(r.finN)+'. Gentle.';
+      else if(r.finN>=g.max) r.lvl='a', r.msg='Walks at '+sN(r.finN)+', inside the 1 in '+g.max+' ramp limit and not gentle. It runs down the fall line, and the block falls 1 in 19, so the route sets this rather than the machine. Turning it across the slope is the only thing that flattens it.';
+      else r.lvl='r', r.msg='Walks at '+sN(r.finN)+', steeper than the 1 in '+g.max+' ramp limit in AS 1428.1. Turn it across the slope, lengthen it, or make it steps.';
+    } else if(g.kind==='lawn'){
+      if(r.finN>=g.want) r.lvl='g', r.msg='Finishes at '+sN(r.finN)+', which reads level underfoot.';
+      else if(r.finN>=g.max) r.lvl='a', r.msg='Finishes at '+sN(r.finN)+'. Gently sloped rather than level. Flatter than that needs a shorter lawn along the fall line, or a step in it.';
+      else r.lvl='r', r.msg='Finishes at '+sN(r.finN)+', which reads as a slope. Shorten it along the fall line, or terrace it.';
+    } else {
+      if(r.finN<g.max) r.lvl='r', r.msg='Finishes at '+sN(r.finN)+', too steep to stand a table on. Cut it to a platform at 1 in '+g.want+'.';
+      else if(g.flat&&r.finN>g.flat) r.lvl='a', r.msg='Finishes at '+sN(r.finN)+', flat enough to pond. Give it 1 in '+g.want+' toward a garden edge.';
+      else r.lvl='g', r.msg='Finishes at '+sN(r.finN)+', which sheds without being felt.';
+    }
+    if(!graded) r.msg=r.msg.replace(/^(Finishes|Walks) at/,'Lies at');
+    if(!graded&&r.lvl==='g') r.msg+=' Left as found. '+Math.round(zone*100)+' per cent of it sits in a protection zone, and at this grade it wants nothing done to it.';
+    else if(!graded){ r.msg+=' Nothing here may be graded either: '+Math.round(zone*100)+' per cent of it sits in a protection zone, where the tree plan allows hand and hydro digging only, in the approved scope, and caps added material at '+BUCAP+' mm of coarse woodchip. So these are the levels it has, not levels to set out to.'; }
+    else if(zone>0.1){ if(miss>0.1&&r.lvl==='g') r.lvl='a';
+      r.msg+=' '+Math.round(zone*100)+' per cent of it sits in a protection zone and stays as found, and the graded part finishes '+(miss*1000).toFixed(0)+' mm away from it'+(miss>0.1?'. That is a step, so the shape is wrong rather than the levels: keep it to the ground that can be worked.':', which feathers out.'); }
+    return r;
+  }
+  /* The schedule itself, and what of it a machine may do. Cut and fill are
+     already the clear part only, so every cubic metre here is machine work;
+     the area left as found is the part that stays for hand work or for
+     nothing. */
+  levels(){ const rows=[]; let cut=0,fill=0,held=0;
+    for(const it of this.state.items){ const p=this.levelPlan(it); if(!p) continue;
+      rows.push(p); cut+=p.cut; fill+=p.fill; held+=p.area*p.zone; }
+    rows.sort((a,b)=>(b.cut+b.fill)-(a.cut+a.fill));
+    return {rows:rows,cut:cut,fill:fill,asFound:held,
+      bad:rows.filter(r=>r.lvl==='r').length,care:rows.filter(r=>r.lvl==='a').length}; }
+  /* How much of a's footprint b covers, in square metres. Sampled rather than
+     clipped: two curved ribbons have no closed form worth writing here, and
+     the number is used to stop a figure being counted twice rather than to
+     price anything. */
+  /* How far an excavator's arm has to reach to set a block, measured from the
+     nearest ground it may stand on. Every tree's protection zone is out, so
+     the answer is the distance from the far end of the run to the nearest
+     point outside all of them. Sampled on a metre grid, which is finer than
+     the question deserves. */
+  stoneReach(it){
+    const D=this.D, clear=[];
+    for(let x=0;x<=40;x++) for(let y=0;y<=21;y++){ let z=false;
+      for(const t of D.TREES){ if(!t.ctrl) continue;
+        if((x-t.x)**2+(y-t.y)**2<=t.ctrl*t.ctrl){ z=true; break; } }
+      if(!z) clear.push([x,y]); }
+    let worst=0;
+    for(const p of this.samples(it,4)){ let best=1e9;
+      for(const c of clear){ const d=(p[0]-c[0])**2+(p[1]-c[1])**2; if(d<best) best=d; }
+      best=Math.sqrt(best); if(best>worst) worst=best; }
+    return worst; }
+  overlapArea(a,b){
+    const pb=this.isRun(b)?this.runPoly(b):(b.shape==='circ'?null:this.corners(b));
+    if(!pb) return 0;
+    const pts=this.samples(a,10); let n=0;
+    for(const p of pts) if(this.inPoly(p,pb)) n++;
+    return pts.length?this.area(a)*n/pts.length:0; }
   /* Everything else in the library she can carry. A block bench she cannot: over
      half a tonne a metre, so where a machine can stand is a question the layout
      has to answer before the stone is ordered. The logs are 500 mm, not the 450
@@ -1197,14 +1378,29 @@ class Component extends DCLogic {
      is 10.2 mm, or 8.2 m³ over the block. Held is first-flush storage into dry
      ground: in sustained rain the chip is already wet and only the troughs and
      the gravel are still taking water, which is why the two are counted apart. */
+  /* Two surfaces on one piece of ground hold what the deeper of them holds,
+     not the two added up. A gravel path laid along a trough is one gravel
+     filled trench, and counting the path's voids and the trough's voids over
+     the same square metre counts the same water twice. Deducted here rather
+     than left to the reader, because this total is what the Drainage page
+     measures the design storm against. */
+  doubled(){ const list=this.state.items.filter(i=>this.storage(i)), out=[];
+    for(let i=0;i<list.length;i++) for(let j=i+1;j<list.length;j++){
+      const A=list[i], B=list[j], a=this.storage(A), b=this.storage(B);
+      const ov=this.overlapArea(A,B); if(ov<0.05) continue;
+      out.push({a:A.n,b:B.n,area:ov,vol:ov*Math.min(a.d*SOAK[A.n].v,b.d*SOAK[B.n].v)}); }
+    return out; }
   water(){ let held=0,eng=0,rows=[];
     for(const it of this.state.items){ const st=this.storage(it); if(!st) continue;
       held+=st.vol; if(st.eng) eng+=st.vol;
       rows.push({n:it.n,area:this.area(it),d:st.d,vol:st.vol,eng:st.eng,mat:st.mat,
         wall:st.eng?(this.nearBuilding(it)||{}).d:null}); }
     rows.sort((a,b)=>b.vol-a.vol);
+    const dup=this.doubled(), twice=dup.reduce((t,d)=>t+d.vol,0);
+    held-=twice; eng=Math.max(0,eng-twice);
     const storm=BLOCKM2*RAIN5/1000;
-    return {held:held,eng:eng,storm:storm,share:storm?held/storm:0,engShare:storm?eng/storm:0,rows:rows}; }
+    return {held:held,eng:eng,storm:storm,share:storm?held/storm:0,engShare:storm?eng/storm:0,
+      rows:rows,dup:dup,twice:twice}; }
   /* Nearest wall to anything on the plan, measured from the item's own footprint
      rather than its centre, so a long channel laid along a wall reads as touching
      it. Buildings are axis-aligned boxes; the item may be rotated, so it is
@@ -1622,11 +1818,30 @@ class Component extends DCLogic {
       const bc=this.buildCheck(it,ck);
       if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' — ground raised '+bc.mm+' mm behind it',body:bc.msg});
       const stone=this.stone(it);
-      if(stone){ const zoned=ck.srz.size||ck.tpz.size;
+      if(stone){ const zoned=ck.srz.size||ck.tpz.size, reach=zoned?this.stoneReach(it):0;
         out.push({sev:zoned?'care':'note',u:it.u,title:it.n+' weighs about '+stone.total.toFixed(1)+' tonnes',
           body:'One course '+(Math.min(it.w,it.h)*1000).toFixed(0)+' mm deep is roughly '+stone.per.toFixed(1)+' t a metre, so none of it is hand work: the blocks come off a crane truck or are set with an excavator, and the only way in is the crossover and driveway at the street end.'
-            +(zoned?' This run sits inside a protection zone, where neither may track. Either the arm reaches it from ground outside the zone, or the run moves clear — settle that with the arborist before the stone is ordered.'
+            +(zoned?' This run sits inside a protection zone, where neither may track, so it has to be set from outside one. The farthest part of it is '+reach.toFixed(1)+' m from the nearest ground a machine may stand on, and the lift there is '+stone.per.toFixed(1)+' t. Put that pair to the builder against the machine\u2019s own lift chart before the stone is ordered'+(reach>STONEREACH?': past about '+STONEREACH.toFixed(0)+' m a small excavator will not hold half a tonne, and the answer is to shorten the run to the ground the arm reaches.':'.')
                    :' Check the machine can reach the line without tracking over a protection zone to get there.')}); }
+      /* How steep the thing you walk on or sit on finishes, and what a machine
+         may do about it. The verdict is the same one the Levels page prints,
+         so the two cannot disagree. */
+      const lp=this.levelPlan(it);
+      if(lp&&lp.lvl!=='g') out.push({sev:lp.lvl==='r'?'stop':'care',u:it.u,
+        title:it.n+' \u2014 '+(lp.graded?'finishes at':'lies at')+' 1 in '+(lp.finN===Infinity?'\u221e':lp.finN.toFixed(0)),body:lp.msg});
+      /* A gravel path laid along a trough is one trench, not two things on one
+         piece of ground. Worth saying because nothing else on the plan tests
+         for overlap, and because the pair only works where the path is level
+         along itself: a dished trough with a walking surface in it is a flat
+         bottomed gravel trench, and it holds what the gravel holds. */
+      if(it.n===SWALE) for(const o of s.items){
+        if(o===it||!GRADE[o.n]) continue;
+        const ov=this.overlapArea(o,it); if(ov<0.2) continue;
+        const cf=this.contourFall(it), gp=o.n==='Gravel path';
+        out.push({sev:gp?'note':'care',u:o.u,title:o.n+' lies on '+it.n+' over '+ov.toFixed(1)+' m\u00b2',
+          body:gp
+            ? 'That can be done, and it is one trench rather than two: excavate the trough to '+(SOAK[SWALE].d*1000).toFixed(0)+' mm, fill it with clean aggregate, and finish the top '+(SOAK['Gravel path'].d*1000).toFixed(0)+' mm as the walking gravel, flush with the ground either side. The dish goes; what holds the water is the voids. Two conditions: the path has to run along the trough rather than across it, and the trough has to stay level along itself, which this one is to '+(cf?(cf.fall*1000).toFixed(0):'?')+' mm against the '+(LEVELTOL*1000).toFixed(0)+' mm limit. The Drainage page counts the shared ground once.'
+            : 'A firm surface is not an infiltration surface, so laying one over the trough takes the trough out of service for that '+ov.toFixed(1)+' m\u00b2 and adds nothing back. Either move the path off it, or make it a Gravel path and build the two as one trench.'}); }
       /* The one thing a swale has to be. Turned the wrong way it is a drain
          pointed at the house rather than a store, and on this block the two
          directions differ by a factor of seven. */
@@ -1810,7 +2025,7 @@ class Component extends DCLogic {
       const k=b[0], plain=k==='p'||k==='h'||k==='note';
       const w=b[2]||[];
       return {
-        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isWater:k==='water',
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isLevels:k==='levels', isWater:k==='water',
         x:plain?b[1]:'',
         items:k==='ul'?b[1].map(t=>({x:t})):[],
         head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
@@ -2000,6 +2215,11 @@ class Component extends DCLogic {
         try{ el.innerHTML=window.PRINTSHEET.earthView(this);
           const btn=el.querySelector('[data-earth-print]');
           if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','earth'); };
+        }catch(e){ el.textContent=''; } },
+      levelsRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ el.innerHTML=window.PRINTSHEET.levelsView(this);
+          const btn=el.querySelector('[data-levels-print]');
+          if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','levels'); };
         }catch(e){ el.textContent=''; } },
       waterRef:el=>{ if(!el||!window.PRINTSHEET) return;
         try{ el.innerHTML=window.PRINTSHEET.waterView(this); }catch(e){ el.textContent=''; } },

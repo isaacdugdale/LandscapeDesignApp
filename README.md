@@ -88,6 +88,20 @@ there and every screen follows.
   every trough, path, bed and mound on the current plan holds against the design storm,
   and the Checks screen stops any of them that infiltrates within 3 m of a wall or that
   is turned down the fall line instead of across it.
+- **Works → Levels** is the sheet to hand a builder who asks for the levels. Earthworks
+  says what may be dug; this says what each surface finishes at. One string line along
+  each thing, a level at each end of it, the grade between them, and the cut and fill
+  that takes. A platform is eased toward the grade it wants, 1 in 40 for a lawn and
+  1 in 80 for paving; a path is not, because how steep a path is comes from where it
+  runs, and easing one moves the ends it was drawn to meet. Only a surface at least
+  60 per cent clear of a protection zone carries set-out levels. Inside a zone the
+  finished surface is the existing surface, so the rest print as found: the tree plan
+  allows hand and hydro digging only, in the approved scope, and caps added material
+  at 100 mm of coarse woodchip, which is not something grass grows in. Grading the
+  clear part of a surface and leaving the rest builds a step, so a surface mostly in
+  a zone is left alone whole. Two printed sheets, and **Levels only** in the print
+  dialog. The Drainage total now deducts ground counted twice, because a gravel path
+  laid along a trough is one gravel filled trench rather than two things stacked.
 - **Works → Earthworks** is the first thing this design needs in the real world: a
   setout drawing with the no-dig zones loud, existing levels on a 4 m grid and every
   excavation keyed and colour-coded by what may touch it, then a schedule of volumes,

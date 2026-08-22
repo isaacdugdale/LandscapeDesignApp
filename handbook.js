@@ -188,6 +188,13 @@ window.HANDBOOK = [
   ['earth','']
 ]},
 
+/* --------------------------------------------------------------- levels --- */
+{id:'levels', group:'works', nav:'Levels', title:'Levels', sub:'What the ground finishes at, and what the machine takes to get there', blocks:[
+  ['p','This is the sheet to hand a builder who asks for the levels. Earthworks says what may be dug; this says what each surface finishes at, as one string line with a level at each end.'],
+  ['note','Most of the block carries no set-out level, and that is the answer rather than a gap. Inside a tree protection zone the finished surface is the existing surface: hand or hydro digging only, in the approved scope, and 100 mm of coarse woodchip at most. Those rows print as found.'],
+  ['levels','']
+]},
+
 /* ------------------------------------------------------------ drainage --- */
 {id:'drainage', group:'works', nav:'Drainage', title:'Drainage design', sub:'The two lines, the numbers, and the route out', blocks:[
   ['p','The block falls 2.08 m from the rear boundary to the street at about 1 in 19, so there is ample fall. The constraint is that the back garden is ringed by the protection zones of trees 1 and 2 where no trenching is allowed, and the addition, link and garage together enclose the rear pocket. There is no buried route from the back garden to the street that avoids both a protection zone and a building.'],
