@@ -18,38 +18,31 @@ Delete this file once the list is empty.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v34**.
+Live build at the time of writing: **v35**.
 
 ## Next, in order
 
-1. **A committed test harness, `tools/check.js`.** There is none. Every check in
-   this session was an ad-hoc harness rebuilt in a scratchpad, and it broke each
-   time `index.html` changed length. `CLAUDE.md` tells you to put a scheme
-   through `checks()`, `issues()`, `water()` and `quantities()` under node before
-   shipping and gives you nothing to do it with.
+Both of the jobs that were here are done.  runs 91 assertions
+and handbook
+levels
+library
+schemes
+prose
+seeding
+baseline
 
-   It needs to: locate the class body by pattern rather than line number, stub
-   `DCLogic` and `localStorage`, build every scheme and the base plan, and
-   assert. The assertions worth having are the ones that would have caught what
-   shipped: the handbook has 13 sections and no `undefined` blocks; every scheme
-   builds; `RL()` is exact at all 126 survey points; no prose carries a dash in
-   either form; issue counts match a committed baseline so a change has to be
-   deliberate.
+all 91 checks passed is the thing to run before shipping. Scheme notes now
+carry a `rev`, so a corrected note reaches a device without touching the layout.
 
-   The bug it would have caught: a `handbook.js` edit left
-   `['note',...]['earth','']`, which is valid JavaScript, evaluates to
-   `undefined`, deleted the Earthworks section and crashed Sources. `node
-   --check` passed it.
+What is left is smaller.
 
-2. **Scheme revisions, so a corrected note reaches the iPad.** `seedStore()`
-   keeps a `seeded` list and skips any id already in it, so none of the rewritten
-   notes will ever appear on a device that has already opened those schemes.
-   Every future correction hits the same wall, and the present workaround is to
-   ship a whole new scheme under a new id, which litters the list.
-
-   Give each scheme a `rev`. Re-seed the notes when `rev` increases and leave the
-   items alone, so nothing the owner has moved is touched. Bump the rev on the
-   schemes whose notes were rewritten this session.
+1. **The Ask screen brief.** It builds from the layout and the fact sheet, and
+   nothing checks that what it claims still matches what the app computes. It is
+   the one surface a stale number could hide in.
+2. **The four verge mounds.** Now legible as stops, still crossing the front
+   boundary into the verge. Either move them or record why they stay.
+3. **Sun hours are cached per scheme** in `sunCache`, and nothing invalidates it
+   when an item moves. Worth checking it is keyed on more than the scheme id.
 
 ## Open decisions, not work
 
