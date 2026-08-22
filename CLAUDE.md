@@ -11,6 +11,12 @@ layout with one node script that prints everything at once rather than a run per
 question, and do not re-derive a number you already have. Say what changed and
 why in a few lines, not a report.
 
+## Between sessions
+
+`NEXT.md` is the handover. Read it first, edit it last. What is live, a numbered
+todo, and the decisions that are the owner's. It is not a log, and git history
+is. Keep it short enough to read cold.
+
 ## Ask the app rather than reading it
 
 `index.html` is 190 kB in one file. Grepping it to answer a question about a

@@ -1,7 +1,11 @@
 # Where this got to, and what is next
 
-Written at the end of a long session, so work can resume without re-deriving it.
-Delete this file once the list is empty.
+**The convention.** This file is the handover between sessions. Read it first,
+edit it last. It has three parts and no others: what is live now, a numbered
+todo in the order worth doing, and the decisions that are the owner's rather
+than work. Keep it under about eighty lines. It is not a log: when something is
+done it comes out of the todo and turns into one line under what is live, or
+disappears if it left no trace worth keeping. Git history is the log.
 
 ## Done and live
 
@@ -20,22 +24,26 @@ Delete this file once the list is empty.
 
 Live build at the time of writing: **v35**.
 
-## Next, in order
+## Todo
 
-Both of the jobs that were here are done. `tools/check.js` runs 91 assertions,
-and `node tools/check.js` is the thing to run before shipping anything. Scheme
-notes now carry a `rev`, so a corrected note reaches a device without touching
-the layout.
+Roughly in order. Nothing here is urgent and each is a spare-tokens job.
 
-What is left is smaller.
-
-1. **The Ask screen brief.** It builds from the layout and the fact sheet, and
-   nothing checks that what it claims still matches what the app computes. It is
-   the one surface a stale number could hide in.
-2. **The four verge mounds.** Now legible as stops, still crossing the front
-   boundary into the verge. Either move them or record why they stay.
-3. **Sun hours are cached per scheme** in `sunCache`, and nothing invalidates it
-   when an item moves. Worth checking it is keyed on more than the scheme id.
+1. **Commit the survey extraction.** `SPOT` and `TRI` are in `site-data.js`, but
+   the code that derived them from layer `SRF-VIEW` of `3891_ZB EXPLODED
+   VERSION.dwg` only ever lived in a scratchpad and is gone. That is the
+   boundary-corner fit that puts MGA into the app frame, the 3-clique walk that
+   rebuilds the surveyor's faces from their edges, the filter that drops a
+   triangle containing another vertex, and the Delaunay fill. Rebuilding it is a
+   day. Commit it as `tools/survey-extract.js`, with a note that it needs
+   LibreDWG built from source and `ezdxf`, and that the DWG is not in the repo.
+2. **The Ask screen brief.** It builds from the layout and the fact sheet and
+   nothing checks that its claims still match what the app computes. It is the
+   one surface a stale number could hide in.
+3. **`sunCache`.** Cached per scheme, and it looks like nothing invalidates it
+   when an item moves. Read it before trusting that; this came from a glance,
+   not a test.
+4. **The four verge mounds.** Legible as stops now, still crossing the front
+   boundary. Either move them or record why they stay.
 
 ## Open decisions, not work
 
