@@ -28,12 +28,21 @@ Before, 110 words, sentences averaging 37:
 > were chosen for, and it is the thing to preserve if the builder wants one
 > moved.
 
-After, 38 words, sentences averaging 10:
+After, 63 words, sentences averaging 12:
 
-> All drainage components are now elements. The stormwater spines now show the
-> yard sumps as selectable elements with context, rather than dots. The
-> positions are the same as previously. All eight yard sumps are clear of
-> protection zones.
+> **Drainage**
+> - All drainage components are now elements. The stormwater spines show the
+>   yard sumps as selectable elements, not dots.
+> - Positions are unchanged. S0 to S3 run down the DN150 spine, D1 sits on its
+>   branch, and P0, P1 and P3 sit at the corner swale, the garage sleeve and
+>   the driveway.
+> - All eight are clear of every protection zone and structural root zone.
+>   Keep them clear if one is moved.
+
+The first draft of this one cut to 38 words and went too far. Three things had
+no other home: the eight pit IDs, which are in `DRAIN.pits` and rendered
+nowhere; the structural root zones, which are the stricter test; and the
+instruction to keep a moved sump clear. See **Check before you cut** below.
 
 ### Pair 2
 
@@ -79,14 +88,18 @@ After, 26 words:
 6. **Fragment headings become sentences or headings.** "The drainage as
    elements." became "All drainage components are now elements." "What the
    Checks screen now asks of each one." became the heading **Checks**.
-7. **Plain and slightly flat is right.** "The positions are the same as
+7. **Check before you cut.** A fact can go if the reader will meet it anyway.
+   Everything pair 2 dropped is in the Checks messages: the 2 m threshold,
+   which sumps need a silt trap, the trap spec, and the flush lid. Search for
+   it before deleting it. If it lives nowhere else, it stays.
+8. **Plain and slightly flat is right.** "The positions are the same as
    previously" is duller than "Same positions the drainage design has always
    had" and better. The note is a record, not a performance.
 
 ## Targets
 
-- **Cut 60 to 80 per cent.** The worked pair went from 261 words to 64. "About
-  half" was not enough.
+- **Cut half to two thirds.** The worked pair went from 261 words to 89.
+  Pair 2, where the app carries the detail, went further: 151 to 26.
 - **Sentences average about 10 words.** One fact per sentence. If a sentence
   needs a comma splice or a "which", it is two sentences.
 - **Em and en dashes: zero.** Comma, colon, full stop, brackets.

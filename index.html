@@ -662,7 +662,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v27';
+const BUILD='v28';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -1814,7 +1814,7 @@ class Component extends DCLogic {
          drains, and clearing it is the one job here that has consequences
          inside the house if it is skipped. */
       if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of grate to keep clear',
-        body:'Long channel rather than a single square grate, so a partial blockage still leaves capacity, with a litter sump below the outlet you can reach and a spare pipe laid in the same trench while it is open. Clear it each autumn. In the courtyard it is the one piece of maintenance where skipping a year puts water inside the house.'});
+        body:'A long channel keeps capacity when part of it blocks. Put a litter sump below the outlet where you can reach it, and lay a spare pipe in the same trench while it is open. Clear it each autumn. In the courtyard, a missed year puts water inside the house.'});
       const bc=this.buildCheck(it,ck);
       if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' — ground raised '+bc.mm+' mm behind it',body:bc.msg});
       const stone=this.stone(it);
@@ -1849,7 +1849,7 @@ class Component extends DCLogic {
         if(cf&&cf.fall>LEVELTOL&&cf.fall>=cf.across) out.push({sev:'stop',u:it.u,title:it.n+' is not on the contour',
           body:'It falls '+(cf.fall*1000).toFixed(0)+' mm from one end to the other, so it would run water along itself instead of holding it. Turned to lie the other way it falls about '+(cf.across*1000).toFixed(0)+' mm over the same ground. Contours here run across the block, not down it.'});
         else if(cf) out.push({sev:'note',u:it.u,title:it.n+' — '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
-          body:'On the contour, so it fills along its whole length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing — the levels here are triangulated survey points, good near a measured level and softer between. Rock the inlet, and leave a level spill at the low end so an overflow leaves the way you chose.'}); }
+          body:'On the contour, so it fills along its length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing. Rock the inlet. Leave a level spill at the low end so an overflow leaves the way you chose.'}); }
       /* What a pipe is judged on is its route, not its level: clause 6.5.2 rules
          out a new service through a protection zone unless the tree plan says
          so, which is the whole reason the sleeves are cast under the slab. */
@@ -1875,7 +1875,7 @@ class Component extends DCLogic {
         else out.push({sev:'note',u:it.u,title:it.n+' — ground '+sc.rl.toFixed(2)+' m, '+sc.kerb.toFixed(2)+' m above the kerb',
           body:'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the kerb at '+KERB.toFixed(2)+'. Gravity is never the constraint on this block — it drops 2.08 m at 1 in 19 — the route past the protection zones is. Set the invert off the survey plan — datum A.H.D., origin SR585 at RL 608.442 — rather than off this drawing, and give it a removable grate rated for whatever crosses it.'});
         if(sc.silt) out.push({sev:'note',u:it.u,title:it.n+' — this is one that needs a silt trap',
-          body:'It takes runoff off the reserve, which arrives orange and heavily silted. A sump below the outlet with a removable grate turns that into shovelling sand out of a box once a year before winter, instead of clearing it out of the pipe under the garage slab where you cannot reach it.'}); }
+          body:'Runoff off the reserve arrives heavily silted. Put a sump below the outlet with a removable grate. Then it is a box to empty once a year before winter, rather than silt in the pipe under the garage slab where you cannot reach it.'}); }
       /* The two things a berm has to be, and neither is level. */
       if(it.n===BERM){ const bs=this.bermShed(it);
         if(bs&&bs.sag) out.push({sev:'care',u:it.u,title:it.n+' has a low point in the middle of it',
@@ -1894,9 +1894,9 @@ class Component extends DCLogic {
          which is why the spine and five of the eight pits sit there by design.
          Flush is the whole of the condition — a raised surround is a weir. */
       if(inCorridor&&it.n===SUMP) out.push({sev:'note',u:it.u,title:it.n+' sits in the overland flow path, which is where it belongs',
-        body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops, and a pit that drains it is the one thing that should be there. Set the grate flush with the finished surface: a raised surround, or a lid standing proud of the grass, turns it into a weir across the corridor. Nothing else may narrow the route around it.'});
+        body:'The corridor between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. A pit that drains it belongs there. Set the grate flush with the finished surface. A raised surround or a proud lid makes a weir across the corridor. Nothing else may narrow the route.'});
       else if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
-        body:'The corridor along the side boundary between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. Anything here needs a formed route around it along the fence — a drainage change, not yet priced.'});
+        body:'The corridor between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. Anything here needs a formed route around it along the fence. That is a drainage change, and it is not priced yet.'});
     }
     const w=this.water();
     if(w.held>0.05) out.push({sev:'note',title:'The shaping holds '+w.held.toFixed(1)+' m³ of rain',
