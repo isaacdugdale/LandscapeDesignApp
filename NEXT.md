@@ -12,7 +12,9 @@ disappears if it left no trace worth keeping. Git history is the log.
 - Levels are the surveyor's own TIN from layer `SRF-VIEW` of the CAD file, not a
   model fitted to it. 126 points, 196 surveyed faces, 83 Delaunay fill.
 - Site has a section, Shape, drawing the block as a solid of earth as surveyed
-  and as built. `finRL` in `index.html` is the finished surface and `isoView` in
+  and as built. Reserve boundary near left, street away to the right, driveway
+  top right, which is the plan's own framing. The surveyed half leaves the new
+  work out, so the additions appear between the two panels. `finRL` in `index.html` is the finished surface and `isoView` in
   `printsheet.js` draws it. The house stands at its finished floor in it.
 - Platforms rather than graded slopes. `datum` in `GRADE` makes a surface a level
   plane. Paving within 2 m of a building takes the finished floor, 611.65, so a
@@ -38,7 +40,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v38**.
+Live build at the time of writing: **v39**.
 
 ## Todo
 
@@ -53,7 +55,16 @@ Roughly in order. Nothing here is urgent and each is a spare-tokens job.
 3. **The four verge mounds.** Legible as stops now, still crossing the front
    boundary. Either move them or record why they stay.
 
-4. **The kitchen addition and link roof heights.** `BOXH` gives them a ridge of
+4. **The seam at the reserve boundary.** `RL` answers from the surveyed TIN
+   where there is one and from the older fitted surface past it. The two
+   disagree by up to 261 mm where they meet, at x 3, y 0. It is 6.5 per cent of
+   the block, almost all of it the strip along the reserve boundary where the
+   surveyor stopped. The Shape view now mutes that ground so it is not read as
+   survey, but a few items sit in the strip and take their levels from the
+   fitted surface. Clamping the fallback to the nearest triangle edge would
+   remove the step; it would also change levels, so it is a decision rather
+   than a fix.
+5. **The kitchen addition and link roof heights.** `BOXH` gives them a ridge of
    614.00 and 613.90, both below the finished ceiling at 614.165. Every other
    building agrees with the architect's set. It changes the sun map and nothing
    else. Recorded under `floor_levels_m_AHD._unresolved`.

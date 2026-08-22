@@ -666,7 +666,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v38';
+const BUILD='v39';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -917,6 +917,18 @@ class Component extends DCLogic {
     if(l1<-1e-9||l2<-1e-9||l3<-1e-9) return null;
     return l1*a[2]+l2*b[2]+l3*c[2];
   }
+  /* Whether the surveyed surface answers here at all. Past the last measured
+     point RL falls back to the older fitted surface, which is the right thing
+     for a level but wrong to draw without saying so: the seam between the two
+     is a step, and on this block it runs along the reserve boundary where the
+     surveyor stopped. Anything drawing the ground asks this so it can show
+     where the survey reaches. */
+  onSurvey(x,y){
+    const T=this.D&&this.D.TRI, S=this.D&&this.D.SPOT;
+    if(!T||!S) return false;
+    if(this._tri!==undefined&&this.triZ(this._tri,x,y)!==null) return true;
+    for(let k=0;k<T.length;k++) if(this.triZ(k,x,y)!==null){ this._tri=k; return true; }
+    return false; }
   RL(x,y){
     const T=this.D&&this.D.TRI, S=this.D&&this.D.SPOT;
     if(T&&S){

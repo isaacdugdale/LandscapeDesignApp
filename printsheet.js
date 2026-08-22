@@ -1048,10 +1048,17 @@ window.PRINTSHEET = (function () {
   var ISOX = 40, ISOY = 21.33;  /* the block, reserve boundary to street and across */
   var COS30 = 0.8660254;
 
+  /* Reserve boundary at the near left, Duffy Street away to the right, so the
+     block sits the way the plan draws it and the driveway is top right. The
+     viewer stands over the reserve corner and the ground falls away toward the
+     street. */
   function isoPt(x, y, z, o) {
     return [o.cx + ((x - y) * COS30 - o.mx) * o.k,
-            o.cy + ((x + y) * 0.5 - (z - o.z0) * ISOZ - o.my) * o.k];
+            o.cy + (-(x + y) * 0.5 - (z - o.z0) * ISOZ - o.my) * o.k];
   }
+  /* Nearest is the smallest x + y, so the painter works from the far corner
+     down, which is the largest. */
+  function isoDepth(p, q) { return q.d - p.d; }
 
   /* Hypsometric tint, low ground dark and high ground pale, times a Lambert
      term off the surface normal so the form reads rather than just the height. */
@@ -1066,96 +1073,202 @@ window.PRINTSHEET = (function () {
     return 'rgb(' + q(r) + ',' + q(g) + ',' + q(b) + ')';
   }
 
+  /* Two thirds of the way to a flat grey, which reads as "not measured" without
+     disappearing next to the ground beside it. */
+  function isoMute(c) {
+    var m = c.match(/rgb\((\d+),(\d+),(\d+)\)/);
+    if (!m) return c;
+    var f = function (v, g) { return Math.round(+v * 0.34 + g * 0.66); };
+    return 'rgb(' + f(m[1], 176) + ',' + f(m[2], 172) + ',' + f(m[3], 158) + ')';
+  }
+
   var isoPoly = function (pts, fill, stroke) {
     return '<polygon points="' + pts.map(function (p) { return n1(p[0]) + ',' + n1(p[1]); }).join(' ')
       + '" fill="' + fill + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="0.25"' : '') + '/>';
   };
 
-  /* One surface, as a solid: the ground on top and a cut face down each of the
-     four sides, so it reads as a block of earth rather than a floating sheet.
-     `zf` gives a level at a point, so the same code draws the survey and the
-     finished ground and the two cannot come out of step. */
+  /* One surface, as a solid: the ground on top and a cut face down the two sides
+     that turn toward the viewer. `zf` gives a level at a point, so the same code
+     draws the survey and the finished ground and the two cannot come out of
+     step. */
   function isoSolid(app, zf, o, lo, hi, base, diff) {
-    var out = [], i, j, Z = [];
-    for (i = 0; i <= NX; i++) { Z[i] = []; for (j = 0; j <= NY; j++) Z[i][j] = zf(i / NX * ISOX, j / NY * ISOY); }
+    var out = [], i, j, Z = [], S = [];
+    for (i = 0; i <= NX; i++) { Z[i] = []; S[i] = [];
+      for (j = 0; j <= NY; j++) { var px = i / NX * ISOX, py = j / NY * ISOY;
+        Z[i][j] = zf(px, py); S[i][j] = app.onSurvey(px, py); } }
     var gx = ISOX / NX, gy = ISOY / NY;
     for (i = 0; i < NX; i++) for (j = 0; j < NY; j++) {
       var x0 = i * gx, x1 = x0 + gx, y0 = j * gy, y1 = y0 + gy;
       var za = Z[i][j], zb = Z[i + 1][j], zc = Z[i + 1][j + 1], zd = Z[i][j + 1];
       var nx = -(zb - za) * gy, ny = -(zd - za) * gx, nz = gx * gy;
       var L = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
-      var shade = (nx * -0.42 + ny * -0.30 + nz * 0.86) / L; if (shade < 0) shade = 0;
+      var shade = (nx * 0.42 + ny * 0.30 + nz * 0.86) / L; if (shade < 0) shade = 0;
       var zm = (za + zb + zc + zd) / 4, tint = null;
       if (diff) { var d = zm - diff(x0 + gx / 2, y0 + gy / 2);
         if (d > 0.02) tint = 'fill'; else if (d < -0.02) tint = 'cut'; }
       var c = isoFill(zm, lo, hi, shade, tint);
+      /* Past the last measured point the fitted surface answers, and the seam
+         between the two is a step. Drawn muted so it is not read as survey. */
+      if (!(S[i][j] && S[i + 1][j] && S[i + 1][j + 1] && S[i][j + 1])) c = isoMute(c);
       /* stroked in its own colour: without it the quads leave hairline gaps
          where they meet and the surface reads as graph paper */
       out.push({d: x0 + y0, s: isoPoly([isoPt(x0, y0, za, o), isoPt(x1, y0, zb, o), isoPt(x1, y1, zc, o), isoPt(x0, y1, zd, o)], c, c)});
     }
-    /* painter's algorithm: the far corner is the smallest x + y */
-    out.sort(function (a, b) { return a.d - b.d; });
+    out.sort(isoDepth);
 
-    /* The two cut faces that face the viewer, each as one polygon following the
-       ground along its edge. The other two are behind the surface and are not
-       drawn at all. Drawn after it, because both are nearer than any of it. */
-    var faceX = [], faceY = [];
-    for (i = 0; i <= NX; i++) faceY.push(isoPt(i * gx, ISOY, Z[i][NY], o));
-    faceY.push(isoPt(ISOX, ISOY, base, o)); faceY.push(isoPt(0, ISOY, base, o));
-    for (j = 0; j <= NY; j++) faceX.push(isoPt(ISOX, j * gy, Z[NX][j], o));
-    faceX.push(isoPt(ISOX, ISOY, base, o)); faceX.push(isoPt(ISOX, 0, base, o));
+    /* The two cut faces that turn toward the viewer, each one polygon following
+       the ground along its edge. The other two are behind the surface and are
+       not drawn. Drawn after it, because both are nearer than any of it.
+
+       The solid is a constant thickness rather than a flat base. On a block that
+       falls 2 m the near edge is the high one, and a flat base under it puts a
+       three metre wall across the front of the drawing with the ground squeezed
+       above it. A slab of even depth keeps the ground the subject. */
+    var faceY = [], faceX = [];
+    for (i = 0; i <= NX; i++) faceY.push(isoPt(i * gx, 0, Z[i][0], o));
+    for (i = NX; i >= 0; i--) faceY.push(isoPt(i * gx, 0, Z[i][0] - base, o));
+    for (j = 0; j <= NY; j++) faceX.push(isoPt(0, j * gy, Z[0][j], o));
+    for (j = NY; j >= 0; j--) faceX.push(isoPt(0, j * gy, Z[0][j] - base, o));
 
     return out.map(function (q) { return q.s; }).join('')
-      + isoPoly(faceY, '#c6bba2', '#9c9078') + isoPoly(faceX, '#b3a68c', '#9c9078');
+      + isoPoly(faceX, '#c6bba2', '#9c9078') + isoPoly(faceY, '#b3a68c', '#9c9078');
   }
 
-  /* The house, lying flat on the ground rather than standing up on it. The
-     drawing is about the shape of the earth, and a roof exaggerated four times
-     hides most of the back yard. An outline is enough to find it by. */
+  /* The house is six overlapping rectangles in the data. Drawn as six boxes they
+     intersect and read as a pile, so they are merged into one outline first.
+     Everything is axis aligned, so the merge is a grid over the distinct edges:
+     mark the cells any rectangle covers, keep the cell edges where covered meets
+     uncovered, and chain those into rings. Interior stays on the left, so a ring
+     comes out anticlockwise. */
+  function rectUnion(rects) {
+    var xs = [], ys = [], i, j;
+    rects.forEach(function (r) { xs.push(r[0], r[2]); ys.push(r[1], r[3]); });
+    var uniq = function (a) { return a.sort(function (p, q) { return p - q; })
+      .filter(function (v, k, arr) { return !k || Math.abs(v - arr[k - 1]) > 1e-9; }); };
+    xs = uniq(xs); ys = uniq(ys);
+    var nx = xs.length - 1, ny = ys.length - 1, cov = [];
+    for (i = 0; i < nx; i++) { cov[i] = [];
+      for (j = 0; j < ny; j++) {
+        var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2;
+        cov[i][j] = rects.some(function (r) { return cx > r[0] && cx < r[2] && cy > r[1] && cy < r[3]; });
+      } }
+    var on = function (a, b) { return a >= 0 && b >= 0 && a < nx && b < ny && cov[a][b]; };
+    var segs = [];
+    for (i = 0; i < nx; i++) for (j = 0; j < ny; j++) {
+      if (!cov[i][j]) continue;
+      if (!on(i, j - 1)) segs.push([[xs[i], ys[j]], [xs[i + 1], ys[j]]]);
+      if (!on(i, j + 1)) segs.push([[xs[i + 1], ys[j + 1]], [xs[i], ys[j + 1]]]);
+      if (!on(i - 1, j)) segs.push([[xs[i], ys[j + 1]], [xs[i], ys[j]]]);
+      if (!on(i + 1, j)) segs.push([[xs[i + 1], ys[j]], [xs[i + 1], ys[j + 1]]]);
+    }
+    var key = function (p) { return p[0].toFixed(4) + ',' + p[1].toFixed(4); };
+    var from = {};
+    segs.forEach(function (sg) { (from[key(sg[0])] = from[key(sg[0])] || []).push(sg); });
+    var used = {}, rings = [];
+    segs.forEach(function (sg, k) {
+      if (used[k]) return;
+      var ring = [sg[0]], cur = sg, guard = 0;
+      used[segs.indexOf(cur)] = 1;
+      while (guard++ < 4000) {
+        ring.push(cur[1]);
+        var next = (from[key(cur[1])] || []).filter(function (t) { return !used[segs.indexOf(t)]; })[0];
+        if (!next) break;
+        used[segs.indexOf(next)] = 1; cur = next;
+        if (key(cur[1]) === key(ring[0])) { ring.push(cur[1]); break; }
+      }
+      if (ring.length > 3) rings.push(ring);
+    });
+    return { rings: rings, segs: segs };
+  }
+
   /* The house, standing at its finished floor rather than lying on the ground.
      The step from a door down to the paving is the thing worth seeing, and at
      four times height a roof would hide the yard behind it, so the floor plane
      is drawn and the roof is not. The driveway has no floor level and lies on
      the ground. */
-  function isoFootprints(app, zf, o) {
-    var D = app.D, out = [];
-    (D.BOXH || []).concat(D.DRIVE || []).forEach(function (b) {
-      var x0 = b[1], y0 = b[2], x1 = b[3], y1 = b[4];
-      var fl = b[5] == null ? null : app.D.FFL;
-      var C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
-      if (fl == null) {
-        out.push({d: x1 + y1, s: isoPoly(C.map(function (c) { return isoPt(c[0], c[1], zf(c[0], c[1]) + 0.02, o); }),
-          'rgba(236,229,214,.85)', '#a79d88')});
-        return;
-      }
-      /* the two faces that turn toward the viewer, each one polygon */
-      [[[x0, y1], [x1, y1]], [[x1, y0], [x1, y1]]].forEach(function (e) {
-        var p0 = e[0], p1 = e[1];
-        var g0 = zf(p0[0], p0[1]), g1 = zf(p1[0], p1[1]);
-        out.push({d: p0[0] + p0[1] + p1[0] + p1[1], s: isoPoly([
-          isoPt(p0[0], p0[1], fl, o), isoPt(p1[0], p1[1], fl, o),
-          isoPt(p1[0], p1[1], Math.min(g1, fl), o), isoPt(p0[0], p0[1], Math.min(g0, fl), o)],
-          'rgba(222,213,194,.95)', '#a79d88')});
-      });
-      out.push({d: x1 + y1 + 0.01, s: isoPoly(C.map(function (c) { return isoPt(c[0], c[1], fl, o); }),
-        'rgba(248,244,235,.97)', '#8d8574')});
+  function isoFootprints(app, zf, o, built) {
+    var D = app.D, out = [], fl = app.D.FFL;
+    (D.DRIVE || []).forEach(function (b) {
+      var C = [[b[1], b[2]], [b[3], b[2]], [b[3], b[4]], [b[1], b[4]]];
+      out.push(isoPoly(C.map(function (c) { return isoPt(c[0], c[1], zf(c[0], c[1]) + 0.02, o); }),
+        'rgba(236,229,214,.85)', '#a79d88'));
     });
-    out.sort(function (p, q) { return p.d - q.d; });
+    /* Before the build, only what is standing. The link, the rear addition and
+       the kitchen addition are new work on the demolition plan, so they are left
+       out of the surveyed half and appear in the built one. The existing floor
+       is 611.65 either way, which is the level the survey measured on it and the
+       level the architect keeps. */
+    var u = rectUnion((D.BOXH || []).filter(function (b) { return built || !b[7]; })
+      .map(function (b) { return [b[1], b[2], b[3], b[4]]; }));
+    /* A boundary segment faces the viewer when its outward normal points at
+       lower x or lower y, which with this winding is a run along +x or along
+       -y. Those get a face down to the ground; the rest are behind the floor. */
+    var faces = [];
+    u.segs.forEach(function (sg) {
+      var dx = sg[1][0] - sg[0][0], dy = sg[1][1] - sg[0][1];
+      if (!(dx > 1e-9 || dy < -1e-9)) return;
+      var g0 = zf(sg[0][0], sg[0][1]), g1 = zf(sg[1][0], sg[1][1]);
+      faces.push({d: sg[0][0] + sg[0][1] + sg[1][0] + sg[1][1], s: isoPoly([
+        isoPt(sg[0][0], sg[0][1], fl, o), isoPt(sg[1][0], sg[1][1], fl, o),
+        isoPt(sg[1][0], sg[1][1], Math.min(g1, fl), o), isoPt(sg[0][0], sg[0][1], Math.min(g0, fl), o)],
+        'rgba(222,213,194,.98)', null)});
+    });
+    faces.sort(isoDepth);
+    out.push(faces.map(function (q) { return q.s; }).join(''));
+    u.rings.forEach(function (r) {
+      out.push(isoPoly(r.map(function (c) { return isoPt(c[0], c[1], fl, o); }),
+        'rgba(248,244,235,.99)', '#8d8574'));
+    });
+    return out.join('');
+  }
+
+  /* The sandstone block edge, which is the thing that holds the high side up.
+     Only its top is drawn, and that is not a shortcut: the viewer stands on the
+     high side, where a retaining wall shows its coping and keeps its face to the
+     ground below. The lawn is level with the top, so without the band drawn in
+     stone there is nothing to see where the edge runs. */
+  function isoWalls(app, zf, o) {
+    var items = (app.state.items || []).filter(function (i) {
+      return i.n === 'Sandstone block edge' || i.n === 'Seat / retaining wall'; });
+    if (!items.length) return '';
+    var out = [];
+    items.forEach(function (it) {
+      var poly = app.itemPoly(it);
+      if (!poly || poly.length < 3) return;
+      /* the top sits at the high side, so the band reads as the edge of the
+         platform it retains rather than sinking into the ground below it */
+      var top = -1e9;
+      poly.forEach(function (p) { var z = zf(p[0], p[1]); if (z > top) top = z; });
+      var c = app.centre(it);
+      [-1, 1].forEach(function (sgn) {
+        poly.forEach(function (p) {
+          var dx = p[0] - c[0], dy = p[1] - c[1], L = Math.hypot(dx, dy) || 1;
+          var z = zf(p[0] + sgn * dx / L * 0.8, p[1] + sgn * dy / L * 0.8);
+          if (z > top) top = z;
+        });
+      });
+      var d = poly.reduce(function (a, p) { return a + p[0] + p[1]; }, 0) / poly.length;
+      out.push({d: d, s: isoPoly(poly.map(function (p) { return isoPt(p[0], p[1], top + 0.03, o); }),
+        '#e0cda6', '#8a7250')});
+    });
+    out.sort(isoDepth);
     return out.map(function (q) { return q.s; }).join('');
   }
 
   /* Fits the drawing to its half of the sheet, so nothing depends on the block
      staying the size it is. */
-  function isoFit(cx, cy, w, h, lo, hi, base) {
-    var xs = [], ys = [], C = [[0, 0], [ISOX, 0], [ISOX, ISOY], [0, ISOY]];
-    C.forEach(function (p) {
-      [base, lo, hi].forEach(function (z) {
-        xs.push((p[0] - p[1]) * COS30);
-        ys.push((p[0] + p[1]) * 0.5 - (z - lo) * ISOZ);
-      });
+  /* Fits the drawing to its half of the sheet, from the ground it actually
+     draws. Fitting the corners against the full range of levels counted
+     combinations that never occur, a corner at the highest level and another at
+     the lowest, and left the drawing filling about half its box. */
+  function isoFit(cx, cy, w, h, samples, lo) {
+    var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    samples.forEach(function (p) {
+      var sx = (p[0] - p[1]) * COS30;
+      var sy = -(p[0] + p[1]) * 0.5 - (p[2] - lo) * ISOZ;
+      if (sx < x0) x0 = sx; if (sx > x1) x1 = sx;
+      if (sy < y0) y0 = sy; if (sy > y1) y1 = sy;
     });
-    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
-    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     var k = Math.min(w / (x1 - x0), h / (y1 - y0));
     return {cx: cx, cy: cy, k: k, z0: lo, mx: (x0 + x1) / 2, my: (y0 + y1) / 2};
   }
@@ -1177,7 +1290,7 @@ window.PRINTSHEET = (function () {
       if (a < lo) lo = a; if (b < lo) lo = b;
       if (a > hi) hi = a; if (b > hi) hi = b;
     }
-    var base = lo - 0.6;
+    var base = 0.5;   /* how deep the slab is drawn, not a datum */
 
     var cell = (ISOX / NX) * (ISOY / NY), cut = 0, fill = 0, mxc = 0, mxf = 0, moved = 0;
     for (i = 0; i < NX; i++) for (j = 0; j < NY; j++) {
@@ -1187,20 +1300,30 @@ window.PRINTSHEET = (function () {
       else if (d < -0.02) { cut -= d * cell; moved++; if (-d > mxc) mxc = -d; }
     }
 
-    var W = 250, H = 132, PW = 121, PH = 92, top = 26;
-    var o1 = isoFit(W * 0.25, top + PH / 2, PW, PH, lo, hi, base);
-    var o2 = isoFit(W * 0.75, top + PH / 2, PW, PH, lo, hi, base);
+    /* Both panels take one scale, so the pair can be read against each other.
+       The samples are the ground both surfaces actually reach, top and bottom. */
+    var samp = [];
+    for (i = 0; i <= NX; i++) for (j = 0; j <= NY; j++) {
+      var sx2 = i / NX * ISOX, sy2 = j / NY * ISOY;
+      var ze = ex(sx2, sy2), zf2 = fin(sx2, sy2);
+      samp.push([sx2, sy2, ze], [sx2, sy2, zf2],
+                [sx2, sy2, Math.min(ze, zf2) - base]);
+    }
+    var W = 250, H = 128, PW = 122, PH = 100, top = 24;
+    var o1 = isoFit(W * 0.25, top + PH / 2, PW, PH, samp, lo);
+    var o2 = isoFit(W * 0.75, top + PH / 2, PW, PH, samp, lo);
     var panel = function (o, title, sub, zf, diff) {
       return '<text x="' + n1(o.cx) + '" y="11" text-anchor="middle" font-size="6.6" font-weight="700" fill="' + INK + '">' + esc(title) + '</text>'
         + '<text x="' + n1(o.cx) + '" y="18" text-anchor="middle" font-size="4.6" fill="' + MUT + '">' + esc(sub) + '</text>'
-        + isoSolid(app, zf, o, lo, hi, base, diff) + isoFootprints(app, zf, o);
+        + isoSolid(app, zf, o, lo, hi, base, diff)
+        + (diff ? isoWalls(app, zf, o) : '') + isoFootprints(app, zf, o, !!diff);
     };
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'
       + '<rect width="' + W + '" height="' + H + '" fill="' + PAPER + '"/>'
-      + panel(o1, 'As surveyed', 'the ground as the surveyor measured it', ex, null)
-      + panel(o2, 'As built', moved ? 'the same ground once this scheme is shaped' : 'nothing on this scheme moves earth yet', fin, ex)
+      + panel(o1, 'As surveyed', 'the ground and the house as they stand', ex, null)
+      + panel(o2, 'As built', moved ? 'the additions built and the ground shaped' : 'the additions built, no earth moved yet', fin, ex)
       + '<text x="' + n1(W / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="4.4" fill="' + MUT + '">'
-      + 'Reserve boundary at the far corner, Duffy Street at the near one.</text>'
+      + 'Reserve boundary near left, Duffy Street away to the right, driveway top right.</text>'
       + '<text x="' + n1(W / 2) + '" y="' + (H - 2.5) + '" text-anchor="middle" font-size="4.4" fill="' + MUT + '">'
       + 'Height stretched ' + ISOZ + ' times so the fall reads. Plan lengths are true.</text>'
       + '</svg>';
@@ -1212,6 +1335,8 @@ window.PRINTSHEET = (function () {
       + sw('rgb(205,130,96)', 'cut, ground taken away')
       + sw('rgb(120,163,200)', 'fill, ground made up')
       + sw('rgb(160,175,130)', 'left as the surveyor found it')
+      + sw('rgb(171,169,152)', 'no survey here, the fitted surface answers')
+      + sw('#e0cda6', 'sandstone block edge, holding the high side up')
       + '<span>Pale is high ground, dark is low.</span></div>';
 
     var tbl = '<table class="ps-tbl"><tbody>'

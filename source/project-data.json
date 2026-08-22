@@ -469,5 +469,19 @@
   "inside_protection_zones_m2": 167,
   "free_m2": 154,
   "pockets": "a 4 m strip along the ENE boundary, a pocket at the WSW rear corner, and a 4 m band next to the house. Only 1.3 m2 of the middle is clear."
+ },
+ "buildings_new_work": {
+  "new": [
+   "rear addition",
+   "link",
+   "kitchen addition"
+  ],
+  "existing": [
+   "existing house",
+   "east wing",
+   "garage"
+  ],
+  "_source": "Enfold Architecture demolition plan A2.01 (POST REVIEW FINAL7). It labels the garage and driveway as existing, and calls up removing a section of external wall to accommodate the extension link. The rear and kitchen additions are new build.",
+  "_in_the_app": "BOXH rows carry 1 in column 7 for new work. The Shape view leaves them out of the surveyed half, so the additions appear between the two panels."
  }
 }

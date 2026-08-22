@@ -77,6 +77,13 @@ console.log('levels');
     try { html = window.PRINTSHEET.isoView(a); } catch (e) { html = 'threw: ' + e.message; }
     ok('the shape view renders', html.indexOf('<polygon') > 0, html.slice(0, 120));
     ok('the shape view has no NaN in it', !/NaN|undefined/.test(html));
+    /* The surveyed half leaves the new work out, so the two halves cannot draw
+       the same house. If the flag in BOXH is lost, they will. */
+    ok('some buildings are flagged as new work', D.BOXH.some(b => b[7]));
+    ok('some buildings are not', D.BOXH.some(b => !b[7]));
+    const P2 = JSON.parse(R('source/project-data.json')).buildings_new_work;
+    ok('the new work matches source/project-data.json',
+       D.BOXH.filter(b => b[7]).map(b => b[0]).sort().join('|') === P2.new.slice().sort().join('|'));
   }
 }
 
