@@ -50,9 +50,12 @@ asserts the headings each document should still have.
   so a raw fetch fails and the API returns a repository-scope error.
 - The survey DWGs are AC1018. Nothing in the image reads them. LibreDWG builds
   from source in about ten minutes (`sh autogen.sh && ./configure
-  --disable-bindings --disable-shared && make`), and `dwg2dxf` plus `pip install
-  ezdxf` then gets you entities. The levels are already extracted into `SPOT`
-  and `TRI`, so this is only needed to go back to the source.
+  --disable-bindings --disable-shared --disable-docs && make`), and `dwg2dxf`
+  then writes a DXF. `tools/survey-extract.js` reads that DXF itself, so node
+  and `dwg2dxf` are the whole toolchain and ezdxf is not needed. It derives
+  `SPOT` and `TRI`, and `--check` compares them against what `site-data.js`
+  holds. Levels have to come back exact, because the fit never touches z.
+  Positions come through the fit and only have to land inside a tolerance.
 - The survey plan PDF is vector with every glyph outlined, so it has no text to
   extract. Render it and read the image instead.
 

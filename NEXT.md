@@ -11,6 +11,10 @@ disappears if it left no trace worth keeping. Git history is the log.
 
 - Levels are the surveyor's own TIN from layer `SRF-VIEW` of the CAD file, not a
   model fitted to it. 126 points, 196 surveyed faces, 83 Delaunay fill.
+- `tools/survey-extract.js` is that derivation, in the repo rather than in a
+  scratchpad. `--check` reads the DWG and says whether the app still holds what
+  the surveyor drew. It found eleven levels a centimetre out and they are fixed;
+  the survey plan's own printed labels confirm two of them.
 - The kerb is seven surveyed levels rather than one constant.
 - `STYLE.md` written, with Isaac's worked rewrite of the `s-sumps` notes as the
   calibration. Applied to the handbook, the scheme notes, the Checks messages,
@@ -22,27 +26,19 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v35**.
+Live build at the time of writing: **v36**.
 
 ## Todo
 
 Roughly in order. Nothing here is urgent and each is a spare-tokens job.
 
-1. **Commit the survey extraction.** `SPOT` and `TRI` are in `site-data.js`, but
-   the code that derived them from layer `SRF-VIEW` of `3891_ZB EXPLODED
-   VERSION.dwg` only ever lived in a scratchpad and is gone. That is the
-   boundary-corner fit that puts MGA into the app frame, the 3-clique walk that
-   rebuilds the surveyor's faces from their edges, the filter that drops a
-   triangle containing another vertex, and the Delaunay fill. Rebuilding it is a
-   day. Commit it as `tools/survey-extract.js`, with a note that it needs
-   LibreDWG built from source and `ezdxf`, and that the DWG is not in the repo.
-2. **The Ask screen brief.** It builds from the layout and the fact sheet and
+1. **The Ask screen brief.** It builds from the layout and the fact sheet and
    nothing checks that its claims still match what the app computes. It is the
    one surface a stale number could hide in.
-3. **`sunCache`.** Cached per scheme, and it looks like nothing invalidates it
+2. **`sunCache`.** Cached per scheme, and it looks like nothing invalidates it
    when an item moves. Read it before trusting that; this came from a glance,
    not a test.
-4. **The four verge mounds.** Legible as stops now, still crossing the front
+3. **The four verge mounds.** Legible as stops now, still crossing the front
    boundary. Either move them or record why they stay.
 
 ## Open decisions, not work

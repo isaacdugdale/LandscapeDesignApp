@@ -129,7 +129,9 @@ there and every screen follows.
   Delaunay triangles fill the rest, which is mostly the house footprint, where no
   levels were taken. So `RL` is exact at every surveyed point. Between them it sits
   within 5 mm of the surveyor's surface, and that 5 mm is the cost of storing levels
-  to the centimetre the survey quotes. Past the last measured point the older fitted
+  to the centimetre the survey quotes. `tools/survey-extract.js` is the derivation,
+  and `--check` reads the DWG and says whether the app still holds what the surveyor
+  drew. Past the last measured point the older fitted
   surface still answers, because an edge extrapolates better from a smooth surface
   than from the nearest triangle's slope. None of it is set-out. That comes off the
   survey plan, datum A.H.D., origin SR585 at RL 608.442, and the plan records that no
