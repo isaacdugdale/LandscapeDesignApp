@@ -668,7 +668,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v40';
+const BUILD='v41';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -763,6 +763,10 @@ const SUMP='Yard sump', SUMPFAR=2.0, SILTY=[[5.5,20.75],[15.8,19.9]], SILTR=2.5;
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own, a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
 const BUCAP=100, BUFILL=400, BUSTEPS=[0,100,200,300,400,500], BURATE=60;
+/* How far inside a wall a surface has to reach before it is overlapping the
+   building rather than running up to it. Fifty millimetres is finer than
+   anything is set out to on site. */
+const ABUT=0.05;
 /* What a finished surface is graded to. `want` is the gradient it is eased
    toward, as 1 in N; `max` is the steepest it may be and still do its job;
    `flat` is the flattest paving may be and still shed. A lawn reads level at
@@ -1193,7 +1197,12 @@ class Component extends DCLogic {
       for(const t of D.TREES){ if(!t.ctrl) continue;
         const d2=(p[0]-t.x)**2+(p[1]-t.y)**2;
         if(d2<=t.srz*t.srz)srz.add(t.id); else if(d2<=t.ctrl*t.ctrl)tpz.add(t.id); }
-      if(!BURIED[it.n]) for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) (b[0]===DRIVEWAY?drv:bld).add(b[0]);
+      /* A sample has to sit ABUT inside a wall to count as overlapping it. Paving
+         is meant to run up to the house, and drawn to the wall its edge samples
+         land exactly on the footprint line. Reading that as overlapping the
+         building turned every terrace drawn properly into a stop. Nothing is set
+         out closer than this anyway. */
+      if(!BURIED[it.n]) for(const b of this.BLDR) if(p[0]>=b[1]+ABUT&&p[0]<=b[3]-ABUT&&p[1]>=b[2]+ABUT&&p[1]<=b[4]-ABUT) (b[0]===DRIVEWAY?drv:bld).add(b[0]);
       if(!this.inPoly(p,BOUND)) out=true;
     }
     /* red and amber collect a short reason each, so the Checks list can say what is

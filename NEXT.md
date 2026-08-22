@@ -18,6 +18,9 @@ disappears if it left no trace worth keeping. Git history is the log.
   top right, which is the plan's own framing. The surveyed half leaves the new
   work out, so the additions appear between the two panels. `finRL` in `index.html` is the finished surface and `isoView` in
   `printsheet.js` draws it. The house stands at its finished floor in it.
+- A surface has to reach 50 mm inside a building footprint before Checks calls
+  it an overlap. Paving is meant to run up to the house, and drawn to the wall
+  its edge samples land exactly on the footprint line.
 - The outdoor kitchen is priced as one item at $2,500, not by the square metre,
   so it never double counted the paving under it. It no longer carries a GRADE
   entry either, because grading it as well graded the same ground twice.
@@ -45,7 +48,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v40**.
+Live build at the time of writing: **v41**.
 
 ## Todo
 

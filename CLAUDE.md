@@ -122,6 +122,12 @@ filled for `pts` to land in the ninth slot at all. A trough or a path is a bent
 line on the ground, so prefer a run over a box for one; the swales in `START`
 and in `s-contour-swales` are the worked example.
 
+Turning a gist export back into scheme rows: a plant item carries `pn` and `n`,
+and only `pn` is the name the plant list can be looked up by. `n` is `DISP(p.n)`,
+capitalised for display, so matching on it drops any plant whose stored name is
+lower case. `baseItems()` fails silently there: the plant is simply not seeded.
+Assert every row resolves before writing the scheme.
+
 `rot` is the one that gets dropped. Leave it as `0` rather than omitting it, or
 the build-up depth is read as a rotation and the cost and volume come out `NaN`.
 Circles (`Planting mound`, plants) take a radius in `w` and `0` in `h`.

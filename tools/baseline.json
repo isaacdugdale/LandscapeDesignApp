@@ -7,6 +7,14 @@
   "cost": 16545,
   "held": 4.57
  },
+ "s-terrace-fitted": {
+  "items": 79,
+  "issues": 83,
+  "stop": 13,
+  "care": 46,
+  "cost": 19196,
+  "held": 3.67
+ },
  "s-platforms-one-terrace": {
   "items": 80,
   "issues": 82,
