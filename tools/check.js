@@ -33,13 +33,15 @@ const D = window.DUFFY;
 
 console.log('handbook');
 const H = window.HANDBOOK;
-eq('sections', H.length, 13);
+eq('sections', H.length, 14);
 ok('no undefined blocks', H.every(s => s.blocks.every(b => b !== undefined)),
    'a missing comma between two blocks parses as an index expression and yields undefined');
 ok('every block has a type', H.every(s => s.blocks.every(b => typeof b[0] === 'string')));
 ok('every section has an id, group and nav', H.every(s => s.id && s.group && s.nav));
 ok('the earthworks section exists', !!H.find(s => s.id === 'earthworks'),
    'it renders the setout drawing and the volumes schedule');
+ok('the shape section exists', !!H.find(s => s.id === 'shape'),
+   'it renders the block as a solid, before and after');
 
 /* ---------- levels ---------- */
 
@@ -57,6 +59,25 @@ console.log('levels');
       if (!isFinite(a.RL(x, y))) return false;
     return true;
   })());
+
+  /* The finished surface and the drawing built on it. It is the one view that
+     asks the layout for a level rather than the survey, so a change to either
+     can break it, and it fails silently on screen because the ref catches. */
+  ok('finRL is finite across the block', (() => {
+    const b = a.baseItems();
+    a.state = { items: b.items, uid: b.uid, sel: null, doy: 1, hour: 12 };
+    for (let x = 0; x <= 40; x += 2) for (let y = 0; y <= 21; y += 2)
+      if (!isFinite(a.finRL(x, y))) return false;
+    return true;
+  })());
+  ok('finRL is the survey where nothing is built', Math.abs(a.finRL(2, 19) - a.RL(2, 19)) < 1e-9);
+  {
+    require(path.join(ROOT, 'printsheet.js'));
+    let html = '';
+    try { html = window.PRINTSHEET.isoView(a); } catch (e) { html = 'threw: ' + e.message; }
+    ok('the shape view renders', html.indexOf('<polygon') > 0, html.slice(0, 120));
+    ok('the shape view has no NaN in it', !/NaN|undefined/.test(html));
+  }
 }
 
 /* ---------- the element library ---------- */

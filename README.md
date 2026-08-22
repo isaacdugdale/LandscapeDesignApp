@@ -136,6 +136,16 @@ there and every screen follows.
   than from the nearest triangle's slope. None of it is set-out. That comes off the
   survey plan, datum A.H.D., origin SR585 at RL 608.442, and the plan records that no
   underground services have been located.
+- **The shape of the ground, before and after.** Site has a section that draws the
+  block as a solid of earth twice over: the surveyed ground, and the ground this
+  scheme leaves behind. It is an isometric, so a length on it is true wherever it
+  sits, and height is stretched four times because the block falls 1.99 m over
+  40 m and at true scale that is a flat sheet. The stretch is written on the
+  drawing. The finished surface is `finRL` in `index.html`, assembled out of what
+  the Levels sheet already says: a graded surface finishes on its own string
+  line, anything with build-up declared finishes that far above what it sits on,
+  and the rest is left as found. Nothing in it is a second opinion, and it is not
+  setting-out.
 - **The kerb is not one level.** It drops 330 mm along this frontage, 609.82 at
   the north end to 609.49 at the south, so a sump's fall to the street depends on
   which end its line reaches. The app used a single 609.85, which is above every

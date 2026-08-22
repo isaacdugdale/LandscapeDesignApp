@@ -66,6 +66,16 @@ window.HANDBOOK = [
   ]]
 ]},
 
+/* --------------------------------------------------------------- shape --- */
+{id:'shape', group:'site', nav:'The shape of it', title:'The shape of the ground', sub:'The block as a solid, before and after', blocks:[
+  ['p','A plan gives the levels and a section gives one line through them. Neither shows the shape, and the shape is what gets argued about on site: how much this actually falls, where the hump is, what the cut looks like once it is open. So here is the block as a solid of earth, the ground the surveyor measured beside the ground this scheme leaves behind.'],
+  ['iso',''],
+  ['p','It is drawn off the working layout, so it answers for the scheme open now rather than for a fixed design. Move a terrace and it redraws.'],
+  ['note','Height is stretched four times. The block falls 1.99 m over 40 m on the surveyor\u2019s surface, which at true scale is a flat sheet of paper. Lengths in plan are true, so nothing measured across the drawing is exaggerated. Only height is.'],
+  ['p','The two halves come off the same numbers as the Levels sheet under Works. A surface that grades finishes on its own string line, anything with build-up declared finishes that much above what it sits on, and everything else stays as the surveyor found it. Where the two disagree, the Levels sheet is the one to hand a builder, because it carries the chainages and the string line and this does not.'],
+  ['note','Nothing here is setting-out. It is the same surveyed surface as the rest of the app: exact where the levels were taken and interpolated between them.']
+]},
+
 /* ----------------------------------------------------------------- sun --- */
 {id:'sun', group:'site', nav:'Sun', title:'Sun', sub:'Where the light is, season by season', blocks:[
   ['p','Direct sunlight was modelled across the block at quarter-hour intervals. It uses the solar geometry for this latitude and the surveyed heights of every building and tree. That includes both neighbouring houses, from the ridge and eave levels recorded on their roofs, and the three boundary fences at an assumed 1.8 m. The gum is treated as a permanently open canopy. The four deciduous trees each carry their own leaf window, set out below. It is the same model the Sun view on the plan runs. Southern hemisphere throughout, so the sun sits due north at midday, 78\u00b0 up on 21 December and 31\u00b0 on 21 June.'],

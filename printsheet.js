@@ -1026,6 +1026,197 @@ window.PRINTSHEET = (function () {
       + '</div>';
   }
 
+  /* ------------------------------------------------------------------ iso --- */
+
+  /* The block as a solid of earth, seen from above one corner, before and after.
+
+     A plan says what the levels are and a section says what one line does.
+     Neither shows the shape of the ground, and that is the thing an owner and a
+     builder argue about: how much is this actually falling, where does the hump
+     sit, what does the cut look like once it is dug. So this draws the surveyed
+     surface and the finished one side by side, out of the same numbers the
+     Levels sheet is built from.
+
+     There is no perspective in it. A length on the drawing is the same length
+     wherever it sits, which is what an isometric is for. Height is stretched,
+     because the block falls 2 m across 40 m and at true scale that is a flat
+     sheet of paper. The stretch is written on the drawing and in the legend: a
+     drawing that exaggerates a slope without saying so is a lie about it. */
+
+  var ISOZ = 4;                 /* height stretch, stated on the drawing */
+  var NX = 40, NY = 21;         /* grid cells over the block, about a metre each */
+  var ISOX = 40, ISOY = 21.33;  /* the block, reserve boundary to street and across */
+  var COS30 = 0.8660254;
+
+  function isoPt(x, y, z, o) {
+    return [o.cx + ((x - y) * COS30 - o.mx) * o.k,
+            o.cy + ((x + y) * 0.5 - (z - o.z0) * ISOZ - o.my) * o.k];
+  }
+
+  /* Hypsometric tint, low ground dark and high ground pale, times a Lambert
+     term off the surface normal so the form reads rather than just the height. */
+  function isoFill(z, lo, hi, shade, tint) {
+    var t = hi > lo ? (z - lo) / (hi - lo) : 0.5;
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    var r = 122 + 104 * t, g = 140 + 88 * t, b = 100 + 78 * t;
+    if (tint === 'cut') { r = 198 + 34 * t; g = 116 + 36 * t; b = 84 + 28 * t; }
+    if (tint === 'fill') { r = 104 + 54 * t; g = 146 + 46 * t; b = 186 + 34 * t; }
+    var k = 0.74 + 0.40 * shade;
+    var q = function (v) { v = Math.round(v * k); return v < 0 ? 0 : v > 255 ? 255 : v; };
+    return 'rgb(' + q(r) + ',' + q(g) + ',' + q(b) + ')';
+  }
+
+  var isoPoly = function (pts, fill, stroke) {
+    return '<polygon points="' + pts.map(function (p) { return n1(p[0]) + ',' + n1(p[1]); }).join(' ')
+      + '" fill="' + fill + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="0.25"' : '') + '/>';
+  };
+
+  /* One surface, as a solid: the ground on top and a cut face down each of the
+     four sides, so it reads as a block of earth rather than a floating sheet.
+     `zf` gives a level at a point, so the same code draws the survey and the
+     finished ground and the two cannot come out of step. */
+  function isoSolid(app, zf, o, lo, hi, base, diff) {
+    var out = [], i, j, Z = [];
+    for (i = 0; i <= NX; i++) { Z[i] = []; for (j = 0; j <= NY; j++) Z[i][j] = zf(i / NX * ISOX, j / NY * ISOY); }
+    var gx = ISOX / NX, gy = ISOY / NY;
+    for (i = 0; i < NX; i++) for (j = 0; j < NY; j++) {
+      var x0 = i * gx, x1 = x0 + gx, y0 = j * gy, y1 = y0 + gy;
+      var za = Z[i][j], zb = Z[i + 1][j], zc = Z[i + 1][j + 1], zd = Z[i][j + 1];
+      var nx = -(zb - za) * gy, ny = -(zd - za) * gx, nz = gx * gy;
+      var L = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+      var shade = (nx * -0.42 + ny * -0.30 + nz * 0.86) / L; if (shade < 0) shade = 0;
+      var zm = (za + zb + zc + zd) / 4, tint = null;
+      if (diff) { var d = zm - diff(x0 + gx / 2, y0 + gy / 2);
+        if (d > 0.02) tint = 'fill'; else if (d < -0.02) tint = 'cut'; }
+      var c = isoFill(zm, lo, hi, shade, tint);
+      /* stroked in its own colour: without it the quads leave hairline gaps
+         where they meet and the surface reads as graph paper */
+      out.push({d: x0 + y0, s: isoPoly([isoPt(x0, y0, za, o), isoPt(x1, y0, zb, o), isoPt(x1, y1, zc, o), isoPt(x0, y1, zd, o)], c, c)});
+    }
+    /* painter's algorithm: the far corner is the smallest x + y */
+    out.sort(function (a, b) { return a.d - b.d; });
+
+    /* The two cut faces that face the viewer, each as one polygon following the
+       ground along its edge. The other two are behind the surface and are not
+       drawn at all. Drawn after it, because both are nearer than any of it. */
+    var faceX = [], faceY = [];
+    for (i = 0; i <= NX; i++) faceY.push(isoPt(i * gx, ISOY, Z[i][NY], o));
+    faceY.push(isoPt(ISOX, ISOY, base, o)); faceY.push(isoPt(0, ISOY, base, o));
+    for (j = 0; j <= NY; j++) faceX.push(isoPt(ISOX, j * gy, Z[NX][j], o));
+    faceX.push(isoPt(ISOX, ISOY, base, o)); faceX.push(isoPt(ISOX, 0, base, o));
+
+    return out.map(function (q) { return q.s; }).join('')
+      + isoPoly(faceY, '#c6bba2', '#9c9078') + isoPoly(faceX, '#b3a68c', '#9c9078');
+  }
+
+  /* The house, lying flat on the ground rather than standing up on it. The
+     drawing is about the shape of the earth, and a roof exaggerated four times
+     hides most of the back yard. An outline is enough to find it by. */
+  function isoFootprints(app, zf, o) {
+    var D = app.D, out = [];
+    (D.BOXH || []).concat(D.DRIVE || []).forEach(function (b) {
+      var x0 = b[1], y0 = b[2], x1 = b[3], y1 = b[4], n = 5, k, m, ring = [];
+      for (k = 0; k <= n; k++) ring.push([x0 + (x1 - x0) * k / n, y0]);
+      for (k = 1; k <= n; k++) ring.push([x1, y0 + (y1 - y0) * k / n]);
+      for (k = 1; k <= n; k++) ring.push([x1 - (x1 - x0) * k / n, y1]);
+      for (k = 1; k < n; k++) ring.push([x0, y1 - (y1 - y0) * k / n]);
+      var pts = ring.map(function (p) { return isoPt(p[0], p[1], zf(p[0], p[1]) + 0.02, o); });
+      out.push(isoPoly(pts, 'rgba(247,243,233,.80)', '#8d8574'));
+    });
+    return out.join('');
+  }
+
+  /* Fits the drawing to its half of the sheet, so nothing depends on the block
+     staying the size it is. */
+  function isoFit(cx, cy, w, h, lo, hi, base) {
+    var xs = [], ys = [], C = [[0, 0], [ISOX, 0], [ISOX, ISOY], [0, ISOY]];
+    C.forEach(function (p) {
+      [base, lo, hi].forEach(function (z) {
+        xs.push((p[0] - p[1]) * COS30);
+        ys.push((p[0] + p[1]) * 0.5 - (z - lo) * ISOZ);
+      });
+    });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var k = Math.min(w / (x1 - x0), h / (y1 - y0));
+    return {cx: cx, cy: cy, k: k, z0: lo, mx: (x0 + x1) / 2, my: (y0 + y1) / 2};
+  }
+
+  /* The drawing, and under it the numbers the plan already computes, so nothing
+     here is a second opinion. */
+  function isoView(app) {
+    var ex = function (x, y) { return app.RL(x, y); };
+    var fin = function (x, y) { return app.finRL(x, y); };
+
+    /* One tint ramp across both panels, so a colour means the same level in
+       each and the pair can be read against one another. The row in the table
+       is the surveyed ground on its own, because that is what it says it is. */
+    var lo = 1e9, hi = -1e9, exLo = 1e9, exHi = -1e9, i, j, x, y;
+    for (i = 0; i <= NX; i++) for (j = 0; j <= NY; j++) {
+      x = i / NX * ISOX; y = j / NY * ISOY;
+      var a = ex(x, y), b = fin(x, y);
+      if (a < exLo) exLo = a; if (a > exHi) exHi = a;
+      if (a < lo) lo = a; if (b < lo) lo = b;
+      if (a > hi) hi = a; if (b > hi) hi = b;
+    }
+    var base = lo - 0.6;
+
+    var cell = (ISOX / NX) * (ISOY / NY), cut = 0, fill = 0, mxc = 0, mxf = 0, moved = 0;
+    for (i = 0; i < NX; i++) for (j = 0; j < NY; j++) {
+      var px = (i + 0.5) / NX * ISOX, py = (j + 0.5) / NY * ISOY;
+      var d = fin(px, py) - ex(px, py);
+      if (d > 0.02) { fill += d * cell; moved++; if (d > mxf) mxf = d; }
+      else if (d < -0.02) { cut -= d * cell; moved++; if (-d > mxc) mxc = -d; }
+    }
+
+    var W = 250, H = 132, PW = 121, PH = 92, top = 26;
+    var o1 = isoFit(W * 0.25, top + PH / 2, PW, PH, lo, hi, base);
+    var o2 = isoFit(W * 0.75, top + PH / 2, PW, PH, lo, hi, base);
+    var panel = function (o, title, sub, zf, diff) {
+      return '<text x="' + n1(o.cx) + '" y="11" text-anchor="middle" font-size="6.6" font-weight="700" fill="' + INK + '">' + esc(title) + '</text>'
+        + '<text x="' + n1(o.cx) + '" y="18" text-anchor="middle" font-size="4.6" fill="' + MUT + '">' + esc(sub) + '</text>'
+        + isoSolid(app, zf, o, lo, hi, base, diff) + isoFootprints(app, zf, o);
+    };
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'
+      + '<rect width="' + W + '" height="' + H + '" fill="' + PAPER + '"/>'
+      + panel(o1, 'As surveyed', 'the ground as the surveyor measured it', ex, null)
+      + panel(o2, 'As built', moved ? 'the same ground once this scheme is shaped' : 'nothing on this scheme moves earth yet', fin, ex)
+      + '<text x="' + n1(W / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="4.4" fill="' + MUT + '">'
+      + 'Reserve boundary at the far corner, Duffy Street at the near one.</text>'
+      + '<text x="' + n1(W / 2) + '" y="' + (H - 2.5) + '" text-anchor="middle" font-size="4.4" fill="' + MUT + '">'
+      + 'Height stretched ' + ISOZ + ' times so the fall reads. Plan lengths are true.</text>'
+      + '</svg>';
+
+    var sw = function (c, t) {
+      return '<span><span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:' + c + ';vertical-align:-1px"></span> ' + t + '</span>';
+    };
+    var legend = '<div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--color-neutral-700)">'
+      + sw('rgb(205,130,96)', 'cut, ground taken away')
+      + sw('rgb(120,163,200)', 'fill, ground made up')
+      + sw('rgb(160,175,130)', 'left as the surveyor found it')
+      + '<span>Pale is high ground, dark is low.</span></div>';
+
+    var tbl = '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Falls, reserve boundary to street</td><td class="ps-num">' + n1(ex(0, ISOY / 2) - ex(ISOX, ISOY / 2)) + ' m over ' + ISOX + ' m</td></tr>'
+      + '<tr><td>Highest and lowest surveyed ground on the block</td><td class="ps-num">' + n1(exHi) + ' to ' + n1(exLo) + ' m AHD</td></tr>'
+      + '<tr><td>Ground this scheme cuts away</td><td class="ps-num">' + n1(cut) + ' m³, deepest ' + Math.round(mxc * 1000) + ' mm</td></tr>'
+      + '<tr><td>Ground this scheme makes up</td><td class="ps-num">' + n1(fill) + ' m³, deepest ' + Math.round(mxf * 1000) + ' mm</td></tr>'
+      + '<tr class="ps-tot"><td>Share of the block that moves at all</td><td class="ps-num">' + Math.round(moved / (NX * NY) * 100) + '%</td></tr>'
+      + '</tbody></table>';
+
+    return '<div class="ps-screen">'
+      + '<div class="ps-warn">' + WARN + '</div>'
+      + '<div class="ps-screen-plan">' + svg + '</div>'
+      + '<div class="ps-screen-legend">' + legend + '</div>'
+      + tbl
+      + '<p class="ps-fine">Both halves are the same grid, a metre square, over the whole block. The left one asks the survey for every level. '
+      + 'The right one asks the plan: a surface that grades finishes on its own string line, anything with build-up declared finishes that much above what it sits on, and everything else is left as found. '
+      + 'So the cut and fill here is the shaping this scheme does to the ground and not the trenching, and it will not match the Earthworks sheet, which counts the digging too. '
+      + 'Inside a tree protection zone the ground is drawn as found, because that is what the tree plan allows: hand or hydro digging only, and no more than 100 mm of coarse woodchip added. '
+      + 'The house is outlined where it sits and not drawn up, because at four times height a roof hides the yard behind it.</p>'
+      + '</div>';
+  }
+
   /* ---------------------------------------------------------------- water --- */
 
   /* The half of the drainage design that is not a pipe. Every surface on the plan
@@ -1062,5 +1253,5 @@ window.PRINTSHEET = (function () {
       + '</div>';
   }
 
-  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, levelsView: levelsView, waterView: waterView};
+  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, levelsView: levelsView, waterView: waterView, isoView: isoView};
 })();

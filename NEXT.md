@@ -11,6 +11,9 @@ disappears if it left no trace worth keeping. Git history is the log.
 
 - Levels are the surveyor's own TIN from layer `SRF-VIEW` of the CAD file, not a
   model fitted to it. 126 points, 196 surveyed faces, 83 Delaunay fill.
+- Site has a section, The shape of it, drawing the block as a solid of earth as
+  surveyed and as built. `finRL` in `index.html` is the finished surface and
+  `isoView` in `printsheet.js` draws it.
 - `tools/survey-extract.js` is that derivation, in the repo rather than in a
   scratchpad. `--check` reads the DWG and says whether the app still holds what
   the surveyor drew. It found eleven levels a centimetre out and they are fixed;
@@ -26,7 +29,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v36**.
+Live build at the time of writing: **v37**.
 
 ## Todo
 

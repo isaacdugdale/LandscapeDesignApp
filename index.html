@@ -476,6 +476,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
                 <div ref="{{ levelsRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
 
+              <sc-if value="{{ b.isIso }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ isoRef }}" style="margin:4px 0 10px"></div>
+              </sc-if>
+
               <sc-if value="{{ b.isWater }}" hint-placeholder-val="{{ false }}">
                 <div ref="{{ waterRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
@@ -662,7 +666,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v36';
+const BUILD='v37';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -1237,6 +1241,51 @@ class Component extends DCLogic {
     const A=[e[0],e[2]], B=[e[1],e[3]], L=drop(A)>=drop(B)?A:B, o=[];
     for(let i=0;i<=20;i++) o.push([L[0][0]+(L[1][0]-L[0][0])*i/20, L[0][1]+(L[1][1]-L[0][1])*i/20]);
     return o; }
+  /* ---------- the finished surface ----------
+     What the ground is when the build is done, as one function of position, so
+     a drawing of it and the Levels sheet cannot drift apart. It is assembled
+     out of what the app already tells the builder and nothing else is invented:
+     a graded surface finishes on its own string line, anything carrying
+     declared build-up finishes that far above what it sits on, and everywhere
+     else the finished surface is the surveyed one.
+
+     A surface only grades the part of it that is clear of a protection zone,
+     and levelPlan says so. Where it cannot grade, the ground stays as found,
+     which is the tree plan's answer rather than the app's. */
+  itemPoly(it){
+    if(this.isRun(it)) return this.runPoly(it);
+    if(it.shape==='circ'){ const o=[];
+      for(let i=0;i<24;i++){ const a=i/24*Math.PI*2; o.push([it.x+it.w*Math.cos(a),it.y+it.w*Math.sin(a)]); }
+      return o; }
+    return this.corners(it); }
+  /* Rebuilt whenever the layout changes. Keyed on the same stamp the rest of
+     the app uses for a layout, so a drag invalidates it and nothing else has
+     to remember to. */
+  finParts(){
+    const items=(this.state.items||[]).filter(i=>i.t!=='plant');
+    const key=items.map(i=>[i.u,i.n,i.x,i.y,i.w,i.h,i.rot,i.bu,(i.pts||[]).length,
+      (i.pts||[]).map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join(';')].join(':')).join('|');
+    if(this._finKey===key) return this._finParts;
+    const parts=[];
+    for(const it of items){
+      const poly=this.itemPoly(it); if(!poly||poly.length<3) continue;
+      const bu=this.buildup(it), lp=this.levelPlan(it);
+      const graded=lp&&lp.graded&&lp.len>0.5;
+      if(!graded&&!bu) continue;
+      parts.push({n:it.n, poly:poly, bu:bu?bu.mm/1000:0,
+        line:graded?this.levelLine(it):null, from:graded?lp.from:0, to:graded?lp.to:0, len:graded?lp.len:0});
+    }
+    this._finKey=key; this._finParts=parts;
+    return parts; }
+  /* Later items sit on top, the way they are drawn, so the last one covering a
+     point is the one that decides its level. */
+  finRL(x,y){
+    const parts=this.finParts(), g=this.RL(x,y);
+    let hit=null;
+    for(let i=parts.length-1;i>=0;i--) if(this.inPoly([x,y],parts[i].poly)){ hit=parts[i]; break; }
+    if(!hit) return g;
+    const base=hit.line?hit.from+(hit.to-hit.from)*(this.chainOf(hit.line,[x,y]).s/hit.len):g;
+    return base+hit.bu; }
   levelPlan(it){
     const g=GRADE[it&&it.n]; if(!g||it.t==='plant'||it.shape==='circ') return null;
     const line=this.levelLine(it); if(!line||line.length<2) return null;
@@ -2083,7 +2132,7 @@ class Component extends DCLogic {
       const k=b[0], plain=k==='p'||k==='h'||k==='note';
       const w=b[2]||[];
       return {
-        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isLevels:k==='levels', isWater:k==='water',
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isLevels:k==='levels', isIso:k==='iso', isWater:k==='water',
         x:plain?b[1]:'',
         items:k==='ul'?b[1].map(t=>({x:t})):[],
         head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
@@ -2279,6 +2328,8 @@ class Component extends DCLogic {
           const btn=el.querySelector('[data-levels-print]');
           if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','levels'); };
         }catch(e){ el.textContent=''; } },
+      isoRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ el.innerHTML=window.PRINTSHEET.isoView(this); }catch(e){ el.textContent=''; } },
       waterRef:el=>{ if(!el||!window.PRINTSHEET) return;
         try{ el.innerHTML=window.PRINTSHEET.waterView(this); }catch(e){ el.textContent=''; } },
       bloomRef:el=>{ if(!el||!window.PRINTSHEET) return;
