@@ -24,7 +24,7 @@ A scheme is a named starting layout offered to the device. They live in
 **Seeding happens once per id, and never again.** `seedStore()` in `index.html`
 keeps a `seeded` list in the device's local storage and skips any id already in
 it. So editing an existing scheme in place reaches nobody who has already opened
-the app — it looks fine in a fresh browser and changes nothing on the iPad. That
+the app. It looks fine in a fresh browser and changes nothing on the iPad. That
 mistake has now been made once; do not make it again.
 
 When a scheme's content changes, **ship it under a new id** with a name that
@@ -47,8 +47,8 @@ Row shapes, which are positional and easy to shift by one:
 
 `LIB` is the element library and the palette is built straight off it, so adding
 an element is adding a row plus a `HARDCOL` entry for its plan colours. `locked`
-means the element *arrives* locked — site fabric does, so a pipe is not nudged
-while a bed is being moved — and `sharp` means its run keeps its corners instead
+means the element *arrives* locked. Site fabric does, so a pipe is not nudged
+while a bed is being moved. `sharp` means its run keeps its corners instead
 of being splined through them. Both are booleans and both are read as `l[12]`
 and `l[13]`, so a row that stops short of them is simply unlocked and smooth.
 
@@ -57,7 +57,7 @@ run: a smooth line through those points, `w` metres wide, with `x`, `y`, `h` and
 `rot` ignored. Ask geometry through `area`, `centre`, `samples`, `corners` and
 `linLen`, which all know about it; never read `w`/`h` directly to get a length.
 Write the first point into `x` and `y` anyway so the row reads honestly, and put
-`null` in the two build-up columns where there is no build-up — they have to be
+`null` in the two build-up columns where there is no build-up. They have to be
 filled for `pts` to land in the ninth slot at all. A trough or a path is a bent
 line on the ground, so prefer a run over a box for one; the swales in `START`
 and in `s-contour-swales` are the worked example.
@@ -90,7 +90,7 @@ yours alone.
 - Rebuild the offline copy with `node tools/build-offline.js` when a served file
   changes, or `offline/234-duffy-offline.html` goes stale. It checks its own work
   and refuses to write a file that still points at anything beside it.
-- Publish by merging to `main` — Pages serves `main` at the repository root.
+- Publish by merging to `main`. Pages serves `main` at the repository root.
   Confirm with the `pages build and deployment` run for your own commit's SHA,
   or by fetching the changed file from the live URL. A green push is not a
   publish.
@@ -105,9 +105,9 @@ yours alone.
 
 `x` runs from the reserve boundary (0) to the street (40) and is the fall line,
 1 in 19. `y` runs from the east-north-east boundary (0) to the west-south-west
-(21.33) and is effectively level, 1 in 132 — so contours, swales and mounds run
+(21.33) and is effectively level, 1 in 132, so contours, swales and mounds run
 in `y`. The constraints that will fail a placement are all computed by the app
 and worth running rather than reasoning about: protection zones and structural
-root zones, building footprints, the overland flow corridor at `y` 0.5–3.0, the
+root zones, building footprints, the overland flow corridor at `y` 0.5 to 3.0, the
 3 m standoff for anything that infiltrates, and the 100 mm cap on material added
 inside a protection zone.

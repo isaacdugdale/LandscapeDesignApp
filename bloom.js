@@ -1,22 +1,22 @@
 /* Flowering month and flower colour for the plant list.
 
-   NOT from the project documents — none of them record flowering. These are
+   NOT from the project documents. None of them record flowering. These are
    horticultural figures for a cool-temperate Canberra garden, southern
    hemisphere, and they are the one part of this app that is judgement rather
    than survey. Correct anything you disagree with: it is read only by the bloom
    calendar on the printed set.
 
    Keyed by plant name, because that is what the app stores on a placed plant
-   and because the ids in the plant list are not unique — 52 is both Eucalyptus
+   and because the ids in the plant list are not unique, 52 is both Eucalyptus
    rossii and the dwarf corymbia, and several entries have no id at all.
 
-     [fromMonth, toMonth, flowerColour, colourName]   months 1–12, may wrap
+     [fromMonth, toMonth, flowerColour, colourName]   months 1 to 12, may wrap
      null                                             no flower worth charting
 
    A wrapped range (11 to 2) means November through February. */
 window.BLOOM = {
 
-  /* grasses and strappy things — flowerheads more than flowers */
+  /* grasses and strappy things, flowerheads more than flowers */
   'Tussock grass - Poa labillardierei':          [10, 1,  '#c9bb92', 'straw'],
   'Poa sieberiana':                              [10, 12, '#c9bb92', 'straw'],
   '‘Tanika’ grass Lomandra longfolia':           [9,  11, '#e0d283', 'cream-yellow'],
@@ -81,7 +81,7 @@ window.BLOOM = {
   '• Acacia ulicifolia':                         [6,  9,  '#e7d485', 'cream-yellow'],
   'correa pulchella ‘orange glow’':              [3,  9,  '#db7634', 'orange'],
 
-  /* trees — the eucalypts, the wattles and the orchard */
+  /* trees, the eucalypts, the wattles and the orchard */
   'Eucalyptus rossii':                           [11, 2,  '#ebe7d7', 'cream-white'],
   'Eucalyptus cinera':                           [10, 12, '#ebe7d7', 'cream-white'],
   'Fig - white adriatic':                        null,

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>234 Duffy — Landscape Studio</title>
+<title>234 Duffy: Landscape Studio</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="234 Duffy">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,7 +14,7 @@
 <script>
 /* Serve React from this repo instead of unpkg.com, so the app opens with no
    network. The runtime checks __resources before reaching for a CDN. The two
-   files in vendor/ are the same bytes unpkg served — they match the runtime's
+   files in vendor/ are the same bytes unpkg served, they match the runtime's
    published SRI hashes. */
 window.__resources={
   "https://unpkg.com/react@18.3.1/umd/react.production.min.js":"vendor/react.production.min.js",
@@ -28,7 +28,7 @@ window.__resources={
 if('serviceWorker' in navigator){
   /* Was there already a worker when this page loaded? If so, a later change of
      controller means a newer version has taken over, and the page is still
-     showing the old files — so reload once, and the home-screen app picks up a
+     showing the old files, so reload once, and the home-screen app picks up a
      published change on the first open rather than the second. Guarded because
      the very first registration also changes the controller. */
   var had=!!navigator.serviceWorker.controller, reloaded=false;
@@ -37,7 +37,7 @@ if('serviceWorker' in navigator){
   });
   /* updateViaCache none, because Pages serves sw.js with a ten minute max-age
      and the browser will otherwise answer the update check from its own HTTP
-     cache — which is how a device sits on an old build after a reopen. The
+     cache, which is how a device sits on an old build after a reopen. The
      explicit update() asks again on every open. */
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('sw.js',{updateViaCache:'none'})
@@ -573,7 +573,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
                 </div>
               </div>
               <div style="display:flex;gap:12px;align-items:center;margin-top:9px;max-width:760px">
-                <div style="flex:1;font-size:11.5px;line-height:1.5;color:var(--color-neutral-600)">Answers read the survey, the tree plan, the geotechnical report and your current layout. Nothing here moves anything on the plan — changes are suggested, and you apply them yourself.</div>
+                <div style="flex:1;font-size:11.5px;line-height:1.5;color:var(--color-neutral-600)">Answers read the survey, the tree plan, the geotechnical report and your current layout. Nothing here moves anything on the plan. Changes are suggested, and you apply them yourself.</div>
                 <div onClick="{{ toggleBrief }}" style="flex:0 0 auto;font-size:11.5px;font-weight:600;color:var(--color-accent-700);cursor:pointer">{{ briefLabel }}</div>
               </div>
               <sc-if value="{{ briefOpen }}" hint-placeholder-val="{{ true }}">
@@ -662,7 +662,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v31';
+const BUILD='v32';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -686,19 +686,17 @@ const HARDCOL={
   'Diversion berm':['#e6d6bb','#b2622d'],'Stormwater line':['#b9ccd1','#33646b'],
   'Path, firm surface':['#e4dccb','#a19786'],'Gate':['#d8c3a4','#645c50']
 };
-/* Soakage and a piped channel are opposite answers to the same problem, and the
-   library only had the first, so the courtyard drain was drawn as a soak pit —
-   the one thing the handbook rules out there. This names which surfaces put water
-   into the ground rather than into a pipe, how much each holds before it overflows,
-   and how close to a wall that stops being allowed.
-
-   d is the working depth in metres and v the share of it that is void; where d is
-   0 the depth is whatever build-up the item declares, so a mound holds what it is
-   actually made of. The geotechnical report and the CSIRO guidance warn against
-   soaking water into reactive clay a metre or two from footings, so anything that
-   concentrates water keeps 3 m off a wall, on a Class P site whose movement figure
-   is already spoken for. Mulch and mounds spread water rather than concentrate it
-   and sit on the surface, so they carry no margin. */
+/* Soakage and a piped channel are opposite answers to the same problem, and the library
+   only had the first, so the courtyard drain was drawn as a soak pit, the one thing the
+   handbook rules out there. This names which surfaces put water into the ground rather than
+   into a pipe, how much each holds before it overflows, and how close to a wall that stops
+   being allowed. d is the working depth in metres and v the share of it that is void; where
+   d is 0 the depth is whatever build-up the item declares, so a mound holds what it is
+   actually made of. The geotechnical report and the CSIRO guidance warn against soaking
+   water into reactive clay a metre or two from footings, so anything that concentrates
+   water keeps 3 m off a wall, on a Class P site whose movement figure is already spoken
+   for. Mulch and mounds spread water rather than concentrate it and sit on the surface, so
+   they carry no margin. */
 const SOAKMIN=3, DRAIN='Channel drain';
 const SOAK={
   'Soak pit':          {d:1.00,v:0.35,min:SOAKMIN,mat:'gravel-filled pit'},
@@ -732,24 +730,24 @@ const SWALE='Swale, on contour', MOUND='Mound, built up', LEVELTOL=0.10;
    being level; a berm is judged on not being, because water has to leave along
    it, and on standing across the whole of what it protects rather than most of
    it. The one behind the addition was drawn into the site data as a dotted line
-   for want of an element to be — you could see it and not touch it. */
+   for want of an element to be, you could see it and not touch it. */
 const BERM='Diversion berm', BERMSAG=0.15;
 /* The pipes. They were site data drawn under everything, which made them
    impossible to touch by accident and impossible to touch on purpose. As
-   elements they are both, so they arrive locked — see LOCKED below. A line is
+   elements they are both, so they arrive locked, see LOCKED below. A line is
    buried, so running under the garage slab is the design rather than a clash:
    the handbook's own route out of the back garden is two DN100 sleeves cast
    under that slab, because a trench through the pear's zone needs the tree plan
    amended. Nothing else in the library goes under a building, so the exemption
    is named here rather than guessed from the category. */
 const PIPE='Stormwater line', BURIED={'Stormwater line':1};
-/* The pits. Eight of them were drawn out of DRAIN.pits as annotation — dots on
-   the lines, there to be read and impossible to move — and the builder asking
+/* The pits. Eight of them were drawn out of DRAIN.pits as annotation, dots on
+   the lines, there to be read and impossible to move, and the builder asking
    for yard sumps is asking about exactly those. A sump is the opposite element
    to a soak pit and deliberately absent from SOAK: it is a box that collects
    water and hands it to a pipe, so nothing about it belongs within the 3 m
    standoff test, and the one thing that would make it wrong here is putting one
-   somewhere it cannot fall to a line. Unlike a pipe it is NOT buried — its
+   somewhere it cannot fall to a line. Unlike a pipe it is NOT buried, its
    grate is the ground surface, so a sump inside a building footprint is a real
    clash rather than a sleeve. SUMPFAR is how far from a line a sump may sit
    before the connection stops being obvious on the drawing; SILT is the ones
@@ -757,7 +755,7 @@ const PIPE='Stormwater line', BURIED={'Stormwater line':1};
 const SUMP='Yard sump', SUMPFAR=2.0, SILTY=[[5.5,20.75],[15.8,19.9]], SILTR=2.5;
 /* Added material: the tree plan's cap inside a protection zone, the project's
    fill limit outside one, and the steps the inspector offers. The rate is the
-   app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
+   app's own, a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
 const BUCAP=100, BUFILL=400, BUSTEPS=[0,100,200,300,400,500], BURATE=60;
 /* What a finished surface is graded to. `want` is the gradient it is eased
    toward, as 1 in N; `max` is the steepest it may be and still do its job;
@@ -787,9 +785,9 @@ const GROW={groundcover:3,grass:3,veggie:1,shrub:6,other:6,tree:12};
 function DISP(n){ if(!n) return n;
   if(n.indexOf('http')===0) return 'Anigozanthos, kangaroo paw';
   const t=n.replace(/\s+$/,''); return t.charAt(0).toUpperCase()+t.slice(1); }
-const STAGEDEF={1:{title:'Water and earth',when:'0–3 months',why:'Shaping and anything that decides where water goes. Do it first, then let a wet season test it.'},
- 2:{title:'Living surfaces',when:'3–6 months',why:'Paving, the wall, the kitchen and the lawn platform — the parts you entertain on.'},
- 3:{title:'Planting and sheds',when:'6–12 months',why:'Plants go in last, once the shaping has settled and you know where the shade falls.'}};
+const STAGEDEF={1:{title:'Water and earth',when:'0 to 3 months',why:'Shaping and anything that decides where water goes. Do it first, then let a wet season test it.'},
+ 2:{title:'Living surfaces',when:'3 to 6 months',why:'Paving, the wall, the kitchen and the lawn platform: the parts you entertain on.'},
+ 3:{title:'Planting and sheds',when:'6 to 12 months',why:'Plants go in last, once the shaping has settled and you know where the shade falls.'}};
 const SUGG=['Where can I dig without calling the arborist?','Why does the firepit fail the reserve clearance?','What is the sunniest spot left in the back garden?','What does stage one cost if I stop there?','What happens to the lawn if the reserve bank overtops?','How much mulch do I need at 100 mm?','Which plants on my list will not survive a Canberra frost?','Is there anywhere left for a second fruit tree?'];
 
 class Component extends DCLogic {
@@ -914,12 +912,12 @@ class Component extends DCLogic {
   }
   /* Site data draws a line until the layout takes it over. The pipes and the
      berm were drawn out of DRAIN before they were elements, and a scheme saved
-     on the iPad before that still has to show them — so the site version is
+     on the iPad before that still has to show them, so the site version is
      drawn only while nothing in the layout is standing in for it. Asked by name
      rather than by line, because both sets are seeded whole. */
   owns(name){ return (this.state.items||[]).some(i=>i.n===name); }
   fy(y){return this.YTOP-y;}
-  /* Landscape holds the handbook's framing — reserve left, Duffy Street right,
+  /* Landscape holds the handbook's framing. Reserve left, Duffy Street right,
      consistent with every other drawing in the set. Portrait turns the plan
      north-up, because the block is 40 m by 21 m and would otherwise be a stamp
      in the middle of a tall screen. Geometry keeps the handbook's baked
@@ -932,7 +930,7 @@ class Component extends DCLogic {
     ? {all:{x:0,y:4.6,w:24,h:42.5},back:{x:0,y:23.5,w:24,h:23},front:{x:0,y:1.4,w:24,h:17}}
     : {all:{x:-2,y:0.3,w:45,h:24.5},back:{x:-0.8,y:1.9,w:24,h:21.8},front:{x:24.5,y:1.9,w:20,h:21.8}}; }
   /* With no argument this is her working layout. With one of the named schemes
-     from the data it is that one instead — same row shape, plus the two extra
+     from the data it is that one instead, same row shape, plus the two extra
      columns for ground made up behind an item, which a starting layout has to
      be able to say or the scheme arrives claiming work it does not do, plus a
      ninth for a curve. A trough on the contour is a bent line on the ground and
@@ -976,17 +974,17 @@ class Component extends DCLogic {
   mk(name,x,y,w,h,rot,uid){
     const l=this.LIBM[name]; if(!l) return null;
     const c=HARDCOL[name]||['#dcd3c4','#82796a'];
-    /* Digging is stage one because it decides where water goes, and so does a
-       swale, a mound, a mulch blanket and a gravel path laid on the contour —
-       none of which are excavations here. Where the library states a stage it
-       wins, and where it states a build-up the item arrives carrying it, so a
-       mound is priced and counted as the material it is actually made of. */
+    /* Digging is stage one because it decides where water goes, and so does a swale, a
+       mound, a mulch blanket and a gravel path laid on the contour. None of which are
+       excavations here. Where the library states a stage it wins, and where it states a
+       build-up the item arrives carrying it, so a mound is priced and counted as the
+       material it is actually made of. */
     const st=l[9]||(l[2]==='dig'?1:(l[2]==='pave'?2:3));
-    /* Thirteenth column: does this element arrive locked. Site fabric does —
-       the pipes and the berm are on the plan to be read and measured, not to be
-       nudged while you are moving a bed next to them. The library decides how
-       one arrives; the item carries whether it is, so locking your own terrace
-       and unlocking a pipe both stick with the scheme. */
+    /* Thirteenth column: does this element arrive locked. Site fabric does, the pipes and
+       the berm are on the plan to be read and measured, not to be nudged while you are
+       moving a bed next to them. The library decides how one arrives; the item carries
+       whether it is, so locking your own terrace and unlocking a pipe both stick with the
+       scheme. */
     return {u:uid,t:'hard',n:name,shape:l[1],cat:l[2],x:x,y:y,w:w,h:h,rot:rot||0,cost:l[5],unit:l[6],fill:c[0],stroke:c[1],st:st,bu:l[10]||0,bum:l[11]||'chip',lk:l[12]?1:0,sharp:l[13]?1:0};
   }
   mkPlant(name,x,y,uid){
@@ -1005,7 +1003,7 @@ class Component extends DCLogic {
     return {alt:alt*180/Math.PI,az:(az*180/Math.PI+360)%360};
   }
   /* How much light a canopy lets through on a given day. A number in the tree's
-     row is a canopy that never changes — the gum, permanently open at 0.55. A
+     row is a canopy that never changes, the gum, permanently open at 0.55. A
      name is a deciduous window from LEAF in the site data, and the windows differ
      by what the tree is: in this climate the ornamental pear is in leaf from early
      spring to late autumn, the ash a month less at each end, and the two street
@@ -1052,15 +1050,14 @@ class Component extends DCLogic {
     this._sc=this._sc||{}; this._sc[key]=h; return h;
   }
   /* ---------- geometry ---------- */
-  /* ---------- curved runs ----------
-     A path, a swale, an edge or a berm is almost never a rectangle on the
-     ground; it bends around a tree and follows a contour. An item carrying a
-     pts array is a run: a smooth line through those points, w metres wide,
-     with h ignored. The curve is Catmull-Rom, which passes exactly through
-     every point rather than near it, so a handle ends up where you put it —
-     the thing that makes dragging one feel predictable. Everything else in the
-     app asks geometry through area, centre, samples and corners, so teaching
-     those four about pts is what makes a run behave like any other item. */
+  /* ---------- curved runs ---------- A path, a swale, an edge or a berm is almost never a
+     rectangle on the ground; it bends around a tree and follows a contour. An item carrying
+     a pts array is a run: a smooth line through those points, w metres wide, with h
+     ignored. The curve is Catmull-Rom, which passes exactly through every point rather than
+     near it, so a handle ends up where you put it, the thing that makes dragging one feel
+     predictable. Everything else in the app asks geometry through area, centre, samples and
+     corners, so teaching those four about pts is what makes a run behave like any other
+     item. */
   isRun(it){ return !!(it&&it.pts&&it.pts.length>1); }
   /* the centreline, sampled */
   spline(pts,per){ per=per||10;
@@ -1073,7 +1070,7 @@ class Component extends DCLogic {
     o.push(pts[pts.length-1]); return o; }
   /* A run is a smooth line through its points, which is what a trough, a path
      or an edge is, and is not what a pipe is. A pipe's corners are surveyed and
-     the spline rounds one off by the better part of a metre — enough to move a
+     the spline rounds one off by the better part of a metre, enough to move a
      line that is placed to stay clear of a protection zone. A sharp run keeps
      its polyline exactly and is only densified along it, so the route is the
      surveyed one, the handles are the corners themselves rather than fifty
@@ -1308,14 +1305,14 @@ class Component extends DCLogic {
   /* Everything else in the library she can carry. A block bench she cannot: over
      half a tonne a metre, so where a machine can stand is a question the layout
      has to answer before the stone is ordered. The logs are 500 mm, not the 450
-     this assumed — which also means filling to the top of one is 100 mm past the
+     this assumed, which also means filling to the top of one is 100 mm past the
      project’s 400 mm fill limit outside a protection zone, and five times the
      cap inside one. */
   stone(it){ if(!it||it.n!==BLOCK) return null;
     const L=this.linLen(it), b=this.isRun(it)?it.w:Math.min(it.w,it.h);
     return {len:L,per:b*BLOCKH*STONET,total:L*b*BLOCKH*STONET}; }
   /* Ground raised behind an edge or over a bed. The app measures cut and fill
-     from the ground surface, which is levelling — it says nothing about material
+     from the ground surface, which is levelling, it says nothing about material
      carted in and heaped up, and that is the move the tree plan actually caps.
      Declared per item rather than inferred, because only the person building it
      knows whether the ground behind a wall is being made up or left alone. */
@@ -1323,7 +1320,7 @@ class Component extends DCLogic {
     return {mm:mm,mat:it.bum==='soil'?'soil':'chip',vol:this.area(it)*mm/1000}; }
   /* What one surface holds before it overflows. A trough and a gravel path hold
      it in the void between the stones, a mulch blanket in the chip itself, and
-     a mound holds whatever it was built out of — which is why its depth comes
+     a mound holds whatever it was built out of, which is why its depth comes
      from the build-up declared on the item rather than from the library. */
   /* Fall from one end of an item's long axis to the other, and across it. What a
      swale is checked on, and what tells you which way a mound should lie. */
@@ -1374,7 +1371,7 @@ class Component extends DCLogic {
     const d=s.d||((it.bu||0)/1000); if(!d) return null;
     return {vol:this.area(it)*d*s.v,d:d,mat:s.mat,eng:!!s.min}; }
   /* The water plan, added up off the plan itself. Everything that infiltrates
-     against the storm the pipes are sized on — 122 mm/h for five minutes, which
+     against the storm the pipes are sized on, 122 mm/h for five minutes, which
      is 10.2 mm, or 8.2 m³ over the block. Held is first-flush storage into dry
      ground: in sustained rain the chip is already wet and only the troughs and
      the gravel are still taking water, which is why the two are counted apart. */
@@ -1417,8 +1414,8 @@ class Component extends DCLogic {
   /* A sump is only a sump while it can let go of what it catches, and here the
      thing it lets go into is one of two lines: the DN150 spine down the side
      strip or the DN100 north line to the sleeve under the garage. Measured
-     against whichever pipes the drawing actually has — the elements where the
-     layout carries them, the site lines where it does not — because a sump two
+     against whichever pipes the drawing actually has, the elements where the
+     layout carries them, the site lines where it does not, because a sump two
      metres from nothing is a hole that fills up. */
   sumpLines(){ const out=[];
     if(this.owns(PIPE)){ for(const it of this.state.items){ if(it.n!==PIPE) continue;
@@ -1456,8 +1453,8 @@ class Component extends DCLogic {
     const b=this.nearBuilding(it); if(!b||b.d>=s.min) return null;
     return {lvl:'r',d:b.d,n:b.n,
       msg:'Infiltrating water '+(b.d<0.05?'hard against':b.d.toFixed(1)+' m from')+' the '+b.n
-        +'. The geotechnical report and the CSIRO guidance both warn against soaking water into reactive clay this close to footings, and the Class P movement figure is already spoken for. Within '+SOAKMIN+' m of a wall it has to be piped — a '+DRAIN+' to a sleeve, not a pit. Soakage belongs out in the free-draining sand of the back garden.'}; }
-  /* Clause 6.6.2–6.6.4 permits building up inside a protection zone where it
+        +'. The geotechnical report and the CSIRO guidance both warn against soaking water into reactive clay this close to footings, and the Class P movement figure is already spoken for. Within '+SOAKMIN+' m of a wall it has to be piped: a '+DRAIN+' to a sleeve, not a pit. Soakage belongs out in the free-draining sand of the back garden.'}; }
+  /* Clause 6.6.2 to 6.6.4 permits building up inside a protection zone where it
      forbids digging, but the bund spec fixes the terms: 100 mm of added material
      maximum, coarse woodchip rather than soil, because soil over a root plate
      cuts the air reaching the roots. Outside a zone the binding number is the
@@ -1468,8 +1465,8 @@ class Component extends DCLogic {
     const zone=ck.srz.size?ck.srz:(ck.tpz.size?ck.tpz:null);
     const m=[]; let lvl='g';
     if(zone){ const z='tree '+[...zone].join(', ');
-      if(bu.mm>BUCAP){ m.push('Raising the ground '+bu.mm+' mm inside the protection zone of '+z+'. The tree plan caps added material at '+BUCAP+' mm, hand placed, arborist supervising — this is '+(bu.mm/BUCAP).toFixed(1)+' times that.'); lvl='r'; }
-      if(bu.mat==='soil'){ m.push('Soil over the root plate of '+z+'. The plan calls for coarse woodchip, because even '+BUCAP+' mm of clay or topsoil reduces the air reaching the roots — that is the reason the cap exists.'); lvl='r'; }
+      if(bu.mm>BUCAP){ m.push('Raising the ground '+bu.mm+' mm inside the protection zone of '+z+'. The tree plan caps added material at '+BUCAP+' mm, hand placed, arborist supervising. This is '+(bu.mm/BUCAP).toFixed(1)+' times that.'); lvl='r'; }
+      if(bu.mat==='soil'){ m.push('Soil over the root plate of '+z+'. The plan calls for coarse woodchip, because even '+BUCAP+' mm of clay or topsoil reduces the air reaching the roots. That is the reason the cap exists.'); lvl='r'; }
       if(lvl==='g') m.push('Within the '+BUCAP+' mm the tree plan allows inside a zone, in the material it asks for. Hand placed, arborist supervising.');
     } else if(bu.mm>BUFILL){ m.push('Raising the ground '+bu.mm+' mm. Past the '+BUFILL+' mm fill limit, which triggers a site reclassification.'); lvl='r'; }
     else if(bu.mm===BUFILL) m.push('Clear of every protection zone, and exactly on the '+BUFILL+' mm fill limit. Any more and the site classification has to be reassessed.');
@@ -1556,7 +1553,7 @@ class Component extends DCLogic {
         el.setPointerCapture(ev.pointerId); return; }
       const t=ev.target.closest('.mv');
       if(t){ const it=s.items.find(i=>i.u===+t.dataset.u);
-        /* Locked still selects — reading a pipe and unlocking it both start
+        /* Locked still selects, reading a pipe and unlocking it both start
            with tapping it. It just does not take hold. */
         if(it&&it.lk){ this.setState({sel:it.u},()=>this.draw()); return; }
         this.push();
@@ -1609,13 +1606,12 @@ class Component extends DCLogic {
       this.commit(this.state.items.map(i=>i.u===it.u?{...i,pts:q}:i)); });
     el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
     el.addEventListener('pointerleave',ev=>{ if(ev.pointerType==='mouse') hideHud(); });
-    /* A trackpad speaks two dialects through the same event. A pinch arrives as
-       a wheel with ctrlKey set, which macOS synthesises; two fingers sliding
-       arrive as a plain wheel with both deltas. Treating every wheel as zoom —
-       which is right for a mouse — makes a trackpad lurch in and out whenever
-       you meant to move sideways, so they are handled apart. Zoom is
-       exponential in the delta rather than a fixed step, because a pinch fires
-       a stream of small ones and a mouse notch fires a single large one, and
+    /* A trackpad speaks two dialects through the same event. A pinch arrives as a wheel
+       with ctrlKey set, which macOS synthesises; two fingers sliding arrive as a plain
+       wheel with both deltas. Treating every wheel as zoom, which is right for a mouse.
+       Makes a trackpad lurch in and out whenever you meant to move sideways, so they are
+       handled apart. Zoom is exponential in the delta rather than a fixed step, because a
+       pinch fires a stream of small ones and a mouse notch fires a single large one, and
        both should feel the same. */
     el.addEventListener('wheel',ev=>{ ev.preventDefault();
       const r=el.getBoundingClientRect();
@@ -1638,7 +1634,7 @@ class Component extends DCLogic {
   }
   /* Zooming sets the width and the height follows it. A preset or a resize
      instead has a rectangle it must show, so there the view widens when the
-     canvas is too flat to cover it — which is why zooming has to say so: left
+     canvas is too flat to cover it, which is why zooming has to say so: left
      to cover, it pulls every zoom-in straight back out to the old height. */
   fit(zoomed){ const el=this.canvas; if(!el) return; const r=el.getBoundingClientRect();
     const a=r.width>0?r.height/r.width:0.9; const h=this.view.w*a;
@@ -1677,7 +1673,7 @@ class Component extends DCLogic {
     const dot=(x,y,cls,f,r,extra)=>'<circle class="'+cls+'" '+(extra||'')+' cx="'+x+'" cy="'+this.fy(y)+'" r="'+(r||0.34)+'" fill="'+f+'" stroke="#fff" stroke-width="2" vector-effect="non-scaling-stroke"/>';
     if(this.isRun(it)){
       /* One handle a point, and a smaller one between each pair that becomes a
-         point the moment you drag it — the same two moves PowerPoint gives you,
+         point the moment you drag it, the same two moves PowerPoint gives you,
          without a mode to be in. Double-tap a point to take it out again. */
       let g='';
       it.pts.forEach((p,i)=>{ g+=dot(p[0],p[1],'hP',COL.tpz,0.34,'data-i="'+i+'"'); });
@@ -1799,10 +1795,10 @@ class Component extends DCLogic {
     for(const it of this.state.items){ const a=this.area(it);
       if(it.t==='plant'){plants++;cost+=it.cost;byg[it.g]=(byg[it.g]||0)+1;}
       else if(it.unit==='m2'){ if(it.cat==='soft'){soft+=a; if(it.n.indexOf('Mulch')>=0)mulch+=a*0.1;} else pave+=a; cost+=a*it.cost; }
-      /* Buried line is linear metres too, and eighty metres of it landing in
-         "walls and edges" would make that number say nothing. Counted apart,
-         and carrying no cost here because the drainage is its own trade —
-         Works → Drainage is where the pipe sizes and falls are priced. */
+      /* Buried line is linear metres too, and eighty metres of it landing in "walls and
+         edges" would make that number say nothing. Counted apart, and carrying no cost here
+         because the drainage is its own trade. Works → Drainage is where the pipe sizes and
+         falls are priced. */
       else if(it.unit==='lin'){ const L=this.linLen(it); if(BURIED[it.n]) pipe+=L; else lin+=L; cost+=L*it.cost; }
       else cost+=it.cost;
       /* carted in and heaped up, so it is priced and counted like anything else */
@@ -1815,7 +1811,7 @@ class Component extends DCLogic {
       if(ck.lvl==='r') out.push({sev:'stop',u:it.u,title:it.n,body:ck.msg});
       else if(ck.lvl==='a'&&digs) out.push({sev:'care',u:it.u,title:it.n,body:ck.msg});
       if(it.cat==='dig'||it.cat==='pave'){ const cf=this.cutfill(it);
-        if(cf.maxCut>0.5||cf.maxFill>0.4) out.push({sev:'stop',u:it.u,title:it.n+' — cut and fill',
+        if(cf.maxCut>0.5||cf.maxFill>0.4) out.push({sev:'stop',u:it.u,title:it.n+' · cut and fill',
           body:'Levelling it needs '+(cf.maxCut*1000).toFixed(0)+' mm of cut and '+(cf.maxFill*1000).toFixed(0)+' mm of fill. Over the 500 mm cut or 400 mm fill limit, which triggers a site reclassification.'}); }
       if(it.t==='plant'&&it.tender) out.push({sev:'care',u:it.u,title:it.n,body:'Frost tender in Canberra. It will need a warm wall, a pot that can move, or replacing with something hardy.'});
       if(it.t==='plant'&&ck.out) out.push({sev:'care',u:it.u,title:it.n+' overhangs the boundary',body:'Its mature canopy crosses the line. Fine if you are happy to prune it, worth knowing before it is in the ground.'});
@@ -1824,10 +1820,10 @@ class Component extends DCLogic {
       /* The grate is the whole design: a long run so partial blockage still
          drains, and clearing it is the one job here that has consequences
          inside the house if it is skipped. */
-      if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of grate to keep clear',
+      if(it.n===DRAIN) out.push({sev:'note',u:it.u,title:it.n+' · '+this.linLen(it).toFixed(1)+' m of grate to keep clear',
         body:'A long channel keeps capacity when part of it blocks. Put a litter sump below the outlet where you can reach it, and lay a spare pipe in the same trench while it is open. Clear it each autumn. In the courtyard, a missed year puts water inside the house.'});
       const bc=this.buildCheck(it,ck);
-      if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' — ground raised '+bc.mm+' mm behind it',body:bc.msg});
+      if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' · ground raised '+bc.mm+' mm behind it',body:bc.msg});
       const stone=this.stone(it);
       if(stone){ const zoned=ck.srz.size||ck.tpz.size, reach=zoned?this.stoneReach(it):0;
         out.push({sev:zoned?'care':'note',u:it.u,title:it.n+' weighs about '+stone.total.toFixed(1)+' tonnes',
@@ -1869,7 +1865,7 @@ class Component extends DCLogic {
       if(it.n===SWALE){ const cf=this.contourFall(it);
         if(cf&&cf.fall>LEVELTOL&&cf.fall>=cf.across) out.push({sev:'stop',u:it.u,title:it.n+' is not on the contour',
           body:'It falls '+(cf.fall*1000).toFixed(0)+' mm from one end to the other, so it would run water along itself instead of holding it. Turned to lie the other way it falls about '+(cf.across*1000).toFixed(0)+' mm over the same ground. Contours here run across the block, not down it.'});
-        else if(cf) out.push({sev:'note',u:it.u,title:it.n+' — '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
+        else if(cf) out.push({sev:'note',u:it.u,title:it.n+' · '+cf.len.toFixed(1)+' m, level to '+(cf.fall*1000).toFixed(0)+' mm',
           body:'On the contour, so it fills along its length and lets go through the ground rather than out one end. Set it out with a water level on the day, not off this drawing. Rock the inlet. Leave a level spill at the low end so an overflow leaves the way you chose.'}); }
       /* What a pipe is judged on is its route, not its level: clause 6.5.2 rules
          out a new service through a protection zone unless the tree plan says
@@ -1880,11 +1876,11 @@ class Component extends DCLogic {
         let deep=0;
         for(const p of this.samples(it,4)) for(const t of this.D.TREES){ if(!t.ctrl) continue;
           const d=t.ctrl-Math.hypot(p[0]-t.x,p[1]-t.y); if(d>deep) deep=d; }
-        const zoned=[...ck.srz,...ck.tpz], u=under.size?' It runs under the '+[...under].join(' and the ')+', which is what the cast-in sleeves are for — laid while the slab is formed and a serious problem afterwards.':'';
+        const zoned=[...ck.srz,...ck.tpz], u=under.size?' It runs under the '+[...under].join(' and the ')+', which is what the cast-in sleeves are for, laid while the slab is formed and a serious problem afterwards.':'';
         if(zoned.length) out.push({sev:'care',u:it.u,title:it.n+' crosses the protection zone of tree '+zoned.join(', '),
           body:'It reaches '+(deep*1000).toFixed(0)+' mm inside the zone at its closest. Clause 6.5.2 rules out an additional service through a protection zone unless the tree plan specifies it, so this route needs the plan amended before it is dug, and then hand or hydro excavation with the arborist present. The sleeves cast under the garage slab are the route that avoids all of that.'
-            +(deep<0.25?' At this depth it is a graze rather than a crossing, and well inside what the survey can resolve — worth confirming the zone radius on site before moving anything.':'')+u});
-        else out.push({sev:'note',u:it.u,title:it.n+' — '+this.linLen(it).toFixed(1)+' m of line',
+            +(deep<0.25?' At this depth it is a graze rather than a crossing, and well inside what the survey can resolve. Worth confirming the zone radius on site before moving anything.':'')+u});
+        else out.push({sev:'note',u:it.u,title:it.n+' · '+this.linLen(it).toFixed(1)+' m of line',
           body:'Clear of every protection zone, so no tree approval and no supervision, which is the reason for this route rather than the short one.'+u+' Falls and pipe sizes are in Works → Drainage; this line is the route on the ground.'}); }
       /* The pits, which is what the builder is asking for when he says yard
          sumps. Falls are never the question on a block that drops 2.08 m; the
@@ -1893,18 +1889,18 @@ class Component extends DCLogic {
       if(it.n===SUMP){ const sc=this.sumpCheck(it);
         if(sc.d>SUMPFAR) out.push({sev:'care',u:it.u,title:it.n+' is '+sc.d.toFixed(1)+' m from the nearest line',
           body:'A sump collects water and hands it to a pipe, so it has to fall to one, and nothing on this drawing runs within '+SUMPFAR.toFixed(1)+' m of it. As drawn it fills and stays full. Either move it onto a line, or draw the '+PIPE+' that serves it. The falls are in Works, Drainage.'});
-        else out.push({sev:'note',u:it.u,title:it.n+' — ground '+sc.rl.toFixed(2)+' m, '+(sc.kerb!=null?sc.kerb.toFixed(2)+' m above the kerb':'kerb level unknown'),
+        else out.push({sev:'note',u:it.u,title:it.n+' · ground '+sc.rl.toFixed(2)+' m, '+(sc.kerb!=null?sc.kerb.toFixed(2)+' m above the kerb':'kerb level unknown'),
           body:(sc.kerb!=null?'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the nearest surveyed kerb level, '+sc.kerbRL.toFixed(2)+'. The kerb is not one level: it drops 330 mm along this frontage, so this is the one nearest the sump rather than a single figure for the street. ':'On a line. ')+'Gravity is never the constraint on this block, which drops 2.08 m at 1 in 19. The route past the protection zones is. Set the invert off the survey plan, datum A.H.D., origin SR585 at RL 608.442, rather than off this drawing, and give it a removable grate rated for whatever crosses it.'});
-        if(sc.silt) out.push({sev:'note',u:it.u,title:it.n+' — this is one that needs a silt trap',
+        if(sc.silt) out.push({sev:'note',u:it.u,title:it.n+' · this is one that needs a silt trap',
           body:'Runoff off the reserve arrives heavily silted. Put a sump below the outlet with a removable grate. Then it is a box to empty once a year before winter, rather than silt in the pipe under the garage slab where you cannot reach it.'}); }
       /* The two things a berm has to be, and neither is level. */
       if(it.n===BERM){ const bs=this.bermShed(it);
         if(bs&&bs.sag) out.push({sev:'care',u:it.u,title:it.n+' has a low point in the middle of it',
-          body:'The ground under it dips '+(bs.drop*1000).toFixed(0)+' mm about '+(bs.at*100).toFixed(0)+' per cent along, near x '+bs.low[0].toFixed(1)+', y '+bs.low[1].toFixed(1)+'. Water turned aside by the berm runs to that dip and stays there rather than leaving along the face, which is the one place it must not stand'+(bs.wall?' — '+bs.wall.d.toFixed(1)+' m from the '+bs.wall.n:'')+'. Carry the crest through the dip, or move the run to ground that sheds.'});
-        else if(bs) out.push({sev:'note',u:it.u,title:it.n+' — '+bs.len.toFixed(1)+' m, shedding '+(bs.ends*1000).toFixed(0)+' mm to its ends',
+          body:'The ground under it dips '+(bs.drop*1000).toFixed(0)+' mm about '+(bs.at*100).toFixed(0)+' per cent along, near x '+bs.low[0].toFixed(1)+', y '+bs.low[1].toFixed(1)+'. Water turned aside by the berm runs to that dip and stays there rather than leaving along the face, which is the one place it must not stand'+(bs.wall?', '+bs.wall.d.toFixed(1)+' m from the '+bs.wall.n:'')+'. Carry the crest through the dip, or move the run to ground that sheds.'});
+        else if(bs) out.push({sev:'note',u:it.u,title:it.n+' · '+bs.len.toFixed(1)+' m, shedding '+(bs.ends*1000).toFixed(0)+' mm to its ends',
           body:'A berm is the opposite of a trough: it is built to send water somewhere, so it wants fall along itself, and it has it. Sheet flow crossing the woodland floor is turned along the face and let go past the '+(bs.end)+' end rather than continuing into the wall. Wide and rounded rather than sharp, so it overtops evenly along its length instead of breaching at one point.'
             +(bs.wall&&bs.short?(bs.short[0]+bs.short[1]>0.05
-              ? ' It stops '+Math.max(bs.short[0],bs.short[1]).toFixed(1)+' m short of the '+bs.wall.n+'’s corner, so water walks round the end of it — run it past both corners.'
+              ? ' It stops '+Math.max(bs.short[0],bs.short[1]).toFixed(1)+' m short of the '+bs.wall.n+'’s corner, so water walks round the end of it. Run it past both corners.'
               : ' It stands across the whole of the '+bs.wall.n+'’s uphill wall, with '+bs.spare[0].toFixed(1)+' m spare at one end and '+bs.spare[1].toFixed(1)+' m at the other.'):'')}); }
       if(it.n==='Sunken firepit'){ const d=it.x-it.w;
         if(d<3) out.push({sev:'stop',u:it.u,title:'Firepit is '+d.toFixed(1)+' m from the reserve',
@@ -1913,7 +1909,7 @@ class Component extends DCLogic {
       /* A sump is the exception the corridor rule needs. Everything else in the
          corridor obstructs it; a sump with its lid flush takes water out of it,
          which is why the spine and five of the eight pits sit there by design.
-         Flush is the whole of the condition — a raised surround is a weir. */
+         Flush is the whole of the condition, a raised surround is a weir. */
       if(inCorridor&&it.n===SUMP) out.push({sev:'note',u:it.u,title:it.n+' sits in the overland flow path, which is where it belongs',
         body:'The corridor between y 0.5 and 3.0 m is the route water takes if the reserve bank overtops. A pit that drains it belongs there. Set the grate flush with the finished surface. A raised surround or a proud lid makes a weir across the corridor. Nothing else may narrow the route.'});
       else if(inCorridor&&(digs||it.n.indexOf('lawn')>=0)) out.push({sev:'care',u:it.u,title:it.n+' sits on the overland flow path',
@@ -1921,7 +1917,7 @@ class Component extends DCLogic {
     }
     const w=this.water();
     if(w.held>0.05) out.push({sev:'note',title:'The shaping holds '+w.held.toFixed(1)+' m³ of rain',
-      body:'Every trough, gravel path, mulched bed and mound on the plan adds up to '+Math.round(w.held*1000).toLocaleString()+' litres held where it falls, against the '+w.storm.toFixed(1)+' m³ the design storm puts on the whole block in five minutes — '+Math.round(w.share*100)+'% of it. That is first-flush storage into dry ground. Once the chip is wet only the troughs and the gravel are still taking water, and that part is '+Math.round(w.engShare*100)+'%. None of it replaces the piped system; it decides how much never reaches it.'});
+      body:'Every trough, gravel path, mulched bed and mound on the plan adds up to '+Math.round(w.held*1000).toLocaleString()+' litres held where it falls, against the '+w.storm.toFixed(1)+' m³ the design storm puts on the whole block in five minutes, '+Math.round(w.share*100)+'% of it. That is first-flush storage into dry ground. Once the chip is wet only the troughs and the gravel are still taking water, and that part is '+Math.round(w.engShare*100)+'%. None of it replaces the piped system; it decides how much never reaches it.'});
     const q=this.quantities();
     if(q.cost>BUDGET) out.push({sev:'care',title:'Over the ten thousand',body:'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+', which is $'+Math.round(q.cost-BUDGET).toLocaleString()+' past the budget. Staging it is the answer, not cutting it.'});
     (this.state.todos||[]).forEach((t,i)=>out.push({sev:'note',title:'From a conversation',body:t}));
@@ -1954,7 +1950,7 @@ class Component extends DCLogic {
     'CURRENT LAYOUT: '+items,
     'CURRENT TOTAL: $'+Math.round(q.cost).toLocaleString()+' of $10,000. '+q.plants+' plants, '+q.pave.toFixed(0)+' m2 paving, '+q.soft.toFixed(0)+' m2 soft surface, '+q.mulch.toFixed(1)+' m3 mulch at 100 mm.',
     'WATER HELD BY THE SHAPING AS DRAWN: '+w.held.toFixed(1)+' m3 into dry ground, of which '+w.eng.toFixed(1)+' m3 is troughs and gravel that keep working once the mulch is wet. The 5 minute 1 in 10 year storm puts '+w.storm.toFixed(1)+' m3 on the block, so '+Math.round(w.share*100)+'% of it never reaches a pipe.',
-    'LIVE PROBLEM LIST: '+(iss.length?iss.map(i=>i.sev+': '+i.title+' — '+i.body).join(' | '):'nothing clashing.')].join('\n');
+    'LIVE PROBLEM LIST: '+(iss.length?iss.map(i=>i.sev+': '+i.title+'. '+i.body).join(' | '):'nothing clashing.')].join('\n');
   }
   async ask(text){
     if(!text||this.state.busy) return;
@@ -1985,15 +1981,15 @@ class Component extends DCLogic {
   /* Hand the question to the Claude app on the iPad, carrying the site brief with
      it, so the answer is grounded in the same facts the app computes from. */
   brief(q){ const t=(this.state.askQ||q||'').trim();
-    return '234 Duffy Street, Ainslie — landscape design.\n'
+    return '234 Duffy Street, Ainslie. Landscape design.\n'
       +(t?'Question: '+t+'\n':'')
-      +'\nAnswer from the following and nothing else. Plain language, concise, no jargon without a gloss. Do not invent numbers; if a figure is not here, say what needs measuring. Bushfire construction compliance is settled — do not reopen it.\n\n'+this.factSheet(); }
+      +'\nAnswer from the following and nothing else. Plain language, concise, no jargon without a gloss. Do not invent numbers; if a figure is not here, say what needs measuring. Bushfire construction compliance is settled. Do not reopen it.\n\n'+this.factSheet(); }
   toast(m){ this.setState({toast:m}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),5000); }
   async handoff(){
     const text=this.brief();
-    try{ if(navigator.share){ await navigator.share({title:'234 Duffy Street landscape',text:text}); this.toast('Shared — pick Claude from the sheet'); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+    try{ if(navigator.share){ await navigator.share({title:'234 Duffy Street landscape',text:text}); this.toast('Shared. Pick Claude from the sheet'); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
     try{ await navigator.clipboard.writeText(text); this.toast('Brief copied. Open Claude and paste it in.'); }
-    catch(e){ this.setState({briefOpen:true}); this.toast('Copy blocked here — the brief is below, select and copy it.'); return; }
+    catch(e){ this.setState({briefOpen:true}); this.toast('Copy blocked here. The brief is below, select and copy it.'); return; }
     if(this.state.fill){ setTimeout(()=>{ try{ window.location.href='claude://'; }catch(e){} },400); }
   }
 
@@ -2002,7 +1998,7 @@ class Component extends DCLogic {
     const s=this.state, self=this;
     if(!s.ready||!this.D){
       const blank={go:()=>{},style:'width:66px;padding:11px 0;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--color-neutral-700)'};
-      return {ready:false,screenTitle:'Landscape studio',screenSub:'Loading the survey…',schemeName:'—',savedLabel:'',
+      return {ready:false,screenTitle:'Landscape studio',screenSub:'Loading the survey…',schemeName:'·',savedLabel:'',
         mock:true,page:'padding:34px;display:flex;flex-direction:column;align-items:center;gap:16px;background:#e6dcc9',
         palHint:'',selKicker:'',selName:'',costLabel:'',issueSummary:'',rotateLabel:'',issueFilters:[],
         selVerdict:'',verdictStyle:'',barStyle:'height:100%;width:0%',hasSel:false,hasSun:false,midWrap:'flex:1;display:flex;flex-direction:column',
@@ -2105,8 +2101,8 @@ class Component extends DCLogic {
           if(n.pts) n.pts=n.pts.map(q=>[q[0]+1,q[1]-1]);
           this.setState({uid:s.uid+1});this.commit(s.items.concat([n]),n.u);})];
       /* Straight is where a run starts, because that is what you can place with
-         one drag. Curve it seeds three points down its long axis — ends and a
-         middle — and from then on it is handles. Straighten drops back to the
+         one drag. Curve it seeds three points down its long axis, ends and a
+         middle, and from then on it is handles. Straighten drops back to the
          box that contains it, so nothing is one-way. */
       if(sel.t!=='plant'&&sel.shape!=='circ'){
         if(!this.isRun(sel)) selActions.push(act('Curve it',()=>{ this.push();
@@ -2128,9 +2124,9 @@ class Component extends DCLogic {
       selActions.push(act('Delete',()=>{this.push();this.commit(s.items.filter(i=>i.u!==sel.u),null);},true));
       }
     }
-    /* Cut and fill are computed; this one has to be told, so it is the only
-       thing in the inspector you set rather than read. Hard elements only —
-       a plant does not raise the ground behind it. */
+    /* Cut and fill are computed; this one has to be told, so it is the only thing in the
+       inspector you set rather than read. Hard elements only, a plant does not raise the
+       ground behind it. */
     let hasBuild=false, buildSteps=[], buildMats=[], buildNote='';
     if(sel&&sel.t!=='plant'){
       hasBuild=true;
@@ -2205,7 +2201,7 @@ class Component extends DCLogic {
           dot:'flex:0 0 12px;height:12px;border-radius:'+(i.shape==='circ'?'999px':'4px')+';background:'+i.fill+';border:1.5px solid '+i.stroke,
           move:()=>{ this.push(); const items=s.items.map(x=>x.u===i.u?{...x,st:(x.st||3)%3+1}:x); this.commit(items); }}))};
     });
-    const sequence=[{n:'1',text:'Shape the corner swale, build the bund, then mulch — and let a full wet season pass before planting around them, so the shaping can be corrected while it is still easy.'},
+    const sequence=[{n:'1',text:'Shape the corner swale, build the bund, then mulch. Let a full wet season pass before planting around them, so the shaping can be corrected while it is still easy.'},
       {n:'2',text:'The stormwater contractor lays the two lines and the garage sleeve before any paving goes over them.'},
       {n:'3',text:'The seat wall on the paving\u2019s uphill edge goes in before the raised lawn behind it, because the wall retains it.'},
       {n:'4',text:'Plants last. Nothing goes in the ground until you have watched where the shade actually falls for a season.'}];
@@ -2404,14 +2400,14 @@ class Component extends DCLogic {
   async pushGist(){
     const cfg=this.gistCfg();
     if(!cfg.token){
-      const t=window.prompt('Paste a GitHub token with gist write access.\n\nMake one at github.com/settings/tokens — fine-grained, no repository access, Account permissions → Gists: read and write. It is kept on this device only.');
+      const t=window.prompt('Paste a GitHub token with gist write access.\n\nMake one at github.com/settings/tokens. Fine-grained, no repository access, Account permissions → Gists: read and write. It is kept on this device only.');
       if(!t||!t.trim()) return; cfg.token=t.trim(); this.saveGistCfg(cfg);
     }
     this.toast('Pushing…');
     const files=this.gistFiles();
     /* a scheme deleted here is deleted there: a null file is how the API removes one */
     (cfg.files||[]).forEach(f=>{ if(!files[f]) files[f]=null; });
-    const body={description:'234 Duffy schemes — '+this.stamp(),public:false,files:files};
+    const body={description:'234 Duffy schemes, '+this.stamp(),public:false,files:files};
     const url=cfg.id?'https://api.github.com/gists/'+cfg.id:'https://api.github.com/gists';
     try{
       const r=await fetch(url,{method:cfg.id?'PATCH':'POST',
@@ -2436,14 +2432,14 @@ class Component extends DCLogic {
        app on iOS; a download link there goes nowhere. */
     try{ if(navigator.canShare){ const f=new File([text],name,{type:'application/json'});
       if(navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:'234 Duffy schemes'});
-        this.toast('Saved — pick Files or AirDrop from the sheet'); return; } } }
+        this.toast('Saved. Pick Files or AirDrop from the sheet'); return; } } }
     catch(e){ if(e&&e.name==='AbortError') return; }
     try{ const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));
       const a=document.createElement('a'); a.href=url; a.download=name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),4000);
       this.toast('Saved to your downloads as '+name); return; }catch(e){}
-    try{ await navigator.clipboard.writeText(text); this.toast('Backup copied to the clipboard — paste it into a note.'); }
+    try{ await navigator.clipboard.writeText(text); this.toast('Backup copied to the clipboard. Paste it into a note.'); }
     catch(e){ this.toast('Could not save the backup on this device.'); }
   }
   /* The printable set. Persist first so the sheets are built from what is

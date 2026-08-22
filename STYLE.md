@@ -102,7 +102,12 @@ After, 26 words:
   Pair 2, where the app carries the detail, went further: 151 to 26.
 - **Sentences average about 10 words.** One fact per sentence. If a sentence
   needs a comma splice or a "which", it is two sentences.
-- **Em and en dashes: zero.** Comma, colon, full stop, brackets.
+- **Em and en dashes: zero in prose.** Comma, colon, full stop, brackets. The one
+  exception is a numeric or date range inside a table cell, where `20–40 mm` and
+  `Jan–Mar` are typography rather than rhetoric. A dash in a sentence is never that.
+- **A label is not a sentence.** Where a Checks title or a legend joins a name to a
+  figure, the app uses a middle dot: `Yard sump · ground 610.20 m`. Same for an
+  empty table cell. That is the separator this repo already used in scheme names.
 - **Bullets wherever the content is a list.** Questions the app asks, things
   that changed, what is left to decide. Prose is for the one idea that needs a
   paragraph.

@@ -2,13 +2,13 @@
 
    Everything is drawn in millimetres at a true, stated scale, so a dimension
    taken off the paper with a ruler is real. The plan is vector, not a screenshot
-   of the editor — heavier boundary, no selection handles, numbered keys instead
+   of the editor, heavier boundary, no selection handles, numbered keys instead
    of labels crowding the drawing, and a title block.
 
-   Entry point: PRINTSHEET.open(app, size) — 'A4' or 'A3', both landscape. */
+   Entry point: PRINTSHEET.open(app, size). 'A4' or 'A3', both landscape. */
 window.PRINTSHEET = (function () {
 
-  /* page, margin, title strip, footer strip — all mm */
+  /* page, margin, title strip, footer strip. All mm */
   var PAGE = {
     A4: {w: 297, h: 210, m: 10, head: 19, foot: 23, body: 3.05, head1: 6.4, head2: 4.4},
     A3: {w: 420, h: 297, m: 13, head: 25, foot: 28, body: 3.5,  head1: 8.4, head2: 5.2}
@@ -161,15 +161,15 @@ window.PRINTSHEET = (function () {
 
   /* ----------------------------------------------------------- earthworks --- */
 
-  /* What a machine operator has to know before he arrives: where he may not dig
-     at all, where only a shovel is allowed, how deep each thing goes, and how
-     much comes out. The levels are the surveyor's own surface, not a set-out pickup, so that
-     caveat is printed on the sheet, not buried here. */
+  /* What a machine operator has to know before he arrives: where he may not dig at all,
+     where only a shovel is allowed, how deep each thing goes, and how much comes out. The
+     levels are the surveyor's own surface, not a set-out pickup, so that caveat is printed
+     on the sheet, not buried here. */
 
   var BOUND = [[0, 0], [39.999, 0], [39.999, 21.333], [4.343, 21.333]];
 
   /* Depth below finished level, where a document states one. Only the firepit
-     does — the handbook calls it a 450 mm cut, which is also what keeps it under
+     does, the handbook calls it a 450 mm cut, which is also what keeps it under
      the 500 mm that would force a site reclassification. Everything else is
      levelling of the existing surface, and anything needing a depth decided on
      site is left blank rather than guessed. A yard sump is the clearest case of
@@ -197,12 +197,12 @@ window.PRINTSHEET = (function () {
     return out;
   }
 
-  /* Machine, shovel, or nothing — straight off the same protection-zone test the
+  /* Machine, shovel, or nothing, straight off the same protection-zone test the
      Checks screen runs, so the sheet cannot disagree with the app. */
   function digMethod(app, it) {
     var ck = app.checks(it);
     if (ck.srz && ck.srz.size) return {m: 'NO EXCAVATION', why: 'structural root zone, tree ' + [].concat(Array.from(ck.srz)).join(', '), rank: 0};
-    if (ck.tpz && ck.tpz.size) return {m: 'Hand or hydro only', why: 'protection zone, tree ' + [].concat(Array.from(ck.tpz)).join(', ') + ' — arborist present', rank: 1};
+    if (ck.tpz && ck.tpz.size) return {m: 'Hand or hydro only', why: 'protection zone, tree ' + [].concat(Array.from(ck.tpz)).join(', ') + ' · arborist present', rank: 1};
     return {m: 'Machine', why: 'clear of every protection zone', rank: 2};
   }
 
@@ -223,7 +223,7 @@ window.PRINTSHEET = (function () {
   }
 
   /* Ground made up rather than cut. Not an excavation, so it cannot go in the
-     table above, but it is the digger's business all the same — and inside a
+     table above, but it is the digger's business all the same, and inside a
      zone it is the number that binds, not the cut. */
   function buildRows(app) {
     return keyList(app).filter(function (k) { return app.buildup(k.it); })
@@ -270,7 +270,7 @@ window.PRINTSHEET = (function () {
 
     /* the rear swale: still site data rather than an editor item. The berm
        beside it may be either, so it is drawn here only while the layout has
-       no element standing in for it — otherwise it arrives twice. */
+       no element standing in for it, otherwise it arrives twice. */
     var line = function (pts, st) {
       return '<path d="' + pts.map(function (q, i) { return (i ? 'L' : 'M') + q[0] + ' ' + app.fy(q[1]); }).join('') + '" fill="none" ' + st + '/>';
     };
@@ -348,7 +348,7 @@ window.PRINTSHEET = (function () {
 
     var hs = flowering.map(function (r) { return Math.max(0.05, r.h || 0.3); });
     var lo = Math.min.apply(null, hs), hi = Math.max.apply(null, hs);
-    /* fit the planting actually on the plan — a scheme of four fruit trees should
+    /* fit the planting actually on the plan, a scheme of four fruit trees should
        not be drawn against an axis running down to a 50 mm groundcover */
     if (hi / lo < 1.6) { lo = lo / 1.6; hi = hi * 1.6; }
     var ly = function (h) {
@@ -430,7 +430,7 @@ window.PRINTSHEET = (function () {
   /* ---------------------------------------------------------------- build --- */
 
   /* The block's +x runs toward Duffy Street on a bearing of 345.66 degrees, so
-     north is not up the sheet — it is 14.3 degrees clockwise of the right-hand
+     north is not up the sheet, it is 14.3 degrees clockwise of the right-hand
      edge. Rotate the arrow to match, or the drawing lies about which way it
      faces. */
   function northArrow(app) {
@@ -525,19 +525,19 @@ window.PRINTSHEET = (function () {
 
     return '<h3 class="ps-h3">Shaping along the rear boundary</h3>'
       + '<table class="ps-tbl"><tbody>'
-      + '<tr><td>Corner swale, position</td><td>western 4 m of the rear boundary, 0.8–1.2 m inside the fence</td></tr>'
+      + '<tr><td>Corner swale, position</td><td>western 4 m of the rear boundary, 0.8 to 1.2 m inside the fence</td></tr>'
       + '<tr><td>Cross-section</td><td>about 2 m wide, 250 mm deep, batters around 1 in 6</td></tr>'
       + '<tr><td>Grade</td><td>around 1 in 40, cutting deeper toward the pit</td></tr>'
-      + '<tr><td>Clearance from the gum</td><td>7.1 m — outside the 6.5 m protection zone. The only diggable stretch</td></tr>'
+      + '<tr><td>Clearance from the gum</td><td>7.1 m, outside the 6.5 m protection zone. The only diggable stretch</td></tr>'
       + '<tr><td>Diversion bund</td><td>built up, 100 mm of coarse woodchip maximum, hand placed, arborist supervising. No excavation, no soil</td></tr>'
       + '<tr><td>Mulch blanket</td><td>100 mm coarse 25 mm chip across the boundary in front of the gum. Spread, not graded in</td></tr>'
       + '</tbody></table>'
 
       + '<h3 class="ps-h3">Contour troughs and mounds</h3>'
       + '<table class="ps-tbl"><tbody>'
-      + '<tr><td>Direction</td><td>across the block, not down it — 1 in 19 along the fall, 1 in 132 across it</td></tr>'
-      + '<tr><td>Trough section</td><td>1.0–1.4 m wide, 250 mm invert to crest, batters about 1 in 4</td></tr>'
-      + '<tr><td>Method inside a zone</td><td>shoulders raised in coarse woodchip. The invert is not cut — no excavation, no compaction</td></tr>'
+      + '<tr><td>Direction</td><td>across the block, not down it: 1 in 19 along the fall, 1 in 132 across it</td></tr>'
+      + '<tr><td>Trough section</td><td>1.0 to 1.4 m wide, 250 mm invert to crest, batters about 1 in 4</td></tr>'
+      + '<tr><td>Method inside a zone</td><td>shoulders raised in coarse woodchip. The invert is not cut: no excavation, no compaction</td></tr>'
       + '<tr><td>Method clear of a zone</td><td>may be cut instead, spoil to the mound. Only the rear pocket qualifies</td></tr>'
       + '<tr><td>Level</td><td>set out with a water level on the day. Over 100 mm end to end it is a drain, not a store</td></tr>'
       + '<tr><td>Standoff</td><td>3 m minimum from any wall for anything holding water in the ground</td></tr>'
@@ -546,18 +546,18 @@ window.PRINTSHEET = (function () {
       + '<h3 class="ps-h3">Rules that bind the machine</h3><ul class="ps-ul">'
       + '<li><b>Nothing deeper than 50 mm inside a protection zone</b> counts as excavation. Hand dig, hydro-excavate or bore. No root over 30 mm may be cut, and a locating trench is dug along the line nearest the tree first.</li>'
       + '<li><b>Nothing at all inside a structural root zone</b>, by any method.</li>'
-      + '<li><b>Building up inside a protection zone is capped at 100 mm</b>, hand placed, arborist supervising, and in coarse woodchip rather than soil — soil over a root plate reduces the air reaching the roots, which is the reason the cap exists. Building up is how paths and beds are made inside a zone; the cap is what makes it safe.</li>'
+      + '<li><b>Building up inside a protection zone is capped at 100 mm</b>, hand placed, arborist supervising, and in coarse woodchip rather than soil. Soil over a root plate reduces the air reaching the roots, which is the reason the cap exists. Building up is how paths and beds are made inside a zone; the cap is what makes it safe.</li>'
       + '<li><b>Keep cut under 500 mm and fill under 400 mm.</b> Beyond that the site classification has to be reassessed. The deepest thing here is the firepit at about 450 mm.</li>'
       + '<li><b>Near footings:</b> no trench below a 30° line from the footing edge, 45° in clay. Any permanent excavation deeper than 600 mm must be retained or battered.</li>'
       + '<li><b>No tracking or spoil stockpiles inside a protection zone.</b> Ground protection is rumble boards over 200 mm of coarse woodchip, cellular geotextile, or rated mats.</li>'
-      + '<li><b>Keep the overland flow path along the side boundary clear</b> — no spoil heap, no plant, no materials, at any stage. No trough or mound crosses it either.</li>'
+      + '<li><b>Keep the overland flow path along the side boundary clear</b>. No spoil heap, no plant, no materials, at any stage. No trough or mound crosses it either.</li>'
       + '<li><b>Nothing that puts water into the ground within 3 m of a wall.</b> Troughs, gravel paths and soak pits all stand off; mulch and mounds sit on the surface and do not.</li>'
       + '</ul>'
 
       + '<h3 class="ps-h3">Confirm before the machine arrives</h3><ul class="ps-ul">'
       + '<li>A benchmark on site, and a level check against the RLs on the drawing.</li>'
       + '<li>Protection zone fencing up, and the arborist booked for anything inside one.</li>'
-      + '<li>Service locations — dial before you dig — and the garage slab sleeves cast before the slab goes down.</li>'
+      + '<li>Service locations: dial before you dig. And the garage slab sleeves cast before the slab goes down.</li>'
       + '<li>Where spoil is stockpiled and where it goes.</li>'
       + '</ul>';
   }
@@ -753,7 +753,7 @@ window.PRINTSHEET = (function () {
     var legend = earthLegend();
 
     var h = '<section class="ps-sheet ps-earth">'
-      + sheetHead(P, 'Earthworks and levels', 'What can be dug, what cannot, and to what depth — ' + scheme, stamp)
+      + sheetHead(P, 'Earthworks and levels', 'What can be dug, what cannot, and to what depth · ' + scheme, stamp)
       + '<div class="ps-warn">' + WARN + '</div>'
       + '<div class="ps-plan">' + draw.svg + '</div>'
       + '<div class="ps-foot"><div class="ps-legend">' + legend + '</div>'
@@ -783,13 +783,13 @@ window.PRINTSHEET = (function () {
 
     /* --- sheet 1: the plan --- */
     var legend = [
-      ['#8c491a', 'solid', 'Structural root zone — no excavation, ever'],
-      ['#b2622d', 'dash', 'Tree protection zone — hand dig, arborist present'],
+      ['#8c491a', 'solid', 'Structural root zone: no excavation, ever'],
+      ['#b2622d', 'dash', 'Tree protection zone: hand dig, arborist present'],
       ['#8fa073', 'dash', 'Mature canopy'],
       ['#33646b', 'solid', 'Stormwater line and pit'],
-      ['#33646b', 'wide', 'Overland flow path — keep clear'],
+      ['#33646b', 'wide', 'Overland flow path: keep clear'],
       ['#b2622d', 'dash', 'Diversion bund'],
-      ['key', 'key', 'Element number — see the schedules'],
+      ['key', 'key', 'Element number: see the schedules'],
       ['tree', 'tree', 'Protected tree, numbered as the tree plan numbers it']
     ].map(function (l) {
       var sw = l[1] === 'wide' ? '<span class="ps-sw" style="background:' + l[0] + ';opacity:.25;height:2.4mm"></span>'
@@ -802,12 +802,12 @@ window.PRINTSHEET = (function () {
 
 
     h += '<section class="ps-sheet">'
-      + sheetHead(P, '234 Duffy Street, Ainslie', 'Landscape plan — ' + scheme, stamp)
+      + sheetHead(P, '234 Duffy Street, Ainslie', 'Landscape plan · ' + scheme, stamp)
       + '<div class="ps-plan">' + plan.svg + '</div>'
       + '<div class="ps-foot">'
       + '<div class="ps-legend">' + legend + '</div>'
       + '<div class="ps-scalebar">' + scaleBar(plan.scale)
-      + '<div class="ps-note">Scale 1:' + plan.scale + ' at ' + size + '. Levels from the 0.25 m contour survey — check on site before digging.</div></div>'
+      + '<div class="ps-note">Scale 1:' + plan.scale + ' at ' + size + '. Levels are the surveyor’s own triangulated surface. Check on site before digging.</div></div>'
       + '<div class="ps-north">' + northArrow(app) + '<div class="ps-nlab">Duffy Street is<br>north-north-west</div></div>'
       + '</div></section>';
 
@@ -819,13 +819,13 @@ window.PRINTSHEET = (function () {
       var b = r.bloom;
       return '<tr><td class="ps-no">' + esc(r.nos) + '</td><td>' + esc(r.name) + '</td><td class="ps-num">' + r.count + '</td>'
         + '<td>' + n1(r.h) + ' × ' + n1(r.w) + ' m</td>'
-        + '<td>' + (b ? '<span class="ps-dot" style="background:' + b[2] + (isPale(b[2]) ? ';box-shadow:inset 0 0 0 0.2mm #bcb3a2' : '') + '"></span>' + esc(MONTHS[b[0] - 1] + '–' + MONTHS[b[1] - 1] + ', ' + b[3]) : '<span class="ps-mut">foliage</span>') + '</td>'
+        + '<td>' + (b ? '<span class="ps-dot" style="background:' + b[2] + (isPale(b[2]) ? ';box-shadow:inset 0 0 0 0.2mm #bcb3a2' : '') + '"></span>' + esc(MONTHS[b[0] - 1] + ' to ' + MONTHS[b[1] - 1] + ', ' + b[3]) : '<span class="ps-mut">foliage</span>') + '</td>'
         + '<td class="ps-num">' + money(r.cost) + '</td></tr>';
     }).join('');
 
     var over = q.cost - 10000;
     h += '<section class="ps-sheet">'
-      + sheetHead(P, 'Schedules', 'Every element on the plan, by its number — ' + scheme, stamp)
+      + sheetHead(P, 'Schedules', 'Every element on the plan, by its number · ' + scheme, stamp)
       + '<div class="ps-cols">'
       + '<div><h3 class="ps-h3">Elements</h3><table class="ps-tbl"><thead><tr><th>No.</th><th>Item</th><th>Size</th><th>Quantity</th><th class="ps-num">Materials</th></tr></thead><tbody>'
       + (hardRows || '<tr><td colspan="5" class="ps-mut">Nothing placed.</td></tr>') + '</tbody></table>'
@@ -845,7 +845,7 @@ window.PRINTSHEET = (function () {
       + '<li>Inside a protection zone: hand or hydro excavation only, no root over 30 mm cut, arborist present. Paths and beds built up above existing grade, never cut in.</li>'
       + '<li>A 900 mm paved apron right around the house, falling away at 1:60. No beds, no irrigation and no taps inside it.</li>'
       + '<li>The overland flow path along the side boundary stays open and continuous to the street. Nothing gets built across it.</li>'
-      + '<li>Backfill service trenches with the spoil that came out, compacted — not gravel — and plug with clay every 6 m near the house.</li>'
+      + '<li>Backfill service trenches with the spoil that came out, compacted, not gravel, and plug with clay every 6 m near the house.</li>'
       + '</ul></div></div></section>';
 
     /* --- sheet 3: bloom calendar --- */
@@ -854,7 +854,7 @@ window.PRINTSHEET = (function () {
       .sort(function (a, b) { return (b.h || 0) - (a.h || 0); });
     var rowHtml = function (r) {
       return '<tr><td>' + esc(r.name) + '</td><td class="ps-num">' + r.count + '</td><td class="ps-num">' + n1(r.h) + '</td><td class="ps-num">' + n1(r.w) + '</td>'
-        + '<td>' + esc(MONTHS[r.bloom[0] - 1] + '–' + MONTHS[r.bloom[1] - 1]) + '</td>'
+        + '<td>' + esc(MONTHS[r.bloom[0] - 1] + ' to ' + MONTHS[r.bloom[1] - 1]) + '</td>'
         + '<td><span class="ps-dot" style="background:' + r.bloom[2] + (isPale(r.bloom[2]) ? ';box-shadow:inset 0 0 0 0.2mm #bcb3a2' : '') + '"></span>' + esc(r.bloom[3]) + '</td></tr>';
     };
     var half = Math.ceil(bloomRows.length / 2);
@@ -866,7 +866,7 @@ window.PRINTSHEET = (function () {
     var tables = '<div class="ps-two">' + tableOf(bloomRows.slice(0, half)) + tableOf(bloomRows.slice(half)) + '</div>';
 
     h += '<section class="ps-sheet">'
-      + sheetHead(P, 'Bloom calendar', 'When each plant flowers, how tall it gets, and in what colour — ' + scheme, stamp)
+      + sheetHead(P, 'Bloom calendar', 'When each plant flowers, how tall it gets, and in what colour · ' + scheme, stamp)
       + (bloom.empty
         ? '<div class="ps-empty">No flowering plants on the plan yet. Place some on the Plan screen and print again.</div>'
         : '<div class="ps-chart">' + bloom.svg + '</div>'
@@ -874,7 +874,7 @@ window.PRINTSHEET = (function () {
           + (bloom.foliage.length ? ' Grown for foliage, so not charted: ' + esc(bloom.foliage.map(function (r) { return r.name; }).join(', ')) + '.' : '')
           + '</div>'
           + tables)
-      + '<div class="ps-src">Flowering months and colours are horticultural figures for a cool-temperate Canberra garden, not survey data — see bloom.js. Everything else on this set is computed from the survey.</div>'
+      + '<div class="ps-src">Flowering months and colours are horticultural figures for a cool-temperate Canberra garden, not survey data. See bloom.js. Everything else on this set is computed from the survey.</div>'
       + '</section>';
 
     var earth = earthSheets(app, P, size, stamp, scheme);
@@ -1029,8 +1029,8 @@ window.PRINTSHEET = (function () {
   /* ---------------------------------------------------------------- water --- */
 
   /* The half of the drainage design that is not a pipe. Every surface on the plan
-     that puts water into the ground, what it holds, and — for the three that
-     concentrate it — how far it is standing off a wall. Read off the plan, so it
+     that puts water into the ground, what it holds, and, for the three that
+     concentrate it. How far it is standing off a wall. Read off the plan, so it
      answers for the layout as it is now rather than for the one in the handbook. */
   function waterView(app) {
     var w = app.water();
@@ -1039,7 +1039,7 @@ window.PRINTSHEET = (function () {
         + 'Swales, gravel paths, mulched beds and mounds all count here; add one and this fills in.</p></div>';
     }
     var rows = w.rows.map(function (r) {
-      var stand = r.eng ? (r.wall == null ? '—'
+      var stand = r.eng ? (r.wall == null ? '·'
         : n1(r.wall) + ' m' + (r.wall < 3 ? ' <b>too close</b>' : '')) : 'on the surface';
       return '<tr><td>' + esc(r.n) + '</td><td class="ps-num">' + n1(r.area) + '</td>'
         + '<td class="ps-num">' + Math.round(r.d * 1000) + '</td>'
@@ -1058,7 +1058,7 @@ window.PRINTSHEET = (function () {
       + '</tbody></table>'
       + '<p class="ps-fine">Depth is the working depth of the material, not how deep it is dug: a trough ponds 250 mm at its invert over a battered section, a gravel path is the void in its 150 mm base, and a mound or a mulch blanket holds what the chip itself holds. '
       + 'These are first-flush figures into dry ground. In sustained rain the chip is already wet and only the troughs and the gravel are still taking water, which is the second line above. '
-      + 'None of it replaces the piped system, and none of it is allowed to change the fact that the overland flow path stays clear — it decides how much of ordinary rain never reaches a pipe at all.</p>'
+      + 'None of it replaces the piped system, and none of it is allowed to change the fact that the overland flow path stays clear. It decides how much of ordinary rain never reaches a pipe at all.</p>'
       + '</div>';
   }
 

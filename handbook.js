@@ -5,7 +5,7 @@
    in index.html:
      p    paragraph
      h    sub-heading
-     note paragraph set apart — the thing to remember from what precedes it
+     note paragraph set apart: the thing to remember from what precedes it
      ul   bullets
      kv   two-column table of label and value
      tbl  table, first row is the header
@@ -72,7 +72,7 @@ window.HANDBOOK = [
   ['tbl',[
     ['Area','Summer','Equinox','Winter'],
     ['Rear pocket and firepit','7.0 h','6.7 h','4.0 h'],
-    ['Side strip, east-north-east — vegetables and fruit','8.3 h','6.5 h','3.9 h'],
+    ['Side strip, east-north-east · vegetables and fruit','8.3 h','6.5 h','3.9 h'],
     ['Paved terrace against the house','10.9 h','4.1 h','0.0 h'],
     ['Under trees 1 and 2','3.8 h','3.0 h','1.8 h'],
     ['Courtyard, once the maple goes','5.7 h','2.9 h','0.1 h'],
@@ -89,7 +89,7 @@ window.HANDBOOK = [
     ['2 · ornamental pear','1 September','1 October','1 May','5 June'],
     ['3 · ash','1 October','5 November','5 May','10 June'],
     ['4 and 5 · street shade trees','25 September','25 October','20 April','25 May'],
-    ['1 · brittle gum','evergreen','—','—','—']
+    ['1 · brittle gum','evergreen','·','·','·']
   ],[1.5,1,1,1,1]],
   ['p','Read as shade cast, meaning how much light the canopy stops, that gives the year below. The gum sits at a flat 45% because it is evergreen and open-crowned.'],
   ['tbl',[
@@ -218,7 +218,7 @@ window.HANDBOOK = [
     ['Spine, flow','5.32 L/s','DN150 at 1:19 carries 45.2 L/s, 12% used'],
     ['Spine, 1 in 100 yr check','8.24 L/s','18% of capacity, passes the extreme event'],
     ['Corner swale','294 L/s','250 mm deep at 1:40, western 4 m of the rear boundary'],
-    ['Overland path, side strip','236 L/s','200 mm swale at 1:19. Must stay clear — the route if the reserve bank fails'],
+    ['Overland path, side strip','236 L/s','200 mm swale at 1:19. Must stay clear: the route if the reserve bank fails'],
     ['Courtyard runoff','0.66 L/s','1 in 100 yr, its own area only'],
     ['North outlet invert at boundary','610.01','nearest surveyed kerb 609.81, verge fall 1:52, gravity OK'],
     ['Spine outlet invert at boundary','609.73','nearest surveyed kerb 609.49, verge fall 1:29, gravity OK']
@@ -243,7 +243,7 @@ window.HANDBOOK = [
     ['Trough section','1.0 to 1.4 m wide, 250 mm from invert to crest, batters around 1 in 4'],
     ['Mound section','1.0 to 1.6 m wide, laid along the downhill side, rounded not peaked'],
     ['Inside a protection zone','100 mm of added material maximum, coarse woodchip, hand placed, arborist supervising'],
-    ['Clear of every zone','soil, up to the project’s 400 mm fill limit — only the rear pocket qualifies'],
+    ['Clear of every zone','soil, up to the project’s 400 mm fill limit. Only the rear pocket qualifies'],
     ['Off any wall','3 m minimum for anything that concentrates water into the ground'],
     ['Ends','a level spill at the low end, rock at the inlet, and never into the overland flow corridor']
   ]],
@@ -313,7 +313,7 @@ window.HANDBOOK = [
     ['Mound','Summer sun','What to put on it','Why'],
     ['Rear pocket, west-south-west corner','5.7 h','Banksia marginata, or a dwarf Eucalyptus mannifera ‘Little Spotty’ if you want height','The only mound clear of every protection zone, so the only one that can be soil rather than chip, and the only one with real winter sun: 5.7 hours in December and 5.0 in June, the most even light anywhere on the block. It is where a small tree earns its place. Silver banksia takes the frost, feeds birds through winter and wants exactly this drainage.'],
     ['East-north-east strip, beside the kitchen','11.0 h','Grevillea iaspicula, or Callistemon ‘Kings Park Special’ for a thicker screen','The sunniest ground on the block. Grevillea iaspicula is the local endangered one, flowers through winter and stays under 2.5 m, so it does not shade the vegetable beds behind it.'],
-    ['Back woodland berms, either side of the path','4.4 h south, 8.1 h north','Bursaria spinosa on the south berm, Leptospermum obovatum on the north','Two different positions despite being 8 m apart. The south berm is dry shade under the gum and the pear, with root competition from both, and bursaria is local, thorny enough to be a screen and copes with 4 hours. The north berm sits in the gap between the two canopies and takes 8.1 hours in December — and nothing at all in June, because the addition stands between it and the low winter sun. Put something there that does not depend on winter light.'],
+    ['Back woodland berms, either side of the path','4.4 h south, 8.1 h north','Bursaria spinosa on the south berm, Leptospermum obovatum on the north','Two different positions despite being 8 m apart. The south berm is dry shade under the gum and the pear, with root competition from both, and bursaria is local, thorny enough to be a screen and copes with 4 hours. The north berm sits in the gap between the two canopies and takes 8.1 hours in December, and nothing at all in June, because the addition stands between it and the low winter sun. Put something there that does not depend on winter light.'],
     ['Front, between the house and the ash','5.7 h','Dodonaea viscosa','Evergreen, tough, dry-shade tolerant, 2 by 3 m, and it holds its screen through winter when the deciduous canopies have gone and the front windows are most exposed.'],
     ['Front, at the boundary','5.3 h','Hakea salicifolia, with Olearia phlogopappa beneath','The privacy layer, at the 1.5 to 2.5 m the front needs. Willow-leaf hakea screens fast and evergreen, and takes the dry shade under the street trees better than anything on the list.'],
     ['Front pocket, east wing side','4.7 and 5.7 h','Acacia pravissima uphill, pomegranate on the sunnier downhill mound','The warmest corner of the front garden, with a trough between the two mounds. The pomegranate is one of the two fruit trees the front is getting and it wants every hour it can find, so it takes the downhill mound rather than the shaded one.']
