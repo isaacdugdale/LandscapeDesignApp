@@ -70,7 +70,7 @@ window.HANDBOOK = [
 {id:'shape', group:'site', nav:'Shape', title:'Shape', sub:'The block as a solid, before and after', blocks:[
   ['p','A plan gives the levels. A section gives one line through them. Neither shows the shape of the ground, which is what gets argued about on site.'],
   ['iso',''],
-  ['p','It draws the working layout, so it answers for the scheme open now. Move a terrace and it redraws.'],
+  ['p','It draws the working layout, so it answers for the scheme open now. Move a terrace and it redraws. Turn left and turn right walk the view round the block a quarter at a time, and the line under the drawing says where you are standing.'],
   ['note','Height is stretched four times. The block falls 1.99 m over 40 m on the surveyor\u2019s surface, and at true scale that is a flat sheet of paper. Lengths in plan are true.'],
   ['ul',[
     'The left half is the surveyed ground with the house as it stands, exact where the levels were taken and interpolated between them.',
@@ -78,7 +78,8 @@ window.HANDBOOK = [
     'Both stand at the finished floor, 611.65 m. The survey measured that on the existing floor and the architect keeps it.',
     'Muted ground is where the survey does not reach, mostly along the reserve boundary. The older fitted surface answers there.',
     'A surface with a datum finishes level. Paving takes the finished floor, 611.65 m, so a sliding door opens onto it with no step. The lawn takes one 500 mm course above that.',
-    'Everything else finishes on its own string line, and ground under nothing stays as the surveyor found it.'
+    'Everything else finishes on its own string line, and ground under nothing stays as the surveyor found it.',
+    'Each surface is drawn at its own level rather than sampled off the grid, so paving set level with the floor meets it instead of missing it by the width of a cell.'
   ]],
   ['p','Works, Levels is the sheet to hand a builder. It carries the chainages and the string line, and this does not.'],
   ['note','Nothing here is setting-out.']

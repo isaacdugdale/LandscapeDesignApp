@@ -12,10 +12,15 @@ disappears if it left no trace worth keeping. Git history is the log.
 - Levels are the surveyor's own TIN from layer `SRF-VIEW` of the CAD file, not a
   model fitted to it. 126 points, 196 surveyed faces, 83 Delaunay fill.
 - Site has a section, Shape, drawing the block as a solid of earth as surveyed
-  and as built. Reserve boundary near left, street away to the right, driveway
+  and as built. Turn left and turn right walk it round a quarter at a time.
+  Each surface is drawn at its own level rather than sampled off the grid, so
+  paving set level with the floor meets it. Reserve boundary near left, street away to the right, driveway
   top right, which is the plan's own framing. The surveyed half leaves the new
   work out, so the additions appear between the two panels. `finRL` in `index.html` is the finished surface and `isoView` in
   `printsheet.js` draws it. The house stands at its finished floor in it.
+- The outdoor kitchen is priced as one item at $2,500, not by the square metre,
+  so it never double counted the paving under it. It no longer carries a GRADE
+  entry either, because grading it as well graded the same ground twice.
 - Platforms rather than graded slopes. `datum` in `GRADE` makes a surface a level
   plane. Paving within 2 m of a building takes the finished floor, 611.65, so a
   sliding door opens onto it with no step. The lawn takes one 500 mm course above
@@ -40,7 +45,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v39**.
+Live build at the time of writing: **v40**.
 
 ## Todo
 

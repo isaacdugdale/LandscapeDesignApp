@@ -1044,6 +1044,14 @@ window.PRINTSHEET = (function () {
      drawing that exaggerates a slope without saying so is a lie about it. */
 
   var ISOZ = 4;                 /* height stretch, stated on the drawing */
+  /* What each quarter turn is looking from, said on the drawing so a turned view
+     is still placeable without counting corners. */
+  var ISOVIEWS = [
+    'From the reserve boundary. Duffy Street away to the right, driveway top right.',
+    'From the north east boundary. Reserve away to the right, driveway top left.',
+    'From Duffy Street. Reserve away to the right, driveway bottom left.',
+    'From the west south west boundary. Duffy Street to the left, driveway bottom right.'
+  ];
   var NX = 40, NY = 21;         /* grid cells over the block, about a metre each */
   var ISOX = 40, ISOY = 21.33;  /* the block, reserve boundary to street and across */
   var COS30 = 0.8660254;
@@ -1052,13 +1060,32 @@ window.PRINTSHEET = (function () {
      block sits the way the plan draws it and the driveway is top right. The
      viewer stands over the reserve corner and the ground falls away toward the
      street. */
-  function isoPt(x, y, z, o) {
-    return [o.cx + ((x - y) * COS30 - o.mx) * o.k,
-            o.cy + (-(x + y) * 0.5 - (z - o.z0) * ISOZ - o.my) * o.k];
+  /* The view turns in quarter steps about the middle of the block. A quarter is
+     exact, so the boundary stays square to the drawing and the two panels keep
+     the same footing however far round it is turned. Turn 0 is the plan's own
+     framing: reserve boundary near left, Duffy Street away right. */
+  function isoRot(x, y, turn) {
+    var dx = x - ISOX / 2, dy = y - ISOY / 2;
+    if (turn === 1) return [-dy, dx];
+    if (turn === 2) return [-dx, -dy];
+    if (turn === 3) return [dy, -dx];
+    return [dx, dy];
   }
-  /* Nearest is the smallest x + y, so the painter works from the far corner
-     down, which is the largest. */
+  function isoPt(x, y, z, o) {
+    var r = isoRot(x, y, o.turn);
+    return [o.cx + ((r[0] - r[1]) * COS30 - o.mx) * o.k,
+            o.cy + (-(r[0] + r[1]) * 0.5 - (z - o.z0) * ISOZ - o.my) * o.k];
+  }
+  /* How far away a point is. Nearest is the smallest, so the painter works down
+     from the largest. */
+  function isoAt(x, y, turn) { var r = isoRot(x, y, turn); return r[0] + r[1]; }
   function isoDepth(p, q) { return q.d - p.d; }
+  /* A face with this outward normal turns toward the viewer when the normal,
+     turned the same way, points at lower depth. */
+  function isoFacing(nx, ny, turn) {
+    var r = isoRot(nx + ISOX / 2, ny + ISOY / 2, turn);
+    return r[0] + r[1] < -1e-9;
+  }
 
   /* Hypsometric tint, low ground dark and high ground pale, times a Lambert
      term off the surface normal so the form reads rather than just the height. */
@@ -1112,7 +1139,7 @@ window.PRINTSHEET = (function () {
       if (!(S[i][j] && S[i + 1][j] && S[i + 1][j + 1] && S[i][j + 1])) c = isoMute(c);
       /* stroked in its own colour: without it the quads leave hairline gaps
          where they meet and the surface reads as graph paper */
-      out.push({d: x0 + y0, s: isoPoly([isoPt(x0, y0, za, o), isoPt(x1, y0, zb, o), isoPt(x1, y1, zc, o), isoPt(x0, y1, zd, o)], c, c)});
+      out.push({d: isoAt(x0, y0, o.turn), s: isoPoly([isoPt(x0, y0, za, o), isoPt(x1, y0, zb, o), isoPt(x1, y1, zc, o), isoPt(x0, y1, zd, o)], c, c)});
     }
     out.sort(isoDepth);
 
@@ -1124,14 +1151,27 @@ window.PRINTSHEET = (function () {
        falls 2 m the near edge is the high one, and a flat base under it puts a
        three metre wall across the front of the drawing with the ground squeezed
        above it. A slab of even depth keeps the ground the subject. */
-    var faceY = [], faceX = [];
-    for (i = 0; i <= NX; i++) faceY.push(isoPt(i * gx, 0, Z[i][0], o));
-    for (i = NX; i >= 0; i--) faceY.push(isoPt(i * gx, 0, Z[i][0] - base, o));
-    for (j = 0; j <= NY; j++) faceX.push(isoPt(0, j * gy, Z[0][j], o));
-    for (j = NY; j >= 0; j--) faceX.push(isoPt(0, j * gy, Z[0][j] - base, o));
+    var edge = function (pts) {
+      var a = [], b = [], k;
+      for (k = 0; k < pts.length; k++) a.push(isoPt(pts[k][0], pts[k][1], pts[k][2], o));
+      for (k = pts.length - 1; k >= 0; k--) b.push(isoPt(pts[k][0], pts[k][1], pts[k][2] - base, o));
+      var d = 0; pts.forEach(function (q) { d += isoAt(q[0], q[1], o.turn); });
+      return {d: d / pts.length, s: a.concat(b)};
+    };
+    var sides = [], p4 = [];
+    for (i = 0; i <= NX; i++) p4.push([i * gx, 0, Z[i][0]]);           sides.push(edge(p4));
+    p4 = []; for (i = 0; i <= NX; i++) p4.push([i * gx, ISOY, Z[i][NY]]); sides.push(edge(p4));
+    p4 = []; for (j = 0; j <= NY; j++) p4.push([0, j * gy, Z[0][j]]);   sides.push(edge(p4));
+    p4 = []; for (j = 0; j <= NY; j++) p4.push([ISOX, j * gy, Z[NX][j]]); sides.push(edge(p4));
+    /* only the two edges that turn toward the viewer; the far two are behind
+       the surface and drawing them puts a wall across it */
+    sides.sort(function (a, b) { return a.d - b.d; });
+    var shown = sides.slice(0, 2).sort(isoDepth);
 
-    return out.map(function (q) { return q.s; }).join('')
-      + isoPoly(faceX, '#c6bba2', '#9c9078') + isoPoly(faceY, '#b3a68c', '#9c9078');
+    /* The quads go back to the caller unsorted into the drawing, so anything
+       else standing on the ground can be merged into the same order. A platform
+       drawn after all of it floats over ground that should hide it. */
+    return {quads: out, sides: isoPoly(shown[0].s, '#c6bba2', '#9c9078') + isoPoly(shown[1].s, '#b3a68c', '#9c9078')};
   }
 
   /* The house is six overlapping rectangles in the data. Drawn as six boxes they
@@ -1205,10 +1245,15 @@ window.PRINTSHEET = (function () {
        -y. Those get a face down to the ground; the rest are behind the floor. */
     var faces = [];
     u.segs.forEach(function (sg) {
+      /* interior is on the left of the run, so the outward normal is its right */
       var dx = sg[1][0] - sg[0][0], dy = sg[1][1] - sg[0][1];
-      if (!(dx > 1e-9 || dy < -1e-9)) return;
-      var g0 = zf(sg[0][0], sg[0][1]), g1 = zf(sg[1][0], sg[1][1]);
-      faces.push({d: sg[0][0] + sg[0][1] + sg[1][0] + sg[1][1], s: isoPoly([
+      if (!isoFacing(dy, -dx, o.turn)) return;
+      /* the ground is read a little outside the wall, so where paving is made up
+         to the floor the face closes rather than leaving a sliver of skirt */
+      var L = Math.hypot(dx, dy) || 1, ox = dy / L * 0.35, oy = -dx / L * 0.35;
+      var g0 = zf(sg[0][0] + ox, sg[0][1] + oy), g1 = zf(sg[1][0] + ox, sg[1][1] + oy);
+      if (Math.min(g0, g1) > fl - 0.02) return;
+      faces.push({d: isoAt((sg[0][0] + sg[1][0]) / 2, (sg[0][1] + sg[1][1]) / 2, o.turn), s: isoPoly([
         isoPt(sg[0][0], sg[0][1], fl, o), isoPt(sg[1][0], sg[1][1], fl, o),
         isoPt(sg[1][0], sg[1][1], Math.min(g1, fl), o), isoPt(sg[0][0], sg[0][1], Math.min(g0, fl), o)],
         'rgba(222,213,194,.98)', null)});
@@ -1220,6 +1265,47 @@ window.PRINTSHEET = (function () {
         'rgba(248,244,235,.99)', '#8d8574'));
     });
     return out.join('');
+  }
+
+  /* Every surface the scheme lays down, at the level it actually finishes at.
+
+     The ground under it is drawn on a metre grid, and a platform three metres
+     across cannot land on that: the quads straddling its edge ramp from the
+     finished level down to the ground and the platform reads as a smudge rather
+     than a plane. Worse, paving set level with the floor then looks as though it
+     misses it. So each one is laid out as its own polygon at its own level, and
+     a face is dropped from its edge to the ground it stands on, which is the
+     depth of fill under it. */
+  function isoPlatforms(app, ex, o) {
+    var parts = app.finParts(), out = [];
+    parts.forEach(function (pt) {
+      var poly = pt.poly, n = poly.length;
+      if (!poly || n < 3) return;
+      var top = poly.map(function (p) { return app.partZ(pt, p[0], p[1]); });
+      var gnd = poly.map(function (p) { return ex(p[0], p[1]); });
+      var cx = 0, cy = 0, zm = 0, gm = 0, i;
+      for (i = 0; i < n; i++) { cx += poly[i][0] / n; cy += poly[i][1] / n; zm += top[i] / n; gm += gnd[i] / n; }
+      var d = zm - gm, tint = d > 0.02 ? 'fill' : d < -0.02 ? 'cut' : null;
+      if (!tint && !pt.bu) return;
+      /* the side faces first, then the top, so the top closes the shape off */
+      for (i = 0; i < n; i++) {
+        var a = poly[i], b = poly[(i + 1) % n];
+        var ex2 = b[0] - a[0], ey = b[1] - a[1];
+        /* outward normal is whichever of the two turns away from the middle */
+        var nx = ey, ny = -ex2;
+        if (nx * (a[0] - cx) + ny * (a[1] - cy) < 0) { nx = -nx; ny = -ny; }
+        if (!isoFacing(nx, ny, o.turn)) continue;
+        var ta = top[i], tb = top[(i + 1) % n], ga = gnd[i], gb = gnd[(i + 1) % n];
+        if (ta - ga < 0.02 && tb - gb < 0.02) continue;
+        out.push({d: isoAt((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, o.turn), s: isoPoly([
+          isoPt(a[0], a[1], ta, o), isoPt(b[0], b[1], tb, o),
+          isoPt(b[0], b[1], Math.min(gb, tb), o), isoPt(a[0], a[1], Math.min(ga, ta), o)],
+          isoFill(zm, o.lo, o.hi, 0.45, tint), null)});
+      }
+      out.push({d: isoAt(cx, cy, o.turn) - 0.01, s: isoPoly(poly.map(function (p, k) {
+        return isoPt(p[0], p[1], top[k], o); }), isoFill(zm, o.lo, o.hi, 1, tint), null)});
+    });
+    return out;
   }
 
   /* The sandstone block edge, which is the thing that holds the high side up.
@@ -1247,8 +1333,8 @@ window.PRINTSHEET = (function () {
           if (z > top) top = z;
         });
       });
-      var d = poly.reduce(function (a, p) { return a + p[0] + p[1]; }, 0) / poly.length;
-      out.push({d: d, s: isoPoly(poly.map(function (p) { return isoPt(p[0], p[1], top + 0.03, o); }),
+      var c2 = app.centre(it);
+      out.push({d: isoAt(c2[0], c2[1], o.turn), s: isoPoly(poly.map(function (p) { return isoPt(p[0], p[1], top + 0.03, o); }),
         '#e0cda6', '#8a7250')});
     });
     out.sort(isoDepth);
@@ -1261,16 +1347,17 @@ window.PRINTSHEET = (function () {
      draws. Fitting the corners against the full range of levels counted
      combinations that never occur, a corner at the highest level and another at
      the lowest, and left the drawing filling about half its box. */
-  function isoFit(cx, cy, w, h, samples, lo) {
+  function isoFit(cx, cy, w, h, samples, lo, turn) {
     var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
     samples.forEach(function (p) {
-      var sx = (p[0] - p[1]) * COS30;
-      var sy = -(p[0] + p[1]) * 0.5 - (p[2] - lo) * ISOZ;
+      var r = isoRot(p[0], p[1], turn);
+      var sx = (r[0] - r[1]) * COS30;
+      var sy = -(r[0] + r[1]) * 0.5 - (p[2] - lo) * ISOZ;
       if (sx < x0) x0 = sx; if (sx > x1) x1 = sx;
       if (sy < y0) y0 = sy; if (sy > y1) y1 = sy;
     });
     var k = Math.min(w / (x1 - x0), h / (y1 - y0));
-    return {cx: cx, cy: cy, k: k, z0: lo, mx: (x0 + x1) / 2, my: (y0 + y1) / 2};
+    return {cx: cx, cy: cy, k: k, z0: lo, turn: turn, mx: (x0 + x1) / 2, my: (y0 + y1) / 2};
   }
 
   /* The drawing, and under it the numbers the plan already computes, so nothing
@@ -1309,13 +1396,19 @@ window.PRINTSHEET = (function () {
       samp.push([sx2, sy2, ze], [sx2, sy2, zf2],
                 [sx2, sy2, Math.min(ze, zf2) - base]);
     }
-    var W = 250, H = 128, PW = 122, PH = 100, top = 24;
-    var o1 = isoFit(W * 0.25, top + PH / 2, PW, PH, samp, lo);
-    var o2 = isoFit(W * 0.75, top + PH / 2, PW, PH, samp, lo);
+    var turn = ((app.state && app.state.isoTurn) | 0) & 3;
+    var W = 250, H = 128, PW = 122, PH = 92, top = 22;
+    var o1 = isoFit(W * 0.25, top + PH / 2, PW, PH, samp, lo, turn);
+    var o2 = isoFit(W * 0.75, top + PH / 2, PW, PH, samp, lo, turn);
+    o1.lo = o2.lo = lo; o1.hi = o2.hi = hi;
     var panel = function (o, title, sub, zf, diff) {
       return '<text x="' + n1(o.cx) + '" y="11" text-anchor="middle" font-size="6.6" font-weight="700" fill="' + INK + '">' + esc(title) + '</text>'
         + '<text x="' + n1(o.cx) + '" y="18" text-anchor="middle" font-size="4.6" fill="' + MUT + '">' + esc(sub) + '</text>'
-        + isoSolid(app, zf, o, lo, hi, base, diff)
+        + (function () {
+          var body = isoSolid(app, zf, o, lo, hi, base, diff);
+          var ground = body.quads.concat(diff ? isoPlatforms(app, diff, o) : []).sort(isoDepth);
+          return ground.map(function (q) { return q.s; }).join('') + body.sides;
+        })()
         + (diff ? isoWalls(app, zf, o) : '') + isoFootprints(app, zf, o, !!diff);
     };
     var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'
@@ -1323,7 +1416,7 @@ window.PRINTSHEET = (function () {
       + panel(o1, 'As surveyed', 'the ground and the house as they stand', ex, null)
       + panel(o2, 'As built', moved ? 'the additions built and the ground shaped' : 'the additions built, no earth moved yet', fin, ex)
       + '<text x="' + n1(W / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="4.4" fill="' + MUT + '">'
-      + 'Reserve boundary near left, Duffy Street away to the right, driveway top right.</text>'
+      + esc(ISOVIEWS[turn]) + '</text>'
       + '<text x="' + n1(W / 2) + '" y="' + (H - 2.5) + '" text-anchor="middle" font-size="4.4" fill="' + MUT + '">'
       + 'Height stretched ' + ISOZ + ' times so the fall reads. Plan lengths are true.</text>'
       + '</svg>';
@@ -1348,8 +1441,14 @@ window.PRINTSHEET = (function () {
       + '<tr class="ps-tot"><td>Share of the block that moves at all</td><td class="ps-num">' + Math.round(moved / (NX * NY) * 100) + '%</td></tr>'
       + '</tbody></table>';
 
+    var turns = '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px">'
+      + '<button data-iso-turn="' + ((turn + 3) & 3) + '" class="ps-turn-btn">Turn left</button>'
+      + '<button data-iso-turn="' + ((turn + 1) & 3) + '" class="ps-turn-btn">Turn right</button>'
+      + '<button data-iso-turn="0" class="ps-turn-btn"' + (turn === 0 ? ' aria-pressed="true"' : '') + '>Back to the plan\u2019s framing</button>'
+      + '</div>';
     return '<div class="ps-screen">'
       + '<div class="ps-warn">' + WARN + '</div>'
+      + turns
       + '<div class="ps-screen-plan">' + svg + '</div>'
       + '<div class="ps-screen-legend">' + legend + '</div>'
       + tbl

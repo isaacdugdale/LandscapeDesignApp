@@ -105,6 +105,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 .ps-screen .ps-ul{margin:0;padding-left:18px}.ps-screen .ps-ul li{margin-bottom:7px}
 .ps-screen .ps-no-dig td{background:#fbecea}.ps-screen .ps-no-dig b{color:#a8332a}
 .ps-screen .ps-hand td{background:#fbf1e7}.ps-screen .ps-hand b{color:#8c491a}
+.ps-turn-btn{appearance:none;padding:7px 14px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font:600 12.5px Figtree,system-ui;color:var(--color-neutral-700);cursor:pointer}
+.ps-turn-btn[aria-pressed=true]{border-color:var(--color-accent);background:var(--color-accent-200);color:var(--color-accent-800)}
 .ps-print-btn{appearance:none;margin:26px 0 4px;padding:11px 20px;border-radius:999px;border:1.5px solid var(--color-neutral-300);background:#fff;font:600 13.5px Figtree,system-ui;color:var(--color-neutral-700);cursor:pointer}
 .ps-print-btn:hover{background:var(--color-neutral-200)}
 </style>
@@ -666,7 +668,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v39';
+const BUILD='v40';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -782,12 +784,16 @@ const BUCAP=100, BUFILL=400, BUSTEPS=[0,100,200,300,400,500], BURATE=60;
    past that distance it falls back to `away`: the lowest ground it covers, all
    cut, nothing made up against anything.
 
-   A path and a gravel path have no datum. Where they run decides their grade. */
+   A path and a gravel path have no datum. Where they run decides their grade.
+
+   The outdoor kitchen is not here at all. It is priced as one item rather than
+   by the square metre, because it is a bench and not a surface, and it stands on
+   whatever paving is under it. Grading it as well graded the same ground twice
+   and raised the same Check twice. */
 const GRADE={
   'Dichondra lawn':     {want:40, max:20,  kind:'lawn',  datum:'floor', rise:BLOCKH},
   'Paving / terrace':   {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
   'Firepit terrace':    {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
-  'Outdoor kitchen':    {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
   'Path, firm surface': {want:20, max:14,  kind:'walk'},
   'Gravel path':        {want:40, max:20,  kind:'soak'}
 };
@@ -1305,13 +1311,16 @@ class Component extends DCLogic {
     return parts; }
   /* Later items sit on top, the way they are drawn, so the last one covering a
      point is the one that decides its level. */
+  /* What one part finishes at, asked of the part rather than of the position, so
+     a drawing can lay a platform out at its own level instead of sampling the
+     ground and hoping the grid is fine enough to catch its edges. */
+  partZ(p,x,y){
+    const base=p.line?p.from+(p.to-p.from)*(this.chainOf(p.line,[x,y]).s/p.len):this.RL(x,y);
+    return base+p.bu; }
   finRL(x,y){
-    const parts=this.finParts(), g=this.RL(x,y);
-    let hit=null;
-    for(let i=parts.length-1;i>=0;i--) if(this.inPoly([x,y],parts[i].poly)){ hit=parts[i]; break; }
-    if(!hit) return g;
-    const base=hit.line?hit.from+(hit.to-hit.from)*(this.chainOf(hit.line,[x,y]).s/hit.len):g;
-    return base+hit.bu; }
+    const parts=this.finParts();
+    for(let i=parts.length-1;i>=0;i--) if(this.inPoly([x,y],parts[i].poly)) return this.partZ(parts[i],x,y);
+    return this.RL(x,y); }
   levelPlan(it){
     const g=GRADE[it&&it.n]; if(!g||it.t==='plant'||it.shape==='circ') return null;
     const line=this.levelLine(it); if(!line||line.length<2) return null;
@@ -2427,7 +2436,12 @@ class Component extends DCLogic {
           if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','levels'); };
         }catch(e){ el.textContent=''; } },
       isoRef:el=>{ if(!el||!window.PRINTSHEET) return;
-        try{ el.innerHTML=window.PRINTSHEET.isoView(this); }catch(e){ el.textContent=''; } },
+        try{ el.innerHTML=window.PRINTSHEET.isoView(this);
+          /* The view turns in quarter steps. Held on the component rather than
+             in the layout, so turning it is not an edit and nothing is saved. */
+          el.querySelectorAll('[data-iso-turn]').forEach(b=>{ b.onclick=()=>
+            this.setState({isoTurn:+b.getAttribute('data-iso-turn')&3}); });
+        }catch(e){ el.textContent=''; } },
       waterRef:el=>{ if(!el||!window.PRINTSHEET) return;
         try{ el.innerHTML=window.PRINTSHEET.waterView(this); }catch(e){ el.textContent=''; } },
       bloomRef:el=>{ if(!el||!window.PRINTSHEET) return;
