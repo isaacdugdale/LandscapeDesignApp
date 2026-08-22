@@ -662,7 +662,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v34';
+const BUILD='v35';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -956,20 +956,51 @@ class Component extends DCLogic {
   /* A named scheme is an option to look at, offered once. After that it belongs
      to the device like any other: edit it and the edits stick, delete it and it
      stays deleted rather than reappearing at every boot. */
+  /* Cheap hash, only ever compared against itself, so what it has to be is short
+     in local storage and stable across a reload. */
+  hash(s){ let h=0; s=s||''; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return h; }
+  /* Seeding runs on every open. A scheme the device has not seen arrives whole.
+     A scheme it already has keeps its layout, always: those items are the owner's
+     and nothing here may touch them.
+
+     What can arrive is a corrected note, and before revisions it could not. A
+     named scheme seeded once and never again, so fixing a note meant shipping the
+     whole scheme under a new id and littering the list. A scheme now carries rev,
+     and a higher rev than the device has means the note is replaced.
+
+     Except when the owner has written in it. They edit notes in the same box, so
+     the note as seeded is hashed and kept. If what is on the device still matches
+     that hash it is mine to correct. If it does not, they have written there and
+     their words win, so the correction is skipped and the rev is left alone, which
+     means a later reworded note gets the same chance rather than being lost. */
   seedStore(){ try{
     const all=JSON.parse(localStorage.getItem(this.key())||'{}');
-    all.schemes=all.schemes||{}; all.seeded=all.seeded||[];
-    let index=all.index||this.state.schemes||[], added=false;
+    all.schemes=all.schemes||{}; all.seeded=all.seeded||[]; all.revs=all.revs||{}; all.noteH=all.noteH||{};
+    let index=all.index||this.state.schemes||[], added=false, renoted=0;
     (this.D.SCHEMES||[]).forEach(sc=>{
-      if(all.seeded.indexOf(sc.id)>=0) return;
-      all.seeded.push(sc.id);
+      const rev=sc.rev||1, notes=sc.notes||'';
+      if(all.seeded.indexOf(sc.id)>=0){
+        const had=all.revs[sc.id]||1, cur=all.schemes[sc.id];
+        if(rev>had&&cur){
+          if(all.noteH[sc.id]===undefined||all.noteH[sc.id]===this.hash(cur.notes)){
+            cur.notes=notes; all.noteH[sc.id]=this.hash(notes); all.revs[sc.id]=rev; renoted++;
+          }
+        }
+        return;
+      }
+      all.seeded.push(sc.id); all.revs[sc.id]=rev; all.noteH[sc.id]=this.hash(notes);
       const b=this.baseItems(sc);
-      all.schemes[sc.id]={name:sc.name,items:b.items,uid:b.uid,notes:sc.notes||'',updated:Date.now()};
+      all.schemes[sc.id]={name:sc.name,items:b.items,uid:b.uid,notes:notes,updated:Date.now()};
       if(!index.some(x=>x.id===sc.id)){ index=index.concat([{id:sc.id,name:sc.name,created:Date.now()}]); added=true; }
     });
     all.index=index;
     localStorage.setItem(this.key(),JSON.stringify(all));
     if(added) this.setState({schemes:index});
+    if(renoted){
+      const cur=all.schemes[this.state.schemeId];
+      if(cur&&this.state.schemeId) this.setState({notes:cur.notes});
+      this.toast(renoted===1?'A scheme note was updated':renoted+' scheme notes were updated');
+    }
   }catch(e){} }
   mk(name,x,y,w,h,rot,uid){
     const l=this.LIBM[name]; if(!l) return null;

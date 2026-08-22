@@ -175,6 +175,37 @@ console.log('seeding');
   ok('a scheme the device has not seen is added',
      D.SCHEMES.every(s => after.seeded.includes(s.id)));
 }
+{
+  /* revisions: a corrected note has to reach a device that already has the scheme,
+     without ever touching the layout or overwriting what the owner wrote there */
+  const id = D.SCHEMES[0].id;
+  const seed = () => { const a = make(); a.state = { items: [], schemes: [], sel: null };
+    a.toast = () => {}; a.seedStore(); return a; };
+  const store = () => JSON.parse(localStorage.getItem(make().key()) || '{}');
+  ok('every scheme carries a rev', D.SCHEMES.every(s => typeof (s.rev || 1) === 'number'));
+
+  localStorage.removeItem(make().key());
+  seed();
+  let st = store();
+  ok('a fresh device records a rev per scheme', Object.keys(st.revs).length === D.SCHEMES.length);
+
+  st.revs[id] = 1; st.schemes[id].notes = 'OLD'; st.noteH[id] = make().hash('OLD');
+  localStorage.setItem(make().key(), JSON.stringify(st));
+  seed(); st = store();
+  ok('a corrected note reaches a device on an older rev', st.schemes[id].notes !== 'OLD');
+
+  st.revs[id] = 1; st.schemes[id].notes = 'OWNER WROTE THIS';
+  st.noteH[id] = make().hash('something the app seeded');
+  st.schemes[id].items = [{ u: 1 }]; st.schemes[id].uid = 9;
+  localStorage.setItem(make().key(), JSON.stringify(st));
+  seed(); st = store();
+  ok('a note the owner has written in is never overwritten', st.schemes[id].notes === 'OWNER WROTE THIS');
+  ok('the layout is never touched by a rev bump',
+     st.schemes[id].items.length === 1 && st.schemes[id].uid === 9);
+
+  const before = JSON.stringify(store()); seed();
+  ok('a second open changes nothing', before === JSON.stringify(store()));
+}
 
 /* ---------- the baseline ---------- */
 

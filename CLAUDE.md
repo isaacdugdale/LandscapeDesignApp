@@ -23,86 +23,13 @@ A scheme is a named starting layout offered to the device. They live in
 
 **Seeding happens once per id, and never again.** `seedStore()` in `index.html`
 keeps a `seeded` list in the device's local storage and skips any id already in
-it. So editing an existing scheme in place reaches nobody who has already opened
-the app. It looks fine in a fresh browser and changes nothing on the iPad. That
-mistake has now been made once; do not make it again.
+it. So changing a scheme's *items* in place reaches nobody who has already
+opened the app. It looks fine in a fresh browser and changes nothing on the
+iPad. That mistake has now been made once; do not make it again.
 
-When a scheme's content changes, **ship it under a new id** with a name that
-tells it apart in the list. It arrives as a new entry, and whatever the device
-already had is left alone for the owner to keep or delete. Say in your reply
-which entry to open and that the old one can be deleted.
-
-**Anything meant to be in "New from base plan" goes in `START` and `STARTP`
-as well.** A new scheme is built from those, not from the named schemes, so work
-that only lands in a scheme makes "New from base plan" look like the old design.
-Both were needed for the swales and mounds; assume both are needed again.
-
-Row shapes, which are positional and easy to shift by one:
-
-| Array | Row |
-| --- | --- |
-| `items`, `START` | `[name, x, y, w, h, rot, buildUpMm, buildUpMaterial, pts]` |
-| `plants`, `STARTP` | `[plant id or exact name, x, y]` |
-| `LIB` | `[name, shape, cat, w, h, cost, unit, fill, stroke, stage, buildUpMm, buildUpMaterial, locked, sharp]` |
-
-`LIB` is the element library and the palette is built straight off it, so adding
-an element is adding a row plus a `HARDCOL` entry for its plan colours. `locked`
-means the element *arrives* locked. Site fabric does, so a pipe is not nudged
-while a bed is being moved. `sharp` means its run keeps its corners instead
-of being splined through them. Both are booleans and both are read as `l[12]`
-and `l[13]`, so a row that stops short of them is simply unlocked and smooth.
-
-The ninth column, `pts`, is an array of `[x, y]`, and it makes the item a curved
-run: a smooth line through those points, `w` metres wide, with `x`, `y`, `h` and
-`rot` ignored. Ask geometry through `area`, `centre`, `samples`, `corners` and
-`linLen`, which all know about it; never read `w`/`h` directly to get a length.
-Write the first point into `x` and `y` anyway so the row reads honestly, and put
-`null` in the two build-up columns where there is no build-up. They have to be
-filled for `pts` to land in the ninth slot at all. A trough or a path is a bent
-line on the ground, so prefer a run over a box for one; the swales in `START`
-and in `s-contour-swales` are the worked example.
-
-`rot` is the one that gets dropped. Leave it as `0` rather than omitting it, or
-the build-up depth is read as a rotation and the cost and volume come out `NaN`.
-Circles (`Planting mound`, plants) take a radius in `w` and `0` in `h`.
-Plant ids are neither unique nor always filled in, so prefer the exact name.
-
-## Writing
-
-`STYLE.md` is how the words here should read, and it applies to scheme notes,
-the handbook, Checks messages, this file and commit messages. Shorter than your
-first draft, no em dashes, no line built to land, and every number saying where
-it came from.
-
-## Notes on a scheme
-
-Every scheme carries a `notes` string, shown in the Notes card under the plan and
-carried into the brief the Ask screen builds. When you ship a scheme, write its
-notes: what it is for, what you changed and why, and what is left to decide. The
-owner writes in the same box, so keep to plain sentences and do not treat it as
-yours alone.
-
-## Before you say it is done
-
-- Bump `CACHE` in `sw.js` and `BUILD` in `index.html` together for any change to
-  a served file, or devices keep the old copy. `BUILD` shows on the Schemes sheet,
-  so ask what it reads before believing a device has the change.
-- Rebuild the offline copy with `node tools/build-offline.js` when a served file
-  changes, or `offline/234-duffy-offline.html` goes stale. It checks its own work
-  and refuses to write a file that still points at anything beside it.
-- Publish by merging to `main`. Pages serves `main` at the repository root.
-  Confirm with the `pages build and deployment` run for your own commit's SHA,
-  or by fetching the changed file from the live URL. A green push is not a
-  publish.
-- Run `node tools/check.js` before you say anything is done. It builds every
-  scheme and the base plan under node, and asserts the things a change must not
-  break: the handbook's 13 sections with no `undefined` blocks, `RL()` exact at
-  all 126 surveyed points, a numeric `rot` on every item row, no dash in prose,
-  an edited scheme on a device left alone by seeding, and issue counts against
-  `tools/baseline.json`. `--update` rewrites the baseline, which you do only
-  when a count moved on purpose.
-
-  It exists because `node --check` is not enough. A handbook edit once left
-  `['note',...]['earth','']`, which is valid JavaScript, evaluates to
-  `undefined`, deleted the Earthworks screen and crashed Sources. `node --check`
-  passed it and it reached the live site. `tools/check.js` fails on it.
+**Notes are the exception, through `rev`.** A scheme carries a `rev`, and a
+higher one than the device holds replaces the notes, leaving the layout alone.
+So a corrected note no longer needs a whole new scheme. Bump `rev` when you
+change a scheme's notes. If the owner has written in the box themselves the
+correction is skipped and their words are kept, which the app knows by hashing
+the note as seeded. Items still never change under an existing id.
