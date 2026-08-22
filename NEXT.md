@@ -22,17 +22,10 @@ Live build at the time of writing: **v35**.
 
 ## Next, in order
 
-Both of the jobs that were here are done.  runs 91 assertions
-and handbook
-levels
-library
-schemes
-prose
-seeding
-baseline
-
-all 91 checks passed is the thing to run before shipping. Scheme notes now
-carry a `rev`, so a corrected note reaches a device without touching the layout.
+Both of the jobs that were here are done. `tools/check.js` runs 91 assertions,
+and `node tools/check.js` is the thing to run before shipping anything. Scheme
+notes now carry a `rev`, so a corrected note reaches a device without touching
+the layout.
 
 What is left is smaller.
 
