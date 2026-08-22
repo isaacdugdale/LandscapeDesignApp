@@ -666,7 +666,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v37';
+const BUILD='v38';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -769,11 +769,25 @@ const BUCAP=100, BUFILL=400, BUSTEPS=[0,100,200,300,400,500], BURATE=60;
    1 in 10 it wants steps. A gravel path is an infiltration surface, so it
    wants to be near level: water it sheds is water it does not hold, and it is
    judged end to end like a trough rather than on its graded line. */
+/* `datum` makes a surface a level plane instead of a graded one, and says what
+   the plane is level with.
+
+   `floor` is the finished floor, D.FFL. Paving against the house takes it, so a
+   sliding door opens onto the paving with no step. `rise` lifts the plane above
+   the floor, and the lawn takes one course of block, so the terrace between the
+   lawn and the paving is one course everywhere.
+
+   `near` is how close to a building a surface has to be before the floor is the
+   right thing to be level with. Paving out in the garden is not a threshold, so
+   past that distance it falls back to `away`: the lowest ground it covers, all
+   cut, nothing made up against anything.
+
+   A path and a gravel path have no datum. Where they run decides their grade. */
 const GRADE={
-  'Dichondra lawn':     {want:40, max:20,  kind:'lawn'},
-  'Paving / terrace':   {want:80, max:40,  flat:150, kind:'paved'},
-  'Firepit terrace':    {want:80, max:40,  flat:150, kind:'paved'},
-  'Outdoor kitchen':    {want:80, max:40,  flat:150, kind:'paved'},
+  'Dichondra lawn':     {want:40, max:20,  kind:'lawn',  datum:'floor', rise:BLOCKH},
+  'Paving / terrace':   {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
+  'Firepit terrace':    {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
+  'Outdoor kitchen':    {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
   'Path, firm surface': {want:20, max:14,  kind:'walk'},
   'Gravel path':        {want:40, max:20,  kind:'soak'}
 };
@@ -1303,32 +1317,60 @@ class Component extends DCLogic {
       ps.forEach(p=>{Ss+=p.s;Sz+=p.z;Sss+=p.s*p.s;Ssz+=p.s*p.z;});
       const den=n*Sss-Ss*Ss, b=Math.abs(den)>1e-9?(n*Ssz-Ss*Sz)/den:0;
       return {a:(Sz-b*Ss)/n,b:b,cs:Ss/n}; };
-    /* Graded only where most of it can be. A surface a third clear grades that
-       third and leaves a step where the two meet, which is worse than leaving
-       the whole of it alone. */
-    const graded=free.length>=4&&free.length>=pts.length*0.6;
-    const f=fit(graded?free:pts);
-    /* A platform is eased toward the grade it wants, pivoting about the middle
-       so the cut and the fill balance. A path is not: how steep a path is comes
-       from where it runs, and easing one moves the ends it was drawn to meet.
-       So a path's finished line is its fitted line, bumps out, grade as found. */
+    /* Everything grades. A protection zone used to stop it, and the owner has
+       set that aside: the shaping is drawn as designed and the conflict is
+       raised in Checks instead. `zone` and the zoned cut and fill below are
+       what carries it there. */
+    const graded=true;
+    const f=fit(pts);
+    /* A surface with a datum is a level plane at one end of its own ground.
+       Everything else is eased toward the grade it wants, pivoting about the
+       middle so the cut and the fill balance. A path is not eased at all: how
+       steep a path is comes from where it runs, and easing one moves the ends
+       it was drawn to meet. */
     const nat=Math.abs(f.b);
-    const k=(graded&&g.kind!=='walk'&&nat>1/g.want)?(1/g.want)/nat:1;
-    const nb=f.b*k, na=f.a+f.b*f.cs-nb*f.cs, at=s=>na+nb*s;
+    let nb, na, datum=g.datum||null;
+    if(datum==='floor'&&g.near!=null){
+      /* Only a surface close enough to a door is a threshold. */
+      const nb2=this.nearBuilding(it);
+      if(!nb2||nb2.d>g.near) datum=g.away||'low';
+    }
+    if(datum==='floor'){ nb=0; na=this.D.FFL+(g.rise||0); }
+    else if(datum==='high'||datum==='low'){ nb=0; na=datum==='high'?hi:lo; }
+    else { datum=null; const k=(g.kind!=='walk'&&nat>1/g.want)?(1/g.want)/nat:1;
+      nb=f.b*k; na=f.a+f.b*f.cs-nb*f.cs; }
+    const at=s=>na+nb*s;
     const cell=this.area(it)/(pts.length||1);
-    let cut=0,fill=0,mc=0,mf=0,miss=0;
+    let cut=0,fill=0,mc=0,mf=0,miss=0,zmc=0,zmf=0;
     pts.forEach(p=>{ const d=p.z-at(p.s);
-      if(!p.free||!graded){ if(Math.abs(d)>miss) miss=Math.abs(d); return; }
-      if(d>0){ cut+=d*cell; if(d>mc)mc=d; } else { fill-=d*cell; if(-d>mf)mf=-d; } });
+      if(d>0){ cut+=d*cell; if(d>mc)mc=d; } else { fill-=d*cell; if(-d>mf)mf=-d; }
+      /* the deepest the machine goes inside a protection zone, which is the
+         number the arborist and the tree plan are owed */
+      if(!p.free){ if(d>0){ if(d>zmc)zmc=d; } else if(-d>zmf) zmf=-d; } });
     const fin=Math.abs(nb), cf=this.contourFall(it);
     const N=x=>x>1/500?1/x:Infinity, sN=n=>n===Infinity?'level':'1 in '+n.toFixed(0);
     const zone=pts.length?1-free.length/pts.length:0;
     const r={n:it.n,u:it.u,len:len,w:wide,area:this.area(it),kind:g.kind,graded:graded,
       exLo:lo,exHi:hi,natN:N(nat),finN:N(fin),from:at(0),to:at(len),
-      cut:cut,fill:fill,maxCut:mc,maxFill:mf,zone:zone,miss:miss,
+      cut:cut,fill:fill,maxCut:mc,maxFill:mf,zone:zone,miss:miss,zMaxCut:zmc,zMaxFill:zmf,datum:datum,
       cross:cf?cf.across:0,a:line[0],b:line[line.length-1]};
     /* One line for what it is, one for what to do about it. */
-    if(g.kind==='soak'){
+    if(datum){
+      /* A level plane has no gradient to report, so the slope wording below
+         would only ever say "level". What matters is what it is level with, and
+         what that costs in cut or fill. */
+      r.lvl='g';
+      const to=datum==='floor'
+        ? (g.rise?'one '+(g.rise*1000).toFixed(0)+' mm course above the finished floor':'the finished floor, '+this.D.FFL.toFixed(2)+' m')
+        : 'the '+(datum==='high'?'highest':'lowest')+' ground it covers';
+      r.msg='Level at '+na.toFixed(2)+' m, set to '+to+'. ';
+      if(mc>0.005&&mf>0.005) r.msg+='Cuts '+(mc*1000).toFixed(0)+' mm and fills '+(mf*1000).toFixed(0)+' mm.';
+      else if(mf>0.005) r.msg+='All fill, '+(mf*1000).toFixed(0)+' mm at the deepest.';
+      else r.msg+='All cut, '+(mc*1000).toFixed(0)+' mm at the deepest.';
+      if(datum==='floor'&&!g.rise) r.msg+=' A sliding door opens onto it with no step.';
+      if(g.kind==='paved'){ r.lvl='a';
+        r.msg+=' Dead level does not shed. It needs a crossfall laid on site, or a drain along its low edge.'; }
+    } else if(g.kind==='soak'){
       /* Judged end to end, the way a trough is: what decides whether a gravel
          path holds water is its high point against its low point, not the
          grade of a line fitted through it. */
@@ -1349,11 +1391,10 @@ class Component extends DCLogic {
       else if(g.flat&&r.finN>g.flat) r.lvl='a', r.msg='Finishes at '+sN(r.finN)+', flat enough to pond. Give it 1 in '+g.want+' toward a garden edge.';
       else r.lvl='g', r.msg='Finishes at '+sN(r.finN)+', which sheds without being felt.';
     }
-    if(!graded) r.msg=r.msg.replace(/^(Finishes|Walks) at/,'Lies at');
-    if(!graded&&r.lvl==='g') r.msg+=' Left as found. '+Math.round(zone*100)+' per cent of it sits in a protection zone, and at this grade it wants nothing done to it.';
-    else if(!graded){ r.msg+=' Nothing here may be graded either: '+Math.round(zone*100)+' per cent of it sits in a protection zone, where the tree plan allows hand and hydro digging only, in the approved scope, and caps added material at '+BUCAP+' mm of coarse woodchip. So these are the levels it has, not levels to set out to.'; }
-    else if(zone>0.1){ if(miss>0.1&&r.lvl==='g') r.lvl='a';
-      r.msg+=' '+Math.round(zone*100)+' per cent of it sits in a protection zone and stays as found, and the graded part finishes '+(miss*1000).toFixed(0)+' mm away from it'+(miss>0.1?'. That is a step, so the shape is wrong rather than the levels: keep it to the ground that can be worked.':', which feathers out.'); }
+    /* A protection zone used to stop the grading here. The owner has set that
+       aside, so the whole surface is shaped and the message says what the
+       machine does inside the zone. The tree plan conflict is a Check. */
+    if(zone>0.1) r.msg+=' '+Math.round(zone*100)+' per cent of it sits in a protection zone, and it is shaped through. Inside the zone that is '+(zmc*1000).toFixed(0)+' mm of cut and '+(zmf*1000).toFixed(0)+' mm added.';
     return r;
   }
   /* The schedule itself, and what of it a machine may do. Cut and fill are
@@ -1401,6 +1442,30 @@ class Component extends DCLogic {
   stone(it){ if(!it||it.n!==BLOCK) return null;
     const L=this.linLen(it), b=this.isRun(it)?it.w:Math.min(it.w,it.h);
     return {len:L,per:b*BLOCKH*STONET,total:L*b*BLOCKH*STONET}; }
+  /* How far the ground steps across a block edge, measured on the finished
+     surface rather than on the survey, because the step is what the grading
+     either side of it makes. Sampled along the run and a little clear of the
+     block on both sides, so the reading is the platform and not the face. */
+  terraceStep(it){
+    if(!it||it.n!==BLOCK) return null;
+    const L=this.linLen(it); if(L<1) return null;
+    const run=this.isRun(it), line=run?this.centreLine(it):null;
+    const cs=run?null:this.corners(it);
+    let a,b,wide;
+    if(run){ a=line[0]; b=line[line.length-1]; wide=it.w; }
+    else { const mid=(p,q)=>[(p[0]+q[0])/2,(p[1]+q[1])/2];
+      const e=[mid(cs[0],cs[1]),mid(cs[1],cs[2]),mid(cs[2],cs[3]),mid(cs[3],cs[0])];
+      const d1=Math.hypot(e[0][0]-e[2][0],e[0][1]-e[2][1]);
+      const d2=Math.hypot(e[1][0]-e[3][0],e[1][1]-e[3][1]);
+      if(d1>=d2){ a=e[0]; b=e[2]; wide=d2; } else { a=e[1]; b=e[3]; wide=d1; } }
+    const vx=b[0]-a[0], vy=b[1]-a[1], len=Math.hypot(vx,vy); if(len<1) return null;
+    const nx=-vy/len, ny=vx/len, off=wide/2+0.8;
+    let mx=0, sum=0, n=0;
+    for(let t=0.05;t<=0.95;t+=0.05){
+      const px=a[0]+vx*t, py=a[1]+vy*t;
+      const hi=this.finRL(px+nx*off,py+ny*off), lo=this.finRL(px-nx*off,py-ny*off);
+      const d=Math.abs(hi-lo); if(d>mx)mx=d; sum+=d; n++; }
+    return n?{len:L,mean:sum/n,max:mx,courses:Math.max(1,Math.ceil(mx/BLOCKH))}:null; }
   /* Ground raised behind an edge or over a bed. The app measures cut and fill
      from the ground surface, which is levelling, it says nothing about material
      carted in and heaped up, and that is the move the tree plan actually caps.
@@ -1900,9 +1965,25 @@ class Component extends DCLogic {
       const ck=this.checks(it), digs=(it.cat==='dig'||it.cat==='pave');
       if(ck.lvl==='r') out.push({sev:'stop',u:it.u,title:it.n+(ck.why?' '+ck.why:''),body:ck.msg});
       else if(ck.lvl==='a'&&(digs||(it.t==='plant'&&ck.bld.size))) out.push({sev:'care',u:it.u,title:it.n+(ck.why?' '+ck.why:''),body:ck.msg});
-      if(it.cat==='dig'||it.cat==='pave'){ const cf=this.cutfill(it);
+      /* Where there is a levelPlan it is the design, so the limits are tested
+         against it. cutfill levels to the middle and only answers for the
+         surfaces that have no plan. */
+      const lpc=this.levelPlan(it);
+      if(lpc||it.cat==='dig'||it.cat==='pave'){ const cf=lpc||this.cutfill(it);
         if(cf.maxCut>0.5||cf.maxFill>0.4) out.push({sev:'stop',u:it.u,title:it.n+' · cut and fill',
-          body:'Levelling it needs '+(cf.maxCut*1000).toFixed(0)+' mm of cut and '+(cf.maxFill*1000).toFixed(0)+' mm of fill. Over the 500 mm cut or 400 mm fill limit, which triggers a site reclassification.'}); }
+          body:'Levelling it needs '+(cf.maxCut*1000).toFixed(0)+' mm of cut and '+(cf.maxFill*1000).toFixed(0)+' mm of fill. Over the 500 mm cut or 400 mm fill limit, which triggers a site reclassification. Section 3 of the geotechnical report puts this block at Class P.'}); }
+      /* The tree plan has been set aside so the shaping can be drawn as the
+         owner wants it. These two are what that costs, one per zone breach, and
+         they are the ones to hand an arborist. */
+      if(lpc&&lpc.zMaxCut>0.005){ const z=[...new Set([...ck.srz,...ck.tpz])];
+        /* The tree plan allows hand and hydro digging in the approved scope, so
+           a shallow cut is a job to agree and a deep one is a machine job it
+           does not allow at all. */
+        out.push({sev:lpc.zMaxCut>BUCAP/1000?'stop':'care',u:it.u,title:it.n+' · digs '+(lpc.zMaxCut*1000).toFixed(0)+' mm inside a protection zone',
+          body:'Grading it cuts '+(lpc.zMaxCut*1000).toFixed(0)+' mm inside the protection zone of '+(z.length?'tree '+z.join(', '):'a retained tree')+'. The tree plan allows hand and hydro digging only there, in the approved scope, with an arborist present. No machine may cut this. Either the platform stops at the zone edge, or the cut inside it is agreed with the arborist before it is dug.'}); }
+      if(lpc&&lpc.zMaxFill>BUCAP/1000+0.005){ const z=[...new Set([...ck.srz,...ck.tpz])];
+        out.push({sev:'stop',u:it.u,title:it.n+' · adds '+(lpc.zMaxFill*1000).toFixed(0)+' mm inside a protection zone',
+          body:'Grading it adds '+(lpc.zMaxFill*1000).toFixed(0)+' mm inside the protection zone of '+(z.length?'tree '+z.join(', '):'a retained tree')+'. The tree plan caps added material at '+BUCAP+' mm of coarse woodchip, hand placed. This is '+(lpc.zMaxFill*1000/BUCAP).toFixed(1)+' times that, and lawn needs soil rather than chip. Soil that deep over a root plate is what the cap exists to prevent.'}); }
       if(it.t==='plant'&&it.tender) out.push({sev:'care',u:it.u,title:it.n,body:'Frost tender in Canberra. It will need a warm wall, a pot that can move, or replacing with something hardy.'});
       if(it.t==='plant'&&ck.out) out.push({sev:'care',u:it.u,title:it.n+' overhangs the boundary',body:'Its mature canopy crosses the line. Fine if you are happy to prune it, worth knowing before it is in the ground.'});
       const sk=this.soakCheck(it);
@@ -1914,6 +1995,11 @@ class Component extends DCLogic {
         body:'A long channel keeps capacity when part of it blocks. Put a litter sump below the outlet where you can reach it, and lay a spare pipe in the same trench while it is open. Clear it each autumn. In the courtyard, a missed year puts water inside the house.'});
       const bc=this.buildCheck(it,ck);
       if(bc) out.push({sev:bc.lvl==='r'?'stop':'note',u:it.u,title:it.n+' · ground raised '+bc.mm+' mm behind it',body:bc.msg});
+      const ts=this.terraceStep(it);
+      if(ts&&ts.max>0.02) out.push({sev:ts.courses>1?'care':'note',u:it.u,
+        title:it.n+' · retains '+(ts.max*1000).toFixed(0)+' mm at the worst',
+        body:'The ground steps '+(ts.mean*1000).toFixed(0)+' mm across it on average and '+(ts.max*1000).toFixed(0)+' mm at the worst, measured on the finished surface either side. One course of block is '+(BLOCKH*1000).toFixed(0)+' mm'
+          +(ts.courses>1?', so the deep end needs '+ts.courses+' courses. A run that changes height along itself is stepped in whole courses, not raked, and the levels sheet gives the platform each end sits at.':' and that covers it.')});
       const stone=this.stone(it);
       if(stone){ const zoned=ck.srz.size||ck.tpz.size, reach=zoned?this.stoneReach(it):0;
         out.push({sev:zoned?'care':'note',u:it.u,title:it.n+' weighs about '+stone.total.toFixed(1)+' tonnes',

@@ -1,5 +1,5 @@
 {
- "_README": "Derived reference data for 234 Duffy Street, Ainslie. Everything here was computed from the source documents and validated; reuse it rather than re-deriving.",
+ "_README": "Derived reference data for 234 Duffy Street, Ainslie. Everything here was computed from the source documents and validated; reuse it rather than re-deriving. The architect's levels are recorded here, so the drawing set does not need reading again; see floor_levels_m_AHD._source.",
  "site": {
   "address": "234 Duffy Street, Ainslie ACT 2602",
   "block": "Block 14, Section 105",
@@ -53,10 +53,19 @@
  "floor_levels_m_AHD": {
   "house_and_addition_FFL": 611.65,
   "sunken_lounge_FFL": 611.07,
+  "finished_ceiling_FCL": 614.165,
   "residence_eave": 613.93,
   "residence_ridge": 616.06,
   "addition_eave": 614.17,
-  "garage_eave": 614.3
+  "garage_eave": 614.3,
+  "roof_pitches_deg": [
+   18,
+   23
+  ],
+  "_source": "Enfold Architecture, 234 Duffy Street Ainslie, POST REVIEW FINAL7, 28.07.26. FFL 611650, sunken lounge 611070 and FCL 614165 are dimensioned on the elevations (A3.01, A3.02) and the sections (A4.01). Roof pitches are noted on A3.02.",
+  "_crosscheck": "The survey's own FFL_LOC layer measures FFL 611.65 and 611.07 on the existing floor. The architect's finished levels and the surveyor's measured levels agree, so there is nothing to reconcile and the alterations keep the existing floor level.",
+  "_in_the_app": "site-data.js carries FFL, FCL and SUNKEN, and levelPlan grades house-adjacent paving level with FFL so a sliding door opens onto it with no step.",
+  "_unresolved": "BOXH gives the kitchen addition a ridge and eave of 614.00 and the link 613.90, both below the finished ceiling at 614.165. Those two are the only place the app's massing disagrees with the architect's set. It changes the sun map and nothing else."
  },
  "buildings_local_m": [
   {
@@ -110,14 +119,14 @@
    "y0": 2.3,
    "x1": 21.52,
    "y1": 7.48,
-   "ridge": 614.0,
-   "eave": 614.0
+   "ridge": 614,
+   "eave": 614
   }
  ],
  "neighbours_local_m": [
   {
    "name": "east-north-east neighbour, main, two storey",
-   "x0": 22.0,
+   "x0": 22,
    "y0": -9.2,
    "x1": 30.53,
    "y1": -1.5,
@@ -207,8 +216,8 @@
    "height_m": 5,
    "canopy_width_m": 10,
    "dbh_cm": 30,
-   "protection_zone_radius_m": 7.0,
-   "structural_root_zone_radius_m": 2.0,
+   "protection_zone_radius_m": 7,
+   "structural_root_zone_radius_m": 2,
    "status": "Regulated",
    "canopy_RL": [
     613.8,
@@ -225,7 +234,7 @@
    "height_m": 11,
    "canopy_width_m": 10,
    "dbh_cm": 35,
-   "protection_zone_radius_m": 7.0,
+   "protection_zone_radius_m": 7,
    "structural_root_zone_radius_m": 2.3,
    "status": "Regulated",
    "canopy_RL": [
@@ -242,12 +251,12 @@
    "height_m": 11,
    "canopy_width_m": 10,
    "dbh_cm": 37,
-   "protection_zone_radius_m": 7.0,
+   "protection_zone_radius_m": 7,
    "structural_root_zone_radius_m": 2.3,
    "status": "Public tree",
    "canopy_RL": [
-    613.0,
-    621.0
+    613,
+    621
    ],
    "deciduous": true
   },
@@ -259,12 +268,12 @@
    "height_m": 12,
    "canopy_width_m": 10,
    "dbh_cm": 36,
-   "protection_zone_radius_m": 7.0,
+   "protection_zone_radius_m": 7,
    "structural_root_zone_radius_m": 2.3,
    "status": "Public tree",
    "canopy_RL": [
-    613.0,
-    622.0
+    613,
+    622
    ],
    "deciduous": true
   },
@@ -302,12 +311,12 @@
   "side_strip_ENE": [
    8.1,
    6.5,
-   4.0
+   4
   ],
   "paved_terrace": [
-   11.0,
+   11,
    3.9,
-   0.0
+   0
   ],
   "under_trees_1_and_2": [
    2.9,
@@ -332,14 +341,14 @@
   "courtyard": [
    5.7,
    3.1,
-   0.0
+   0
   ]
  },
  "drainage": {
   "spine": {
    "route_local": [
     [
-     1.0,
+     1,
      2.5
     ],
     [
@@ -348,11 +357,11 @@
     ],
     [
      19.6,
-     1.0
+     1
     ],
     [
      37.3,
-     1.0
+     1
     ]
    ],
    "size": "DN150",

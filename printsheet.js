@@ -1112,18 +1112,36 @@ window.PRINTSHEET = (function () {
   /* The house, lying flat on the ground rather than standing up on it. The
      drawing is about the shape of the earth, and a roof exaggerated four times
      hides most of the back yard. An outline is enough to find it by. */
+  /* The house, standing at its finished floor rather than lying on the ground.
+     The step from a door down to the paving is the thing worth seeing, and at
+     four times height a roof would hide the yard behind it, so the floor plane
+     is drawn and the roof is not. The driveway has no floor level and lies on
+     the ground. */
   function isoFootprints(app, zf, o) {
     var D = app.D, out = [];
     (D.BOXH || []).concat(D.DRIVE || []).forEach(function (b) {
-      var x0 = b[1], y0 = b[2], x1 = b[3], y1 = b[4], n = 5, k, m, ring = [];
-      for (k = 0; k <= n; k++) ring.push([x0 + (x1 - x0) * k / n, y0]);
-      for (k = 1; k <= n; k++) ring.push([x1, y0 + (y1 - y0) * k / n]);
-      for (k = 1; k <= n; k++) ring.push([x1 - (x1 - x0) * k / n, y1]);
-      for (k = 1; k < n; k++) ring.push([x0, y1 - (y1 - y0) * k / n]);
-      var pts = ring.map(function (p) { return isoPt(p[0], p[1], zf(p[0], p[1]) + 0.02, o); });
-      out.push(isoPoly(pts, 'rgba(247,243,233,.80)', '#8d8574'));
+      var x0 = b[1], y0 = b[2], x1 = b[3], y1 = b[4];
+      var fl = b[5] == null ? null : app.D.FFL;
+      var C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+      if (fl == null) {
+        out.push({d: x1 + y1, s: isoPoly(C.map(function (c) { return isoPt(c[0], c[1], zf(c[0], c[1]) + 0.02, o); }),
+          'rgba(236,229,214,.85)', '#a79d88')});
+        return;
+      }
+      /* the two faces that turn toward the viewer, each one polygon */
+      [[[x0, y1], [x1, y1]], [[x1, y0], [x1, y1]]].forEach(function (e) {
+        var p0 = e[0], p1 = e[1];
+        var g0 = zf(p0[0], p0[1]), g1 = zf(p1[0], p1[1]);
+        out.push({d: p0[0] + p0[1] + p1[0] + p1[1], s: isoPoly([
+          isoPt(p0[0], p0[1], fl, o), isoPt(p1[0], p1[1], fl, o),
+          isoPt(p1[0], p1[1], Math.min(g1, fl), o), isoPt(p0[0], p0[1], Math.min(g0, fl), o)],
+          'rgba(222,213,194,.95)', '#a79d88')});
+      });
+      out.push({d: x1 + y1 + 0.01, s: isoPoly(C.map(function (c) { return isoPt(c[0], c[1], fl, o); }),
+        'rgba(248,244,235,.97)', '#8d8574')});
     });
-    return out.join('');
+    out.sort(function (p, q) { return p.d - q.d; });
+    return out.map(function (q) { return q.s; }).join('');
   }
 
   /* Fits the drawing to its half of the sheet, so nothing depends on the block
@@ -1199,6 +1217,7 @@ window.PRINTSHEET = (function () {
     var tbl = '<table class="ps-tbl"><tbody>'
       + '<tr><td>Falls, reserve boundary to street</td><td class="ps-num">' + n1(ex(0, ISOY / 2) - ex(ISOX, ISOY / 2)) + ' m over ' + ISOX + ' m</td></tr>'
       + '<tr><td>Highest and lowest surveyed ground on the block</td><td class="ps-num">' + n1(exHi) + ' to ' + n1(exLo) + ' m AHD</td></tr>'
+      + '<tr><td>Finished floor, and the paving set level with it</td><td class="ps-num">' + app.D.FFL.toFixed(2) + ' m AHD</td></tr>'
       + '<tr><td>Ground this scheme cuts away</td><td class="ps-num">' + n1(cut) + ' m³, deepest ' + Math.round(mxc * 1000) + ' mm</td></tr>'
       + '<tr><td>Ground this scheme makes up</td><td class="ps-num">' + n1(fill) + ' m³, deepest ' + Math.round(mxf * 1000) + ' mm</td></tr>'
       + '<tr class="ps-tot"><td>Share of the block that moves at all</td><td class="ps-num">' + Math.round(moved / (NX * NY) * 100) + '%</td></tr>'

@@ -145,6 +145,17 @@ console.log('prose');
 
 console.log('docs');
 {
+  /* The architect's levels are recorded in source/project-data.json so nobody has
+     to read the drawing set again. If the app and that file disagree, one of them
+     has been edited without the other. */
+  const P = JSON.parse(R('source/project-data.json'));
+  const F = P.floor_levels_m_AHD;
+  eq('FFL matches source/project-data.json', D.FFL, F.house_and_addition_FFL);
+  eq('FCL matches source/project-data.json', D.FCL, F.finished_ceiling_FCL);
+  eq('the sunken lounge matches source/project-data.json', D.SUNKEN, F.sunken_lounge_FFL);
+  ok('the architect\'s set is cited', /FINAL7/.test(F._source || ''));
+}
+{
   /* Twice now a scripted edit has sliced a markdown file and dropped everything
      after the cut, once taking half of CLAUDE.md with it. A file the next person
      reads to know how not to break the app is worth asserting. */
@@ -183,7 +194,11 @@ console.log('seeding');
 {
   /* revisions: a corrected note has to reach a device that already has the scheme,
      without ever touching the layout or overwriting what the owner wrote there */
-  const id = D.SCHEMES[0].id;
+  /* Any scheme past its first revision will do. Picking SCHEMES[0] tied this to
+     the order of the list, and adding a new scheme at the top broke it. */
+  const rev2 = D.SCHEMES.find(s => (s.rev || 1) > 1);
+  ok('some scheme is past rev 1', !!rev2, 'the revision path cannot be tested without one');
+  const id = (rev2 || D.SCHEMES[0]).id;
   const seed = () => { const a = make(); a.state = { items: [], schemes: [], sel: null };
     a.toast = () => {}; a.seedStore(); return a; };
   const store = () => JSON.parse(localStorage.getItem(make().key()) || '{}');

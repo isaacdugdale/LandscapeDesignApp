@@ -11,9 +11,18 @@ disappears if it left no trace worth keeping. Git history is the log.
 
 - Levels are the surveyor's own TIN from layer `SRF-VIEW` of the CAD file, not a
   model fitted to it. 126 points, 196 surveyed faces, 83 Delaunay fill.
-- Site has a section, The shape of it, drawing the block as a solid of earth as
-  surveyed and as built. `finRL` in `index.html` is the finished surface and
-  `isoView` in `printsheet.js` draws it.
+- Site has a section, Shape, drawing the block as a solid of earth as surveyed
+  and as built. `finRL` in `index.html` is the finished surface and `isoView` in
+  `printsheet.js` draws it. The house stands at its finished floor in it.
+- Platforms rather than graded slopes. `datum` in `GRADE` makes a surface a level
+  plane. Paving within 2 m of a building takes the finished floor, 611.65, so a
+  sliding door opens onto it with no step. The lawn takes one 500 mm course above
+  that, which is what sets the terrace.
+- Tree protection zones no longer stop a surface being graded. The owner set that
+  aside. Checks carries the conflict per surface, with the cut and the fill that
+  lands inside a zone.
+- The architect's levels are in `source/project-data.json`, and `tools/check.js`
+  asserts the app agrees with them. The drawing set does not need reading again.
 - `tools/survey-extract.js` is that derivation, in the repo rather than in a
   scratchpad. `--check` reads the DWG and says whether the app still holds what
   the surveyor drew. It found eleven levels a centimetre out and they are fixed;
@@ -29,7 +38,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v37**.
+Live build at the time of writing: **v38**.
 
 ## Todo
 
@@ -43,6 +52,11 @@ Roughly in order. Nothing here is urgent and each is a spare-tokens job.
    not a test.
 3. **The four verge mounds.** Legible as stops now, still crossing the front
    boundary. Either move them or record why they stay.
+
+4. **The kitchen addition and link roof heights.** `BOXH` gives them a ridge of
+   614.00 and 613.90, both below the finished ceiling at 614.165. Every other
+   building agrees with the architect's set. It changes the sun map and nothing
+   else. Recorded under `floor_levels_m_AHD._unresolved`.
 
 ## Open decisions, not work
 

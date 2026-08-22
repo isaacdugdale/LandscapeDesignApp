@@ -67,13 +67,19 @@ window.HANDBOOK = [
 ]},
 
 /* --------------------------------------------------------------- shape --- */
-{id:'shape', group:'site', nav:'The shape of it', title:'The shape of the ground', sub:'The block as a solid, before and after', blocks:[
-  ['p','A plan gives the levels and a section gives one line through them. Neither shows the shape, and the shape is what gets argued about on site: how much this actually falls, where the hump is, what the cut looks like once it is open. So here is the block as a solid of earth, the ground the surveyor measured beside the ground this scheme leaves behind.'],
+{id:'shape', group:'site', nav:'Shape', title:'Shape', sub:'The block as a solid, before and after', blocks:[
+  ['p','A plan gives the levels. A section gives one line through them. Neither shows the shape of the ground, which is what gets argued about on site.'],
   ['iso',''],
-  ['p','It is drawn off the working layout, so it answers for the scheme open now rather than for a fixed design. Move a terrace and it redraws.'],
-  ['note','Height is stretched four times. The block falls 1.99 m over 40 m on the surveyor\u2019s surface, which at true scale is a flat sheet of paper. Lengths in plan are true, so nothing measured across the drawing is exaggerated. Only height is.'],
-  ['p','The two halves come off the same numbers as the Levels sheet under Works. A surface that grades finishes on its own string line, anything with build-up declared finishes that much above what it sits on, and everything else stays as the surveyor found it. Where the two disagree, the Levels sheet is the one to hand a builder, because it carries the chainages and the string line and this does not.'],
-  ['note','Nothing here is setting-out. It is the same surveyed surface as the rest of the app: exact where the levels were taken and interpolated between them.']
+  ['p','It draws the working layout, so it answers for the scheme open now. Move a terrace and it redraws.'],
+  ['note','Height is stretched four times. The block falls 1.99 m over 40 m on the surveyor\u2019s surface, and at true scale that is a flat sheet of paper. Lengths in plan are true.'],
+  ['ul',[
+    'The left half is the surveyed ground, exact where the levels were taken and interpolated between them.',
+    'The right half is the same ground once the open scheme is shaped.',
+    'A surface with a datum finishes level. Paving takes the finished floor, 611.65 m, so a sliding door opens onto it with no step. The lawn takes one 500 mm course above that.',
+    'Everything else finishes on its own string line, and ground under nothing stays as the surveyor found it.'
+  ]],
+  ['p','Works, Levels is the sheet to hand a builder. It carries the chainages and the string line, and this does not.'],
+  ['note','Nothing here is setting-out.']
 ]},
 
 /* ----------------------------------------------------------------- sun --- */

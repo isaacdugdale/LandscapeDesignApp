@@ -58,6 +58,11 @@ asserts the headings each document should still have.
   Positions come through the fit and only have to land inside a tolerance.
 - The survey plan PDF is vector with every glyph outlined, so it has no text to
   extract. Render it and read the image instead.
+- The architect's drawing set does have extractable text, and its levels are
+  already recorded in `source/project-data.json` under `floor_levels_m_AHD`. Read
+  that rather than the PDF. `tools/check.js` asserts the app agrees with it.
+  `pypdfium2` reads the set if you ever do need it, because `pypdf` pulls in a
+  `cryptography` build that is broken in this image.
 
 ## Adding or changing a scheme
 

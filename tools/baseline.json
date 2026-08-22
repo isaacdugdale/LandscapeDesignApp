@@ -1,49 +1,57 @@
 {
  "base": {
   "items": 60,
-  "issues": 50,
-  "stop": 2,
-  "care": 14,
-  "cost": 14250,
+  "issues": 63,
+  "stop": 7,
+  "care": 22,
+  "cost": 16545,
   "held": 4.57
+ },
+ "s-terrace-platforms": {
+  "items": 81,
+  "issues": 86,
+  "stop": 14,
+  "care": 44,
+  "cost": 20813,
+  "held": 4.17
  },
  "s-gravel-fruit": {
   "items": 80,
-  "issues": 72,
-  "stop": 9,
-  "care": 37,
+  "issues": 90,
+  "stop": 16,
+  "care": 46,
   "cost": 20653,
   "held": 3.75
  },
  "s-sumps": {
   "items": 58,
-  "issues": 56,
-  "stop": 2,
-  "care": 17,
+  "issues": 69,
+  "stop": 8,
+  "care": 22,
   "cost": 18945,
   "held": 3.43
  },
  "s-sand-bike2": {
   "items": 44,
-  "issues": 34,
-  "stop": 3,
-  "care": 15,
+  "issues": 47,
+  "stop": 9,
+  "care": 20,
   "cost": 17126,
   "held": 2.8
  },
  "s-contour-swales": {
   "items": 50,
-  "issues": 42,
-  "stop": 2,
-  "care": 17,
+  "issues": 55,
+  "stop": 8,
+  "care": 22,
   "cost": 17505,
   "held": 3.43
  },
  "s-levels-terrace": {
   "items": 81,
-  "issues": 67,
-  "stop": 6,
-  "care": 34,
+  "issues": 85,
+  "stop": 14,
+  "care": 43,
   "cost": 18613,
   "held": 4.17
  }

@@ -136,6 +136,14 @@ there and every screen follows.
   than from the nearest triangle's slope. None of it is set-out. That comes off the
   survey plan, datum A.H.D., origin SR585 at RL 608.442, and the plan records that no
   underground services have been located.
+- **The house sits at its finished floor.** `FFL` in `site-data.js` is 611.65 m
+  AHD, from Enfold's POST REVIEW FINAL7 set and confirmed by the survey, which
+  measured the same level on the existing floor. Paving within 2 m of a building
+  grades to a level plane at that level, so a sliding door opens onto it with no
+  step, and the lawn takes one 500 mm course of block above it. That is what
+  `datum` does in `GRADE`. The levels are recorded in
+  `source/project-data.json`, and `tools/check.js` asserts the app agrees with
+  it, so the drawing set does not need reading again.
 - **The shape of the ground, before and after.** Site has a section that draws the
   block as a solid of earth twice over: the surveyed ground, and the ground this
   scheme leaves behind. It is an isometric, so a length on it is true wherever it
