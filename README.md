@@ -36,10 +36,11 @@ the last note in this file.
 | `vendor/` | React and the two typefaces, served from here rather than a CDN |
 | `sw.js` | Service worker: caches the app so it opens with no signal |
 | `manifest.webmanifest`, `apple-touch-icon.png`, `icon-512.png` | Home-screen name and icon |
-| `offline/234-duffy-offline.html` | The whole app inlined into one file. AirDrop it and it works with no network. **Stale: built 14 August 2026 and not rebuilt since**, so it has none of the curved runs, the locks, the sumps or the survey levels. It is bundler output rather than a hand-assembled inline, so regenerating it means running that tool again |
+| `offline/234-duffy-offline.html` | The whole app in one file. AirDrop it and it works with no network. Built by `tools/build-offline.js`, so rebuild it whenever a served file changes |
 | `source/` | The original handbook and project data the site file was extracted from |
 | `CLAUDE.md` | How to add a scheme, publish, and check it. The parts that are easy to get wrong |
 | `STYLE.md` | How the words here should read |
+| `tools/build-offline.js` | Rebuilds the offline single-file copy from the current sources |
 
 Sun hours, ground levels, cut and fill, protection-zone rules and costs are computed
 in the app from `site-data.js` using the same maths as the handbook. Change a number

@@ -87,6 +87,9 @@ yours alone.
 - Bump `CACHE` in `sw.js` and `BUILD` in `index.html` together for any change to
   a served file, or devices keep the old copy. `BUILD` shows on the Schemes sheet,
   so ask what it reads before believing a device has the change.
+- Rebuild the offline copy with `node tools/build-offline.js` when a served file
+  changes, or `offline/234-duffy-offline.html` goes stale. It checks its own work
+  and refuses to write a file that still points at anything beside it.
 - Publish by merging to `main` — Pages serves `main` at the repository root.
   Confirm with the `pages build and deployment` run for your own commit's SHA,
   or by fetching the changed file from the live URL. A green push is not a
