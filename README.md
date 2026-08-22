@@ -209,10 +209,13 @@ there and every screen follows.
   that is *buried*, so passing under the garage slab is the design rather than a
   clash, and its metres are counted as drainage rather than as walls and edges.
 - Making the berm an element made visible something that was always true. In the base
-  plan the back path runs along the same strip, so the two now draw over each other.
-  Nothing checks for overlap, so nothing will say so. Move one of them, or accept a
-  path along the berm's toe and know the chip is counted twice. **Contour swales** has
-  the path further uphill and does not have the problem.
+  plan the back path runs along the same strip, so the two draw over each other, 6.2 m²
+  of it. Both are built up 100 mm over that ground, so the chip and the cost are
+  counted twice and the berm ends up the section the path was built to rather than the
+  ridge it has to be. The Checks screen says so now. Overlap is tested where it changes
+  what gets built: a graded surface lying on a swale, and one lying on a berm. Nothing
+  else on the plan is tested for it. **Contour swales** has the path further uphill and
+  does not have the problem.
 - Selecting anything on the plan floats a bar over the drawing with its name,
   **Copy**, **Rotate 90°** on rectangles, **Lock**, and **Delete**. The inspector
   carries the same actions from the same definition. The bar exists because the

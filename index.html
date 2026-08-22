@@ -662,7 +662,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v28';
+const BUILD='v29';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -1842,6 +1842,16 @@ class Component extends DCLogic {
           body:gp
             ? 'That can be done, and it is one trench rather than two: excavate the trough to '+(SOAK[SWALE].d*1000).toFixed(0)+' mm, fill it with clean aggregate, and finish the top '+(SOAK['Gravel path'].d*1000).toFixed(0)+' mm as the walking gravel, flush with the ground either side. The dish goes; what holds the water is the voids. Two conditions: the path has to run along the trough rather than across it, and the trough has to stay level along itself, which this one is to '+(cf?(cf.fall*1000).toFixed(0):'?')+' mm against the '+(LEVELTOL*1000).toFixed(0)+' mm limit. The Drainage page counts the shared ground once.'
             : 'A firm surface is not an infiltration surface, so laying one over the trough takes the trough out of service for that '+ov.toFixed(1)+' m\u00b2 and adds nothing back. Either move the path off it, or make it a Gravel path and build the two as one trench.'}); }
+      /* And the berm, which has the same problem for a different reason. Where
+         a path lies along it, both carry 100 mm of chip over the same ground,
+         so the volume and the cost are counted twice and the berm's section is
+         whatever the path was built to rather than the ridge it is meant to
+         be. In the base plan the back path does exactly this over 6 m2. */
+      if(it.n===BERM) for(const o of s.items){
+        if(o===it||!GRADE[o.n]) continue;
+        const ov=this.overlapArea(o,it); if(ov<0.2) continue;
+        out.push({sev:'care',u:o.u,title:o.n+' lies on '+it.n+' over '+ov.toFixed(1)+' m\u00b2',
+          body:'Both are built up 100 mm over the same '+ov.toFixed(1)+' m\u00b2, so the chip and the cost are counted twice, and the berm ends up the section the path was built to rather than the ridge it has to be. A berm only works if it stands proud of the ground either side of it. Move one of them, or build the path along the berm\u2019s toe rather than over its crown.'}); }
       /* The one thing a swale has to be. Turned the wrong way it is a drain
          pointed at the house rather than a store, and on this block the two
          directions differ by a factor of seven. */
