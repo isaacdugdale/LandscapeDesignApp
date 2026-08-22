@@ -662,7 +662,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v29';
+const BUILD='v30';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -754,7 +754,7 @@ const PIPE='Stormwater line', BURIED={'Stormwater line':1};
    clash rather than a sleeve. SUMPFAR is how far from a line a sump may sit
    before the connection stops being obvious on the drawing; SILT is the ones
    that take hillside runoff and therefore need a sump below the outlet. */
-const SUMP='Yard sump', SUMPFAR=2.0, SILTY=[[5.5,20.75],[15.8,19.9]], SILTR=2.5, KERB=609.85;
+const SUMP='Yard sump', SUMPFAR=2.0, SILTY=[[5.5,20.75],[15.8,19.9]], SILTR=2.5;
 /* Added material: the tree plan's cap inside a protection zone, the project's
    fill limit outside one, and the steps the inspector offers. The rate is the
    app's own — a mulched bed is $6/m² at 100 mm, so $60 the cubic metre. */
@@ -1428,13 +1428,24 @@ class Component extends DCLogic {
   segD(p,a,b){ const vx=b[0]-a[0], vy=b[1]-a[1], L=vx*vx+vy*vy;
     let t=L?((p[0]-a[0])*vx+(p[1]-a[1])*vy)/L:0; t=Math.max(0,Math.min(1,t));
     return Math.hypot(p[0]-(a[0]+vx*t), p[1]-(a[1]+vy*t)); }
+  /* The kerb a sump falls to is the one its line reaches, and the kerb is not
+     one level. It drops 330 mm along this frontage, 609.82 at the north end to
+     609.49 at the south. A single constant was 609.85, which is above every
+     surveyed point and 360 mm above the gutter the spine actually discharges
+     to, so every sump on the spine was told it had a third of a metre less
+     fall than it has. KERBP is the seven kerb and gutter levels off the survey
+     and this returns the nearest. */
+  kerbAt(x,y){ const K=this.D.KERBP; if(!K||!K.length) return null;
+    let best=null,bd=Infinity;
+    for(const k of K){ const d=Math.hypot(k[0]-x,k[1]-y); if(d<bd){bd=d;best=k;} }
+    return {rl:best[2], at:best, d:bd}; }
   sumpCheck(it){
     if(!it||it.n!==SUMP) return null;
     const c=this.centre(it); let best=null;
     for(const L of this.sumpLines()) for(let i=0;i<L.length-1;i++){
       const d=this.segD(c,L[i],L[i+1]); if(best===null||d<best) best=d; }
-    const rl=this.RL(c[0],c[1]);
-    return {d:best===null?Infinity:best, rl:rl, kerb:rl-KERB,
+    const rl=this.RL(c[0],c[1]), kb=this.kerbAt(c[0],c[1]);
+    return {d:best===null?Infinity:best, rl:rl, kerbRL:kb?kb.rl:null, kerb:kb?rl-kb.rl:null,
       silt:SILTY.some(s=>Math.hypot(c[0]-s[0],c[1]-s[1])<=SILTR)}; }
   /* Where the ground is free-draining sand a soak pit is the right answer, which
      is why one is recommended beside the firepit. Beside the house it is reactive
@@ -1881,9 +1892,9 @@ class Component extends DCLogic {
          the two catching hillside runoff and therefore needing a silt trap. */
       if(it.n===SUMP){ const sc=this.sumpCheck(it);
         if(sc.d>SUMPFAR) out.push({sev:'care',u:it.u,title:it.n+' is '+sc.d.toFixed(1)+' m from the nearest line',
-          body:'A sump collects water and hands it to a pipe, so it has to fall to one, and nothing on this drawing runs within '+SUMPFAR.toFixed(1)+' m of it. As drawn it is a hole that fills up. Either move it onto a line, or draw the '+PIPE+' that serves it — the falls are in Works → Drainage.'});
-        else out.push({sev:'note',u:it.u,title:it.n+' — ground '+sc.rl.toFixed(2)+' m, '+sc.kerb.toFixed(2)+' m above the kerb',
-          body:'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the kerb at '+KERB.toFixed(2)+'. Gravity is never the constraint on this block — it drops 2.08 m at 1 in 19 — the route past the protection zones is. Set the invert off the survey plan — datum A.H.D., origin SR585 at RL 608.442 — rather than off this drawing, and give it a removable grate rated for whatever crosses it.'});
+          body:'A sump collects water and hands it to a pipe, so it has to fall to one, and nothing on this drawing runs within '+SUMPFAR.toFixed(1)+' m of it. As drawn it fills and stays full. Either move it onto a line, or draw the '+PIPE+' that serves it. The falls are in Works, Drainage.'});
+        else out.push({sev:'note',u:it.u,title:it.n+' — ground '+sc.rl.toFixed(2)+' m, '+(sc.kerb!=null?sc.kerb.toFixed(2)+' m above the kerb':'kerb level unknown'),
+          body:(sc.kerb!=null?'On a line, with '+sc.kerb.toFixed(2)+' m of fall to the nearest surveyed kerb level, '+sc.kerbRL.toFixed(2)+'. The kerb is not one level: it drops 330 mm along this frontage, so this is the one nearest the sump rather than a single figure for the street. ':'On a line. ')+'Gravity is never the constraint on this block, which drops 2.08 m at 1 in 19. The route past the protection zones is. Set the invert off the survey plan, datum A.H.D., origin SR585 at RL 608.442, rather than off this drawing, and give it a removable grate rated for whatever crosses it.'});
         if(sc.silt) out.push({sev:'note',u:it.u,title:it.n+' — this is one that needs a silt trap',
           body:'Runoff off the reserve arrives heavily silted. Put a sump below the outlet with a removable grate. Then it is a box to empty once a year before winter, rather than silt in the pipe under the garage slab where you cannot reach it.'}); }
       /* The two things a berm has to be, and neither is level. */

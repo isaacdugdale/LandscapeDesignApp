@@ -27,7 +27,7 @@ the last note in this file.
 | File | What it is |
 | --- | --- |
 | `index.html` | The app: plan editor, checks, stages, the reference sections, ask |
-| `site-data.js` | The site: boundaries, contours, the surveyor's 126 ground levels and their triangulation, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
+| `site-data.js` | The site: boundaries, contours, the surveyor's 126 ground levels and their triangulation, the seven kerb and gutter levels, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
 | `handbook.js` | The reference half: the Site, Works and Risks sections, as blocks the app renders |
 | `bloom.js` | Flowering month and flower colour per plant. Horticultural, not survey |
 | `printsheet.js` | The printable set: plan, schedules and bloom calendar, drawn in mm at a true scale |
@@ -134,6 +134,15 @@ there and every screen follows.
   than from the nearest triangle's slope. None of it is set-out. That comes off the
   survey plan, datum A.H.D., origin SR585 at RL 608.442, and the plan records that no
   underground services have been located.
+- **The kerb is not one level.** It drops 330 mm along this frontage, 609.82 at
+  the north end to 609.49 at the south, so a sump's fall to the street depends on
+  which end its line reaches. The app used a single 609.85, which is above every
+  surveyed kerb point and 320 mm above the gutter the spine discharges to, and it
+  told the five sumps on the spine they had a third of a metre less fall than they
+  have. `KERBP` in `site-data.js` is the seven surveyed kerb and gutter levels and
+  the sump note quotes the nearest. The handbook had this right before the app did:
+  its drainage table already gave the two outlets different kerbs.
+
 - The bloom calendar plots mature height against month. The bar's thickness is the
   plant's mature spread and its colour is the flower's own. Flowering months and
   colours live in `bloom.js` and are the one part of the app that is judgement rather

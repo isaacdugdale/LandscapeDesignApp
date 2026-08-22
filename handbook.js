@@ -220,8 +220,8 @@ window.HANDBOOK = [
     ['Corner swale','294 L/s','250 mm deep at 1:40, western 4 m of the rear boundary'],
     ['Overland path, side strip','236 L/s','200 mm swale at 1:19. Must stay clear — the route if the reserve bank fails'],
     ['Courtyard runoff','0.66 L/s','1 in 100 yr, its own area only'],
-    ['North outlet invert at boundary','610.01','kerb 609.85, verge fall 1:50, gravity OK'],
-    ['Spine outlet invert at boundary','609.73','kerb 609.60, verge fall 1:58, gravity OK']
+    ['North outlet invert at boundary','610.01','nearest surveyed kerb 609.81, verge fall 1:52, gravity OK'],
+    ['Spine outlet invert at boundary','609.73','nearest surveyed kerb 609.49, verge fall 1:29, gravity OK']
   ],[1.4,1,1.8]],
   ['p','Pipe capacities by Manning, n = 0.010, running full. Flows by the rational method at the AS/NZS 3500.3 standard of a 5 minute duration and a 1 in 10 year storm for dwelling site drainage.'],
 
