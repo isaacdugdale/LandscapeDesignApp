@@ -3,75 +3,128 @@
 How the words in this repo should read: scheme notes, the handbook, Checks
 messages, `README.md`, `CLAUDE.md`, commit messages. Adapted from Isaac's
 document style guide, which covers essays and briefs. The principle carries
-over; the register does not.
+over. The register does not.
 
 **Principle: checkable beats clever.** The reader is standing in a garden, or
 holding a shovel, or opening the repo a year from now. They need to see each
 claim on its own and test it. Where a sentence has to choose between reading
 well and being checkable, it is checkable.
 
+## The worked rewrite
+
+This is the calibration. Two paragraphs from the `s-sumps` notes, and Isaac's
+rewrite of each.
+
+### Pair 1
+
+Before, 110 words, sentences averaging 37:
+
+> The drainage as elements. Every pit that was a dot on the line is a Yard sump
+> you can select, move and check: S0, S1, S2 and S3 down the DN150 spine in the
+> side strip, D1 on its branch, P0 at the foot of the corner swale, P1 at the
+> head of the sleeve under the garage, and P3 at the driveway. Same positions
+> the drainage design has always had, all eight sit clear of every protection
+> zone and every structural root zone, which is not luck, it is what the routes
+> were chosen for, and it is the thing to preserve if the builder wants one
+> moved.
+
+After, 38 words, sentences averaging 10:
+
+> All drainage components are now elements. The stormwater spines now show the
+> yard sumps as selectable elements with context, rather than dots. The
+> positions are the same as previously. All eight yard sumps are clear of
+> protection zones.
+
+### Pair 2
+
+Before, 151 words, sentences averaging 38:
+
+> What the Checks screen now asks of each one. Whether it reaches a line,
+> because a sump that falls to nothing is a hole that fills up, move it more
+> than 2 m off every pipe and it says so. Whether it is one of the two taking
+> runoff off the reserve, P0 and P1, which need a silt trap: a sump below the
+> outlet with a removable grate, because that water arrives orange and heavily
+> silted and shovelling sand out of a box once a year beats clearing it out of
+> the pipe under the garage slab. And it treats the overland flow corridor the
+> opposite way round for a sump than for anything else, a pit draining that
+> corridor belongs there, so long as its lid sits flush, because a raised
+> surround is a weir across the route the block needs if the reserve bank lets
+> go.
+
+After, 26 words:
+
+> **Checks**
+> - Does the yard sump attach to a line?
+> - Does it require a silt trap?
+> - Unlike other earthworks, sumps are allowed in the overland flow corridor
+
+## What the rewrite demonstrates
+
+1. **A list is a list.** Pair 2 was three parallel items wearing paragraph
+   clothing. The tell is prose that starts successive clauses with "Whether",
+   "Whether", "And". Set it as bullets and the parallel structure does the work
+   the sentences were straining to do.
+2. **Cut the reason, keep the fact.** Every "because" in pair 2 went. The
+   reasoning belongs in the handbook, where someone has come to understand the
+   design, or in the Checks message itself, which the reader is about to see.
+   A scheme note saying what the app checks does not also argue for it.
+3. **Don't recite what the plan shows.** The sump IDs and their positions came
+   out. They are on the drawing, labelled, two inches from the note.
+4. **Delete the tic, don't rephrase it.** "which is not luck, it is what the
+   routes were chosen for" has no replacement in the rewrite. It was doing no
+   work.
+5. **Delete the flourish too.** "a hole that fills up", "a raised surround is a
+   weir", "arrives orange and heavily silted". All gone, nothing put in their
+   place.
+6. **Fragment headings become sentences or headings.** "The drainage as
+   elements." became "All drainage components are now elements." "What the
+   Checks screen now asks of each one." became the heading **Checks**.
+7. **Plain and slightly flat is right.** "The positions are the same as
+   previously" is duller than "Same positions the drainage design has always
+   had" and better. The note is a record, not a performance.
+
+## Targets
+
+- **Cut 60 to 80 per cent.** The worked pair went from 261 words to 64. "About
+  half" was not enough.
+- **Sentences average about 10 words.** One fact per sentence. If a sentence
+  needs a comma splice or a "which", it is two sentences.
+- **Em and en dashes: zero.** Comma, colon, full stop, brackets.
+- **Bullets wherever the content is a list.** Questions the app asks, things
+  that changed, what is left to decide. Prose is for the one idea that needs a
+  paragraph.
+
 ## Rules
 
-1. **Say the thing, then stop.** Most paragraphs here make one point and then
-   make it again in a better-sounding way. Cut the second version. The rewrite
-   below is the worked example.
-2. **No line built to land.** If a sentence would work as a pull quote, it is
-   wrong. "A sump that falls to nothing is a hole that fills up" is a slogan
-   wearing a hard hat. Say what happens: the pit fills and stays full.
-3. **No headings that announce a move.** In a scheme note, `THE BERM IS AN
-   ELEMENT NOW.` and `WHAT CHANGED.` are shouting. Name the subject in normal
-   case, or use no heading and start the paragraph with its subject.
-4. **No "not X, it is Y".** This is the tic that shows up most. "which is not
-   luck, it is what the routes were chosen for" becomes "the routes were chosen
-   to keep them clear."
-5. **Sentences average under 18 words.** Currently the README averages 31 and
-   the handbook 21. Long sentences here are usually two sentences joined by a
-   dash or a "which".
-6. **No em or en dashes.** Use a comma, a colon, a full stop, or brackets. The
-   dash is how a second thought gets smuggled in without deciding where it
-   belongs.
-7. **One fact, one place.** If the app computes a number, the prose names it
-   once and says the app is what to trust. Don't restate a figure that will
-   drift.
-8. **Every number says where it comes from.** Survey, geotechnical report,
-   tree plan, or computed by the app. A number with no source cannot be
-   checked, which makes it decoration.
-9. **Assert or drop.** One hedge, stated plainly, or none. Not "may be
-   dependent on". If it is unknown, say "I don't know" and say what to measure.
-10. **Contractions in. Plain words.** "It is the reason the paths run across
-    the slope" becomes "that's why the paths run across the slope".
-11. **One form per term.** `Yard sump`, not "sump" one line and "pit" the next,
-    unless the difference is the point.
-12. **UK/Australian spelling.** Metres, millimetres, colour, levelled.
-
-## Length
-
-About half your first instinct. The current corpus is roughly 20,000 words
-across the handbook, notes, Checks and README. Most sections lose a third
-without losing a fact.
+1. Say the thing, then stop. Do not say it again in a better-sounding way.
+2. No line built to land. If a sentence would work as a pull quote, cut it.
+3. No "not X, it is Y".
+4. No headings that announce a move. Name the subject, in normal case. Never
+   in capitals.
+5. One fact, one place. If the app computes a number, name it once and say the
+   app is what to trust.
+6. Every number says where it comes from: survey, geotechnical report, tree
+   plan, or computed by the app.
+7. Assert or drop. One hedge, plainly, or none. If it is unknown, say so and
+   say what to measure.
+8. Contractions in. Plain words.
+9. One form per term. `Yard sump`, not "sump" then "pit".
+10. UK/Australian spelling.
 
 ## Register, by surface
 
-- **Scheme notes.** Written to the owner, who will read them on an iPad next to
-  the plan. What it is for, what changed, what is left to decide. The owner
-  writes in the same box, so no house voice they have to match.
-- **Handbook.** Read in the garden with a decision to make. Lead with the
-  instruction, then the reason.
-- **Checks messages.** One line saying what is wrong, one saying what to do.
-  No metaphor. These are read while something is being moved.
-- **README and CLAUDE.md.** Written to whoever opens the repo next, including
-  you. Say what breaks if they get it wrong.
+- **Scheme notes.** To the owner, reading on an iPad beside the plan. What it
+  is for, what changed, what is left to decide. Bullets for all three. The
+  owner writes in the same box, so no house voice to match.
+- **Handbook.** Read in the garden with a decision to make. This is where
+  reasons belong. Lead with the instruction, then the reason.
+- **Checks messages.** One line on what is wrong, one on what to do. No
+  metaphor. Read while something is being moved.
+- **README and CLAUDE.md.** To whoever opens the repo next. Say what breaks if
+  they get it wrong.
 - **Commit messages.** What changed and why. Not a retelling of the session.
-
-## Worked rewrite
-
-<!-- SLOT: paste the "before" text and Isaac's rewrite here, then derive the
-     rules the rewrite demonstrates. This section is the one that will do the
-     real work, because it shows the register rather than describing it. -->
-
-_To be filled: the before/after pair, with the rules it demonstrates._
 
 ## Checking a draft
 
-Average sentence length, em dash count, and the tic list are all countable.
-Run the numbers before saying a rewrite is done.
+Word count against the original, average sentence length, dash count. All
+countable. Run them before calling a rewrite done.
