@@ -1,0 +1,50 @@
+{
+ "base": {
+  "items": 60,
+  "issues": 50,
+  "stop": 2,
+  "care": 14,
+  "cost": 14250,
+  "held": 4.57
+ },
+ "s-gravel-fruit": {
+  "items": 80,
+  "issues": 72,
+  "stop": 9,
+  "care": 37,
+  "cost": 20653,
+  "held": 3.75
+ },
+ "s-sumps": {
+  "items": 58,
+  "issues": 56,
+  "stop": 2,
+  "care": 17,
+  "cost": 18945,
+  "held": 3.43
+ },
+ "s-sand-bike2": {
+  "items": 44,
+  "issues": 34,
+  "stop": 3,
+  "care": 15,
+  "cost": 17126,
+  "held": 2.8
+ },
+ "s-contour-swales": {
+  "items": 50,
+  "issues": 42,
+  "stop": 2,
+  "care": 17,
+  "cost": 17505,
+  "held": 3.43
+ },
+ "s-levels-terrace": {
+  "items": 81,
+  "issues": 67,
+  "stop": 6,
+  "care": 34,
+  "cost": 18613,
+  "held": 4.17
+ }
+}

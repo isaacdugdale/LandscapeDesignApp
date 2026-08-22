@@ -94,20 +94,15 @@ yours alone.
   Confirm with the `pages build and deployment` run for your own commit's SHA,
   or by fetching the changed file from the live URL. A green push is not a
   publish.
-- Check the layout rather than eyeballing it. `site-data.js`, `handbook.js` and
-  the class body of `index.html` all run under node with a stub `DCLogic` and a
-  fake `localStorage`, so a scheme can be built with `baseItems()` and put
-  through `checks()`, `issues()`, `water()` and `quantities()` before it ships.
-  Simulate a device that has already seeded the old id, or the bug above is
-  invisible.
+- Run `node tools/check.js` before you say anything is done. It builds every
+  scheme and the base plan under node, and asserts the things a change must not
+  break: the handbook's 13 sections with no `undefined` blocks, `RL()` exact at
+  all 126 surveyed points, a numeric `rot` on every item row, no dash in prose,
+  an edited scheme on a device left alone by seeding, and issue counts against
+  `tools/baseline.json`. `--update` rewrites the baseline, which you do only
+  when a count moved on purpose.
 
-## Placing anything on the plan
-
-`x` runs from the reserve boundary (0) to the street (40) and is the fall line,
-1 in 19. `y` runs from the east-north-east boundary (0) to the west-south-west
-(21.33) and is effectively level, 1 in 132, so contours, swales and mounds run
-in `y`. The constraints that will fail a placement are all computed by the app
-and worth running rather than reasoning about: protection zones and structural
-root zones, building footprints, the overland flow corridor at `y` 0.5 to 3.0, the
-3 m standoff for anything that infiltrates, and the 100 mm cap on material added
-inside a protection zone.
+  It exists because `node --check` is not enough. A handbook edit once left
+  `['note',...]['earth','']`, which is valid JavaScript, evaluates to
+  `undefined`, deleted the Earthworks screen and crashed Sources. `node --check`
+  passed it and it reached the live site. `tools/check.js` fails on it.
