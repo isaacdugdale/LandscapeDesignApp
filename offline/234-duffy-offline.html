@@ -2552,7 +2552,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v33';
+const BUILD='v34';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -2630,7 +2630,7 @@ const BERM='Diversion berm', BERMSAG=0.15;
    under that slab, because a trench through the pear's zone needs the tree plan
    amended. Nothing else in the library goes under a building, so the exemption
    is named here rather than guessed from the category. */
-const PIPE='Stormwater line', BURIED={'Stormwater line':1};
+const PIPE='Stormwater line', BURIED={'Stormwater line':1}, DRIVEWAY='driveway';
 /* The pits. Eight of them were drawn out of DRAIN.pits as annotation, dots on
    the lines, there to be read and impossible to move, and the builder asking
    for yard sumps is asking about exactly those. A sump is the opposite element
@@ -3010,28 +3010,38 @@ class Component extends DCLogic {
     const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];
     if(((yi>p[1])!=(yj>p[1]))&&(p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi))c=!c;} return c; }
   checks(it){
-    const D=this.D, pts=this.samples(it), tpz=new Set(), srz=new Set(), bld=new Set(); let out=false;
+    const D=this.D, pts=this.samples(it), tpz=new Set(), srz=new Set(), bld=new Set(), drv=new Set(); let out=false;
     const BOUND=[[0,0],[39.999,0],[39.999,21.333],[4.343,21.333]];
     for(const p of pts){
       for(const t of D.TREES){ if(!t.ctrl) continue;
         const d2=(p[0]-t.x)**2+(p[1]-t.y)**2;
         if(d2<=t.srz*t.srz)srz.add(t.id); else if(d2<=t.ctrl*t.ctrl)tpz.add(t.id); }
-      if(!BURIED[it.n]) for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) bld.add(b[0]);
+      if(!BURIED[it.n]) for(const b of this.BLDR) if(p[0]>=b[1]&&p[0]<=b[3]&&p[1]>=b[2]&&p[1]<=b[4]) (b[0]===DRIVEWAY?drv:bld).add(b[0]);
       if(!this.inPoly(p,BOUND)) out=true;
     }
-    const m=[]; let lvl='g';
+    /* red and amber collect a short reason each, so the Checks list can say what is
+       wrong in the title instead of only in the body. The first red, or the first
+       amber if there is no red, is the one worth putting there. */
+    const m=[], red=[], amber=[]; let lvl='g';
     if(srz.size){ const z='tree '+[...srz].join(', ');
-      if(it.cat==='dig'||it.cat==='pave'){ m.push('In the structural root zone of '+z+'. Nothing may be excavated, paved or compacted here, ever.'); lvl='r'; }
-      else { m.push('In the structural root zone of '+z+'. Mulch and hand planting only.'); if(lvl==='g')lvl='a'; } }
-    if(bld.size){ m.push('Overlaps the '+[...bld].join(', ')+'.'); lvl='r'; }
-    if(out){ if(it.t==='plant'){ m.push('Its mature canopy will overhang the boundary. Fine if you prune it.'); if(lvl==='g')lvl='a'; }
-      else { m.push('Crosses the boundary.'); lvl='r'; } }
+      if(it.cat==='dig'||it.cat==='pave'){ m.push('In the structural root zone of '+z+'. Nothing may be excavated, paved or compacted here, ever.'); lvl='r'; red.push('in the structural root zone of '+z); }
+      else { m.push('In the structural root zone of '+z+'. Mulch and hand planting only.'); if(lvl==='g')lvl='a'; amber.push('in the structural root zone of '+z); } }
+    /* A plant standing on a building footprint is a pot on paving, which is exactly how
+       the courtyard is planted. Calling that a clash is wrong. What it cannot be there
+       is planted into the ground, so say that instead. */
+    if(bld.size){ const w=[...bld].join(', ');
+      if(it.t==='plant'){ m.push('Stands on the '+w+'. A pot here, not planted into the ground.'); if(lvl==='g')lvl='a'; amber.push('stands on the '+w); }
+      else { m.push('Overlaps the '+w+'.'); lvl='r'; red.push('overlaps the '+w); } }
+    /* The driveway is a surface, not a building. A path is allowed to cross one. */
+    if(drv.size){ m.push('Crosses the driveway. Keep the crossing flush and put nothing structural in it.'); if(lvl==='g')lvl='a'; amber.push('crosses the driveway'); }
+    if(out){ if(it.t==='plant'){ m.push('Its mature canopy will overhang the boundary. Fine if you prune it.'); if(lvl==='g')lvl='a'; amber.push('overhangs the boundary'); }
+      else { m.push('Crosses the boundary.'); lvl='r'; red.push('crosses the boundary'); } }
     if(tpz.size){ const z='tree '+[...tpz].join(', ');
-      if(it.cat==='dig'){ m.push('Digging inside the protection zone of '+z+'. Hand or hydro dig only, arborist supervising, no roots over 30 mm, and it must be added to the approved scope.'); if(lvl!=='r')lvl='a'; }
-      else if(it.cat==='pave'){ m.push('Paving inside the protection zone of '+z+'. Build above existing grade on a cellular geotextile or mulch and board base, no excavation or compaction.'); if(lvl==='g')lvl='a'; }
-      else { m.push('Inside the protection zone of '+z+'. Fine as it sits on the ground. Hand-dig planting holes only.'); if(lvl==='g')lvl='a'; } }
+      if(it.cat==='dig'){ m.push('Digging inside the protection zone of '+z+'. Hand or hydro dig only, arborist supervising, no roots over 30 mm, and it must be added to the approved scope.'); if(lvl!=='r')lvl='a'; amber.push('digging inside the protection zone of '+z); }
+      else if(it.cat==='pave'){ m.push('Paving inside the protection zone of '+z+'. Build above existing grade on a cellular geotextile or mulch and board base, no excavation or compaction.'); if(lvl==='g')lvl='a'; amber.push('paving inside the protection zone of '+z); }
+      else { m.push('Inside the protection zone of '+z+'. Fine as it sits on the ground. Hand-dig planting holes only.'); if(lvl==='g')lvl='a'; amber.push('inside the protection zone of '+z); } }
     if(!m.length) m.push('Clear of everything.');
-    return {lvl:lvl,msg:m.join(' '),srz:srz,tpz:tpz,bld:bld,out:out};
+    return {lvl:lvl,why:(red[0]||amber[0]||''),msg:m.join(' '),srz:srz,tpz:tpz,bld:bld,drv:drv,out:out};
   }
   cutfill(it){ const pts=this.samples(it,5), c=this.centre(it), target=this.RL(c[0],c[1]);
     let cut=0,fill=0,mx=0,mn=0;
@@ -3698,8 +3708,8 @@ class Component extends DCLogic {
     const s=this.state, out=[];
     for(const it of s.items){
       const ck=this.checks(it), digs=(it.cat==='dig'||it.cat==='pave');
-      if(ck.lvl==='r') out.push({sev:'stop',u:it.u,title:it.n,body:ck.msg});
-      else if(ck.lvl==='a'&&digs) out.push({sev:'care',u:it.u,title:it.n,body:ck.msg});
+      if(ck.lvl==='r') out.push({sev:'stop',u:it.u,title:it.n+(ck.why?' '+ck.why:''),body:ck.msg});
+      else if(ck.lvl==='a'&&(digs||(it.t==='plant'&&ck.bld.size))) out.push({sev:'care',u:it.u,title:it.n+(ck.why?' '+ck.why:''),body:ck.msg});
       if(it.cat==='dig'||it.cat==='pave'){ const cf=this.cutfill(it);
         if(cf.maxCut>0.5||cf.maxFill>0.4) out.push({sev:'stop',u:it.u,title:it.n+' · cut and fill',
           body:'Levelling it needs '+(cf.maxCut*1000).toFixed(0)+' mm of cut and '+(cf.maxFill*1000).toFixed(0)+' mm of fill. Over the 500 mm cut or 400 mm fill limit, which triggers a site reclassification.'}); }
