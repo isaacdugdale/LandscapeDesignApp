@@ -463,10 +463,10 @@ window.PRINTSHEET = (function () {
 
   function earthLegend() {
     return [
-      ['#8c491a', 'solid', 'Structural root zone \u2014 no excavation, not even by hand'],
-      ['#b2622d', 'dash', 'Tree protection zone \u2014 hand or hydro dig, arborist present'],
-      ['#33646b', 'solid', 'Corner swale \u2014 the one part of the rear boundary that can be cut'],
-      ['#b2622d', 'solid', 'Diversion bund \u2014 built up in mulch, never dug'],
+      ['#8c491a', 'solid', 'Structural root zone: no excavation, not even by hand'],
+      ['#b2622d', 'dash', 'Tree protection zone: hand or hydro dig, arborist present'],
+      ['#33646b', 'solid', 'Corner swale: the one part of the rear boundary that can be cut'],
+      ['#b2622d', 'solid', 'Diversion bund: built up in mulch, never dug'],
       ['level', 'level', 'Existing surface level, m AHD, on a 4 m grid'],
       ['key', 'key', 'Excavation, numbered in the schedule']
     ].map(function (l) {
@@ -487,9 +487,9 @@ window.PRINTSHEET = (function () {
       var cls = r.meth.rank === 0 ? 'ps-no-dig' : r.meth.rank === 1 ? 'ps-hand' : '';
       return '<tr class="' + cls + '"><td class="ps-no">' + r.no + '</td><td>' + esc(r.name) + '</td><td>' + esc(r.size) + '</td>'
         + '<td class="ps-num">' + r.rl.toFixed(2) + '</td>'
-        + '<td class="ps-num">' + (r.depth ? Math.round(r.depth * 1000) : '\u2014') + '</td>'
-        + '<td class="ps-num">' + (r.cut + r.digV >= 0.05 ? n1(r.cut + r.digV) : '\u2014') + '</td>'
-        + '<td class="ps-num">' + (r.fill >= 0.05 ? n1(r.fill) : '\u2014') + '</td>'
+        + '<td class="ps-num">' + (r.depth ? Math.round(r.depth * 1000) : '\u00b7') + '</td>'
+        + '<td class="ps-num">' + (r.cut + r.digV >= 0.05 ? n1(r.cut + r.digV) : '\u00b7') + '</td>'
+        + '<td class="ps-num">' + (r.fill >= 0.05 ? n1(r.fill) : '\u00b7') + '</td>'
         + '<td class="ps-num">' + Math.round(Math.max(r.maxCut, r.maxFill) + r.depth * 1000) + '</td>'
         + '<td><b>' + esc(r.meth.m) + '</b><br><span class="ps-mut">' + esc(r.meth.why) + '</span></td></tr>';
     }).join('');
@@ -502,7 +502,7 @@ window.PRINTSHEET = (function () {
       + '<tr class="ps-tot"><td>' + (net >= 0 ? 'Net to cart away' : 'Net to import') + '</td><td class="ps-num">' + n1(Math.abs(net)) + ' m\u00b3</td></tr>'
       + '</tbody></table>'
       + buildTable(app)
-      + '<p class="ps-fine"><b>Dig mm</b> is depth below finished level where a document states one \u2014 only the firepit does, at 450 mm, which is also what keeps it under the 500 mm that would force a site reclassification. Everything else is levelling of the existing surface across the item\u2019s own footprint, from the fitted surface. Anything needing a depth decided on site is left blank rather than guessed. Bulking is not allowed for: loose spoil carts at roughly 1.25 times these figures.</p>';
+      + '<p class="ps-fine"><b>Dig mm</b> is depth below finished level where a document states one. Only the firepit does, at 450 mm, which is also what keeps it under the 500 mm that would force a site reclassification. Everything else is levelling of the existing surface across the item\u2019s own footprint, from the fitted surface. Anything needing a depth decided on site is left blank rather than guessed. Bulking is not allowed for: loose spoil carts at roughly 1.25 times these figures.</p>';
   }
 
   function buildTable(app) {
@@ -650,8 +650,8 @@ window.PRINTSHEET = (function () {
       ['#b2622d', 'Finishes flatter or steeper than it wants. Read the schedule'],
       ['#a8332a', 'Wrong grade for what it is. Change the shape, not the levels'],
       [MUT, 'Left as found: mostly inside a protection zone, so not set out'],
-      ['zone', 'Tree protection zone \u2014 no machine, no cut, 100 mm of chip at most'],
-      ['flow', 'Overland flow corridor \u2014 nothing set out here may dam it']
+      ['zone', 'Tree protection zone: no machine, no cut, 100 mm of chip at most'],
+      ['flow', 'Overland flow corridor: nothing set out here may dam it']
     ].map(function (l) {
       var sw = l[0] === 'zone' ? '<span class="ps-sw" style="border-top:0.6mm dashed #b2622d"></span>'
         : l[0] === 'flow' ? '<span class="ps-sw" style="background:#33646b;opacity:0.18"></span>'
@@ -667,12 +667,12 @@ window.PRINTSHEET = (function () {
       var cls = !r.graded ? 'ps-hand' : r.lvl === 'r' ? 'ps-no-dig' : '';
       return '<tr class="' + cls + '"><td class="ps-no">' + r.no + '</td><td>' + esc(r.n) + '</td>'
         + '<td>' + n1(r.len) + ' \u00d7 ' + n1(r.w) + ' m</td>'
-        + '<td class="ps-num">' + r.exLo.toFixed(2) + '\u2013' + r.exHi.toFixed(2) + '</td>'
+        + '<td class="ps-num">' + r.exLo.toFixed(2) + ' to ' + r.exHi.toFixed(2) + '</td>'
         + '<td class="ps-num">' + (r.graded ? '<b>' + r.from.toFixed(2) + ' \u2192 ' + r.to.toFixed(2) + '</b>' : '<span class="ps-mut">as found</span>') + '</td>'
         + '<td class="ps-num">' + grade(r.finN) + '</td>'
-        + '<td class="ps-num">' + (r.cut >= 0.05 ? n1(r.cut) : '\u2014') + '</td>'
-        + '<td class="ps-num">' + (r.fill >= 0.05 ? n1(r.fill) : '\u2014') + '</td>'
-        + '<td class="ps-num">' + (r.graded ? Math.round(Math.max(r.maxCut, r.maxFill) * 1000) : '\u2014') + '</td></tr>'
+        + '<td class="ps-num">' + (r.cut >= 0.05 ? n1(r.cut) : '\u00b7') + '</td>'
+        + '<td class="ps-num">' + (r.fill >= 0.05 ? n1(r.fill) : '\u00b7') + '</td>'
+        + '<td class="ps-num">' + (r.graded ? Math.round(Math.max(r.maxCut, r.maxFill) * 1000) : '\u00b7') + '</td></tr>'
         + '<tr><td></td><td colspan="8" class="ps-mut">' + esc(r.msg) + '</td></tr>';
     }).join('');
     return '<h3 class="ps-h3">Finished levels, surface by surface</h3>'
@@ -727,7 +727,7 @@ window.PRINTSHEET = (function () {
   function levelSheets(app, P, size, stamp, scheme) {
     var draw = levelSvg(app, P);
     var h = '<section class="ps-sheet ps-earth">'
-      + sheetHead(P, 'Levels', 'What the ground finishes at, and what the machine takes to get there \u2014 ' + scheme, stamp)
+      + sheetHead(P, 'Levels', 'What the ground finishes at, and what the machine takes to get there \u00b7 ' + scheme, stamp)
       + '<div class="ps-warn">' + WARN + '</div>'
       + '<div class="ps-plan">' + draw.svg + '</div>'
       + '<div class="ps-foot"><div class="ps-legend">' + levelLegend() + '</div>'
@@ -737,7 +737,7 @@ window.PRINTSHEET = (function () {
       + '<div class="ps-north">' + northArrow(app) + '<div class="ps-nlab">Duffy Street is<br>north-north-west</div></div>'
       + '</div></section>';
     h += '<section class="ps-sheet ps-earth">'
-      + sheetHead(P, 'Levels schedule', 'Existing and finished, by the numbers on the drawing \u2014 ' + scheme, stamp)
+      + sheetHead(P, 'Levels schedule', 'Existing and finished, by the numbers on the drawing \u00b7 ' + scheme, stamp)
       + '<div class="ps-cols ps-cols-earth">'
       + '<div>' + levelTable(app) + '</div>'
       + '<div>' + levelNotes(app) + '</div>'
@@ -764,7 +764,7 @@ window.PRINTSHEET = (function () {
       + '</div></section>';
 
     h += '<section class="ps-sheet ps-earth">'
-      + sheetHead(P, 'Earthworks schedule', 'Volumes, depths and method, by the numbers on the drawing \u2014 ' + scheme, stamp)
+      + sheetHead(P, 'Earthworks schedule', 'Volumes, depths and method, by the numbers on the drawing \u00b7 ' + scheme, stamp)
       + '<div class="ps-cols ps-cols-earth">'
       + '<div>' + earthTable(app) + '</div>'
       + '<div>' + earthNotes() + '</div>'

@@ -662,7 +662,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v32';
+const BUILD='v33';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -1835,7 +1835,7 @@ class Component extends DCLogic {
          so the two cannot disagree. */
       const lp=this.levelPlan(it);
       if(lp&&lp.lvl!=='g') out.push({sev:lp.lvl==='r'?'stop':'care',u:it.u,
-        title:it.n+' \u2014 '+(lp.graded?'finishes at':'lies at')+' 1 in '+(lp.finN===Infinity?'\u221e':lp.finN.toFixed(0)),body:lp.msg});
+        title:it.n+' \u00b7 '+(lp.graded?'finishes at':'lies at')+' 1 in '+(lp.finN===Infinity?'\u221e':lp.finN.toFixed(0)),body:lp.msg});
       /* A gravel path laid along a trough is one trench, not two things on one
          piece of ground. Worth saying because nothing else on the plan tests
          for overlap, and because the pair only works where the path is level
@@ -1945,7 +1945,7 @@ class Component extends DCLogic {
     'The block is inside the ACT mapped bushfire prone area. Bushfire construction compliance is already dealt with and the certifier is satisfied; do not reopen it. Landscape only: the ACT rule is three metres clearance to the reserve for a firepit.',
     'Budget about $10,000 over 6-12 months, staged, her own labour, hand-dug. A contractor does the stormwater.',
     'Decisions made: keep the pear; no pond (snakes); the area off the house is paved with an outdoor kitchen, not a deck; lawn beats vegetables (toddler); vegetables become planters on the paving; natives only from here; front garden gets mounds and two fruit trees only, quince and pomegranate; the courtyard maple is gone; the driveway takes the sunniest front ground so nothing goes there.',
-    'Water shaping: swales are level troughs on the contour with a mound on the downhill side, running across the block because the fall is 1 in 19 along it and 1 in 132 across it. Almost nothing here can be dug \u2014 inside a protection zone the trough is formed by raising its shoulders in 100 mm of coarse woodchip, and only the rear pocket is clear enough for soil. Gravel paths are part of the same system: laid level on 150 mm of aggregate they hold about 50 litres a square metre. Anything that puts water into the ground stays 3 m clear of a wall.',
+    'Water shaping: swales are level troughs on the contour with a mound on the downhill side, running across the block because the fall is 1 in 19 along it and 1 in 132 across it. Almost nothing here can be dug. Inside a protection zone the trough is formed by raising its shoulders in 100 mm of coarse woodchip, and only the rear pocket is clear enough for soil. Gravel paths are part of the same system: laid level on 150 mm of aggregate they hold about 50 litres a square metre. Anything that puts water into the ground stays 3 m clear of a wall.',
     'NOTES ON THIS SCHEME: '+((this.state.notes||'').trim()||'none written.'),
     'CURRENT LAYOUT: '+items,
     'CURRENT TOTAL: $'+Math.round(q.cost).toLocaleString()+' of $10,000. '+q.plants+' plants, '+q.pave.toFixed(0)+' m2 paving, '+q.soft.toFixed(0)+' m2 soft surface, '+q.mulch.toFixed(1)+' m3 mulch at 100 mm.',
@@ -1974,7 +1974,7 @@ class Component extends DCLogic {
     if(s.includes('firepit')) return 'As drawn the firepit sits '+((this.state.items.find(i=>i.n==='Sunken firepit')||{x:3,w:0.85}).x-0.85).toFixed(1)+' m from the reserve boundary. The ACT rule is three metres. Moving it toward the street fixes it until you reach the gum\u2019s protection zone.';
     if(s.includes('mulch')) return 'At 100 mm you need '+q.mulch.toFixed(1)+' m³ for the mulched beds as drawn. Coarse 25 mm chip, not fine or shredded, so it knits together on the slope.';
     if(s.includes('cost')||s.includes('budget')||s.includes('stage')) return 'The layout as drawn is $'+Math.round(q.cost).toLocaleString()+' of the $10,000, materials only with your labour, and it excludes the stormwater contractor.';
-    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 10.9 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 8.3 hours in summer, 6.5 at the equinox, 3.9 in midwinter. Under trees 1 and 2 it is 3.8 hours even in summer. Trees 2 to 5 are deciduous on their own dates \u2014 full canopy from about November to March, April included, and bare through winter. The full table is on the Site screen, under Sun.';
+    if(s.includes('sun')) return 'Sunniest ground is the paved terrace in summer at 10.9 hours, dropping to nothing in midwinter. The east-north-east side strip is the most consistent: 8.3 hours in summer, 6.5 at the equinox, 3.9 in midwinter. Under trees 1 and 2 it is 3.8 hours even in summer. Trees 2 to 5 are deciduous on their own dates: full canopy from about November to March, April included, and bare through winter. The full table is on the Site screen, under Sun.';
     return 'The site knowledge is here but the answering model is unavailable in this preview. The figures behind every screen are the same ones in the handbook: 807 m², a 2.08 m fall to the street, 52% of the open back garden inside protection zones, and $'+Math.round(q.cost).toLocaleString()+' spent of $10,000.';
   }
   scrollChat(){ const el=this.chatEl; if(el) el.scrollTop=el.scrollHeight; }
