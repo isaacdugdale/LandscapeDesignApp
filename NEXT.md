@@ -70,10 +70,14 @@ disappears if it left no trace worth keeping. Git history is the log.
 - Floor levels confirmed throughout. FFL 611.650 and the sunken lounge 611.070
   match the architect exactly. The garage floor at 611.535 and its apron at
   611.575 are new to the app.
-- The site plan draws the model's outline, split into existing and new work.
-  The footprint is 265.5 m² against the 284.4 m² the boxes claimed.
+- The site plan draws the model's outline, one path per building, as built.
+  It does not tint new work: Shape still does, from the flag in BOXH. The
+  footprint is 245.0 m² against the 284.4 m² the boxes claimed.
+- A floor counts as house if it is inside one of the six building extents. Under
+  a roof was tried and drew the paved terrace as building, the terrace sitting
+  under a transparent canopy.
 
-Live build at the time of writing: **v46**.
+Live build at the time of writing: **v47**.
 
 ## Todo
 
