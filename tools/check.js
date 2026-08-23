@@ -156,12 +156,22 @@ console.log('house');
        return Math.abs(p[0] - q[0]) < 1e-9 || Math.abs(p[1] - q[1]) < 1e-9; })),
      'the trace runs on a grid, so every edge is axis-aligned');
 
-  /* The plan draws BLDS from the model now. Both halves have to be there, or
-     the addition or the old house silently stops being drawn. */
-  ok('the plan outline is split into existing and new work',
-     HH.BLDS.length === 2 && HH.BLDS.every(b => b.d && b.d.length > 40));
-  ok('the new work half is the smaller of the two',
-     HH.BLDS.find(b => b.k === 'proposed').d.length < HH.BLDS.find(b => b.k === 'existing').d.length);
+  /* The plan draws BLDS from the model now, one path per building. Merging
+     them into one outline was tried and read as a blob: the garage, the wing
+     and the house ran together and the additions stopped being legible. Every
+     building has to be there, or one silently stops being drawn. */
+  eq('the plan draws one path per building', HH.BLDS.length, D.BOXH.length);
+  ok('every building has a path', HH.BLDS.every(b => b.d && b.d.length > 40),
+     HH.BLDS.filter(b => !b.d || b.d.length <= 40).map(b => b.n).join(', '));
+  ok('the paths name the building they came from',
+     HH.BLDS.map(b => b.n).sort().join('|') === D.BOXH.map(b => b[0]).sort().join('|'));
+  /* The plan draws the house as built and does not tint new work, but the flag
+     still has to be right: the Shape view reads it to leave the additions out
+     of the surveyed half. */
+  const P3 = JSON.parse(R('source/project-data.json')).buildings_new_work;
+  ok('the new work flag on the paths matches source/project-data.json',
+     HH.BLDS.filter(b => b.k === 'proposed').map(b => b.n).sort().join('|')
+       === P3.new.slice().sort().join('|'));
 
   /* Two tile roofs came across as one pitch of their two, so a section through
      them draws part of a roof. Ridge and eave are right, being the top and

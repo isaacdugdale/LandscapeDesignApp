@@ -1819,11 +1819,16 @@ window.PRINTSHEET = (function () {
     H.ROOF.forEach(function (r) {
       var hits = intCross(r[5], r[6], cy);
       if (hits.length < 2) return;
-      var i;
-      for (i = 0; i + 1 < hits.length; i += 2)
-        sec += '<line x1="' + n1(sx(hits[i][0])) + '" y1="' + n1(sz(hits[i][1]))
-          + '" x2="' + n1(sx(hits[i + 1][0])) + '" y2="' + n1(sz(hits[i + 1][1]))
-          + '" stroke="' + COLI.roof + '" stroke-width="1.1" stroke-linecap="round"/>';
+      /* Drawn as the slab it is, at its own build up, rather than as a line.
+         A hairline read as a wire strung over the walls instead of a roof. */
+      var t = (r[7] || 0.15) * k, i;
+      for (i = 0; i + 1 < hits.length; i += 2) {
+        var ax = sx(hits[i][0]), az = sz(hits[i][1]);
+        var bx = sx(hits[i + 1][0]), bz = sz(hits[i + 1][1]);
+        sec += '<path d="M' + n1(ax) + ' ' + n1(az) + 'L' + n1(bx) + ' ' + n1(bz)
+          + 'L' + n1(bx) + ' ' + n1(bz + t) + 'L' + n1(ax) + ' ' + n1(az + t)
+          + 'Z" fill="' + COLI.roof + '"/>';
+      }
     });
 
     /* floors */

@@ -122,6 +122,8 @@ const BOXH = [
   ['kitchen addition', 19.95, 2.3, 21.52, 7.48, 1]
 ];
 const boxOf = n => BOXH.find(b => b[0] === n);
+const inBox = (b, x, y, g) => x >= b[1] - g && x <= b[3] + g && y >= b[2] - g && y <= b[4] + g;
+
 
 /* The grid angle is only known modulo 90, so try all four quarter turns and
    both handedness, and keep whichever puts the garage the right way round: long
@@ -349,6 +351,19 @@ if (partialRoofs.length) {
   say('  re-run tools/ifc/extract.py against the IFC to pick up every upward face');
 }
 
+/* A roof off a brep carries no thickness, but its type name does: the family
+   is called Tile Roof - 210 or Metal Roof - 180, and that number is the build
+   up in millimetres. The two roofs that came across as extrusions confirm the
+   convention, measuring 158 mm against a name of 150 and 181 against 180. So
+   the name is read where there is nothing to measure, and the measurement wins
+   where there is one. Only the section drawing uses this. */
+const roofThick = s => {
+  if (s.thick > 0) return s.thick;
+  const m = /-\s*(\d{2,4})\s*(?::|$)/.exec(String(s.name || ''));
+  const mm = m ? +m[1] : 0;
+  return mm >= 20 && mm <= 500 ? mm / 1000 : 0.15;
+};
+
 /* ---- 5. the massing, rebuilt from the roofs ---- */
 
 /* BOXH gave every building one ridge and one eave, and project-data.json
@@ -426,12 +441,24 @@ function intQuad(w) {
   return [[w.a[0] + nx - ex, w.a[1] + ny - ey], [w.b[0] + nx + ex, w.b[1] + ny + ey],
           [w.b[0] - nx + ex, w.b[1] - ny + ey], [w.a[0] - nx - ex, w.a[1] - ny - ey]];
 }
-const roofed = poly => {
-  const c = poly.reduce(function (a, p) { return [a[0] + p[0], a[1] + p[1]]; }, [0, 0]);
-  const n = poly.length, mid = [c[0] / n, c[1] / n];
-  return roofs.some(r => inPoly(mid, r.poly));
-};
-const houseFloors = floors.filter(f => roofed(f.poly));
+/* A floor counts as house if it sits inside one of the six building extents.
+
+   Being under a roof was tried first and got two things wrong. The paved
+   terrace sits under a transparent canopy, which is a roof in the model, so
+   49.6 m2 of paving was drawn as building. And both tile roofs are missing a
+   pitch, so eight rooms under the half that did not come across read as
+   unroofed and were cut out of the outline.
+
+   The boxes have neither problem. They are the architect's own building
+   extents off the site plan, the model agrees with them to 20 mm, and a canopy
+   over a courtyard is not one of them. They decide what counts; the walls and
+   the slabs still give the shape inside. The 200 mm of reach picks up a slab
+   sitting on the line of its own box. */
+const houseFloors = floors.filter(f => {
+  const c = f.poly.reduce(function (a, p) { return [a[0] + p[0], a[1] + p[1]]; }, [0, 0]);
+  const n = f.poly.length;
+  return BOXH.some(b => inBox(b, c[0] / n, c[1] / n, 0.2));
+});
 const openFloors = floors.length - houseFloors.length;
 
 /* The grid has to cover the floors as well as the walls. Sizing it off the
@@ -472,7 +499,7 @@ const IN = WALLC;
 let cells = 0;
 for (let k = 0; k < IN.length; k++) if (IN[k]) cells++;
 const footprint_m2 = r2(cells * CELL * CELL);
-say(houseFloors.length + ' floor slabs are under a roof, ' + openFloors + ' are open paving');
+say(houseFloors.length + ' floor slabs are inside a building extent, ' + openFloors + ' are paving outside one');
 
 /* Trace the boundary. Every cell edge with house on one side and not on the
    other is a segment; the segments are then chained into rings and collinear
@@ -520,32 +547,42 @@ return rings.map(simplify).filter(r => r.length >= 4).map(r =>
 const OUTLINE = trace(IN);
 OUTLINE.sort((a, b) => Math.abs(shoelace(b)) - Math.abs(shoelace(a)));
 
-/* The plan tints new build differently from what is already standing, so the
-   outline is traced twice more against the same grid: once masked to the boxes
-   flagged as new work, once to everything else. Tracing a mask rather than
-   splitting a finished ring keeps the two halves sharing an exact edge where
-   an addition meets the old house. */
-/* Wall cells reach half a cell past the box they belong to, and a strict
-   containment test left a 50 mm skin of the old house wrapped round every
-   addition. So an old box wins where it contains the cell outright, and a new
-   box is allowed 150 mm of reach to pick up its own walls. At plan scale
-   150 mm at a junction cannot be seen; the slivers could. */
-const inBox = (b, x, y, g) => x >= b[1] - g && x <= b[3] + g && y >= b[2] - g && y <= b[4] + g;
-const inNew = (x, y) => !BOXH.some(b => !b[5] && inBox(b, x, y, 0))
-  && BOXH.some(b => b[5] && inBox(b, x, y, 0.15));
-const NEWC = new Uint8Array(NXc * NYc), OLDC = new Uint8Array(NXc * NYc);
+/* The plan draws one path per building, not one merged outline.
+
+   Merging them was the first attempt and it read badly: the garage, the east
+   wing and the house ran together into a single blob and the additions stopped
+   being legible as additions. The traced paths this replaces kept the
+   buildings apart, and a plan has to.
+
+   Each cell goes to the smallest building extent that contains it. Smallest
+   matters, because the boxes overlap: the kitchen addition sits inside the
+   existing house's box, and picking the first or the largest match drew that
+   pop-out as existing rather than as new work. The smallest containing box is
+   always the specific one. */
+const boxFor = (x, y) => {
+  let best = null, bestA = Infinity;
+  BOXH.forEach(b => {
+    if (!inBox(b, x, y, 0.2)) return;
+    const a = (b[3] - b[1]) * (b[4] - b[2]);
+    if (a < bestA) { bestA = a; best = b; }
+  });
+  return best;
+};
+const masks = BOXH.map(() => new Uint8Array(NXc * NYc));
+let newCells = 0, orphan = 0;
 for (let i = 0; i < NXc; i++) for (let j = 0; j < NYc; j++) {
   const k = j * NXc + i; if (!IN[k]) continue;
-  const c = cellAt(i, j);
-  if (inNew(c[0], c[1])) NEWC[k] = 1; else OLDC[k] = 1;
+  const c = cellAt(i, j), b = boxFor(c[0], c[1]);
+  if (!b) { orphan++; continue; }
+  masks[BOXH.indexOf(b)][k] = 1;
+  if (b[5]) newCells++;
 }
-let newCells = 0;
-for (let k = 0; k < NEWC.length; k++) if (NEWC[k]) newCells++;
+if (orphan) say(r2(orphan * CELL * CELL) + ' m2 of footprint sits in no building extent and is not drawn');
 const footprint_new_m2 = r2(newCells * CELL * CELL);
 const asPath = rs => rs.map(r => 'M' + r.map(q => n2(q[0]) + ' ' + n2(YTOP - q[1])).join('L') + 'Z').join('');
 const n2 = v => (Math.round(v * 100) / 100).toFixed(2);
 const YTOP = 23.5;                     /* the plan draws y flipped, as fy() does */
-const BLDS = [{k: 'existing', d: asPath(trace(OLDC))}, {k: 'proposed', d: asPath(trace(NEWC))}]
+const BLDS = BOXH.map((b, i) => ({k: b[5] ? 'proposed' : 'existing', n: b[0], d: asPath(trace(masks[i]))}))
   .filter(b => b.d);
 say('footprint ' + footprint_m2 + ' m2 in ' + OUTLINE.length + ' ring'
   + (OUTLINE.length === 1 ? '' : 's') + ', ' + OUTLINE.reduce((n, r) => n + r.length, 0) + ' corners');
@@ -628,7 +665,7 @@ const out = {
   ROOF: roofs.map(s => [r3(s.eave != null ? s.eave : s.z0), r3(s.ridge != null ? s.ridge : s.z1),
                         s.plane ? r2(s.plane.slope_deg) : null, sIdx(s.st), s.name,
                         s.poly.map(p => [r3(p[0]), r3(p[1])]),
-                        s.bz ? s.bz.map(r3) : null]),
+                        s.bz ? s.bz.map(r3) : null, r3(roofThick(s))]),
   OPEN: openings,
   CWALL: cwalls,
   BOXH: boxh.filter(Boolean),
