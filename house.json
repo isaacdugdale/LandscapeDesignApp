@@ -1,0 +1,7075 @@
+{
+ "source_file": "234 Duffy Street, Ainslie - POST REVIEW FINAL7.ifc",
+ "schema": "IFC2X3",
+ "exported_by": "ODA SDAI 25.12",
+ "coordinate_note": "All coordinates are raw IFC world coordinates converted to metres. No site/survey fit applied. Apply georef yourself.",
+ "units": {
+  "length_unit": "MILLIMETRE",
+  "scale_to_metres": 0.001,
+  "z_is_AHD": true,
+  "z_is_AHD_evidence": "IfcBuildingStorey FFL resolves to world z 611.65 m, matching the expected AHD ground-floor level. IfcSite.RefElevation is 0 and there is no IfcMapConversion, so no z offset is pending - world z is already AHD.",
+  "angle_unit": "degree (IFC DMS for lat/long)"
+ },
+ "georef": {
+  "IfcSite": {
+   "GlobalId": "0Kf9TtacPDyhpiKNVbpmo$",
+   "Name": "Surface:2008230",
+   "RefLatitude_raw": [
+    -35,
+    -15,
+    -43,
+    -849182
+   ],
+   "RefLatitude_deg": -35.262180328,
+   "RefLongitude_raw": [
+    149,
+    8,
+    52,
+    507324
+   ],
+   "RefLongitude_deg": 149.147918701,
+   "RefElevation": 0.0
+  },
+  "IfcMapConversion": null,
+  "TrueNorth": {
+   "DirectionRatios": [
+    0.0,
+    1.0
+   ],
+   "bearing_deg_cw_from_+Y": 0.0
+  },
+  "site_placement_matrix_m": [
+   [
+    -0.247656665,
+    -0.96884786,
+    0.0,
+    10.33779842
+   ],
+   [
+    0.96884786,
+    -0.247656665,
+    0.0,
+    -2512.168131493
+   ],
+   [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "site_local_x_axis_bearing_deg_cw_from_+Y": -14.338889
+ },
+ "storeys": [
+  {
+   "GlobalId": "16l28tORP3CeXwyk4_vl2C",
+   "name": "SITE PLAN",
+   "long_name": "SITE PLAN",
+   "Elevation_raw": 609490.0,
+   "Elevation_m": 609.49,
+   "world_z_m": 609.49
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Nn8",
+   "name": "SUNKEN LOUNGE",
+   "long_name": "SUNKEN LOUNGE",
+   "Elevation_raw": 611070.0,
+   "Elevation_m": 611.07,
+   "world_z_m": 611.07
+  },
+  {
+   "GlobalId": "0uptRQkVbCIAgIzzFoM6Wt",
+   "name": "FFL",
+   "long_name": "FFL",
+   "Elevation_raw": 611650.0,
+   "Elevation_m": 611.65,
+   "world_z_m": 611.65
+  },
+  {
+   "GlobalId": "3BylApapbEXBdomFVLzz9c",
+   "name": "FCL",
+   "long_name": "FCL",
+   "Elevation_raw": 614165.0,
+   "Elevation_m": 614.165,
+   "world_z_m": 614.165
+  }
+ ],
+ "walls": [
+  {
+   "GlobalId": "2wDYk6e3LBvu5N7mtwfKTt",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Vert) - 160:2046999",
+   "class": "IfcWall",
+   "storey": "FFL",
+   "start": [
+    7.853,
+    -2478.056
+   ],
+   "end": [
+    6.692,
+    -2473.512
+   ],
+   "length_m": 4.69,
+   "thickness_m": 0.16,
+   "base_z": 611.35,
+   "top_z": 614.425,
+   "height_m": 3.075,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "1i2heFT_L8wQWb2fDx1Mu8",
+   "name": "Basic Wall:Stud - 90:2072408",
+   "class": "IfcWall",
+   "storey": "FFL",
+   "start": [
+    8.424,
+    -2480.148
+   ],
+   "end": [
+    7.887,
+    -2478.047
+   ],
+   "length_m": 2.168,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.491,
+   "height_m": 3.841,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb$Nr",
+   "name": "Basic Wall:Stud - 90:2170739",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    15.338,
+    -2465.182
+   ],
+   "end": [
+    14.355,
+    -2465.433
+   ],
+   "length_m": 1.015,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.231,
+   "height_m": 1.056,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb$KK",
+   "name": "Basic Wall:Stud - 90:2170770",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    14.411,
+    -2465.473
+   ],
+   "end": [
+    15.142,
+    -2468.331
+   ],
+   "length_m": 2.951,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.742,
+   "height_m": 1.567,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb$Kv",
+   "name": "Basic Wall:Stud - 90:2170815",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    15.172,
+    -2468.266
+   ],
+   "end": [
+    15.981,
+    -2468.059
+   ],
+   "length_m": 0.835,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.742,
+   "height_m": 1.567,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb$Lf",
+   "name": "Basic Wall:Stud - 90:2170863",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    16.038,
+    -2468.102
+   ],
+   "end": [
+    15.307,
+    -2465.244
+   ],
+   "length_m": 2.951,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.742,
+   "height_m": 1.567,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUbyYa",
+   "name": "Basic Wall:Stud - 90:2171426",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    13.003,
+    -2465.779
+   ],
+   "end": [
+    12.02,
+    -2466.03
+   ],
+   "length_m": 1.015,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.231,
+   "height_m": 1.056,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUbyYb",
+   "name": "Basic Wall:Stud - 90:2171427",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    12.077,
+    -2466.069
+   ],
+   "end": [
+    12.807,
+    -2468.928
+   ],
+   "length_m": 2.951,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.742,
+   "height_m": 1.567,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUbyYY",
+   "name": "Basic Wall:Stud - 90:2171428",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    12.837,
+    -2468.863
+   ],
+   "end": [
+    13.646,
+    -2468.656
+   ],
+   "length_m": 0.835,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.742,
+   "height_m": 1.567,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUbyYZ",
+   "name": "Basic Wall:Stud - 90:2171429",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    13.703,
+    -2468.699
+   ],
+   "end": [
+    12.972,
+    -2465.84
+   ],
+   "length_m": 2.951,
+   "thickness_m": 0.09,
+   "base_z": 614.175,
+   "top_z": 615.742,
+   "height_m": 1.567,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$D2m$6v96CQOBoIWi3FhU",
+   "name": "Basic Wall:Stud - 90:2383368",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    6.668,
+    -2469.227
+   ],
+   "end": [
+    6.975,
+    -2470.429
+   ],
+   "length_m": 1.24,
+   "thickness_m": 1.089,
+   "base_z": 614.165,
+   "top_z": 615.871,
+   "height_m": 1.706,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$D2m$6v96CQOBoIWi3FhS",
+   "name": "Basic Wall:Stud - 90:2383370",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    9.838,
+    -2469.697
+   ],
+   "end": [
+    9.531,
+    -2468.495
+   ],
+   "length_m": 1.24,
+   "thickness_m": 1.09,
+   "base_z": 614.165,
+   "top_z": 615.874,
+   "height_m": 1.709,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$D2m$6v96CQOBoIWi3CQr",
+   "name": "Basic Wall:Stud - 90:2384483",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    9.492,
+    -2468.552
+   ],
+   "end": [
+    6.73,
+    -2469.258
+   ],
+   "length_m": 2.851,
+   "thickness_m": 0.234,
+   "base_z": 614.165,
+   "top_z": 615.802,
+   "height_m": 1.637,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$D2m$6v96CQOBoIWi3CQo",
+   "name": "Basic Wall:Stud - 90:2384484",
+   "class": "IfcWall",
+   "storey": "FCL",
+   "start": [
+    7.015,
+    -2470.372
+   ],
+   "end": [
+    9.777,
+    -2469.666
+   ],
+   "length_m": 2.851,
+   "thickness_m": 0.09,
+   "base_z": 614.165,
+   "top_z": 615.473,
+   "height_m": 1.308,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "0stSbZSyDBD8Je6HPi6c8K",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2612553",
+   "class": "IfcWall",
+   "storey": "FFL",
+   "start": [
+    17.73,
+    -2470.572
+   ],
+   "end": [
+    17.981,
+    -2471.555
+   ],
+   "length_m": 1.015,
+   "thickness_m": 0.16,
+   "base_z": 611.05,
+   "top_z": 614.934,
+   "height_m": 3.884,
+   "thickness_source": "body_perpendicular_extent",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LM4",
+   "name": "Basic Wall:Brick Dbl - 230:2003025",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    1.516,
+    -2467.104
+   ],
+   "end": [
+    3.371,
+    -2474.361
+   ],
+   "length_m": 7.49,
+   "thickness_m": 0.23,
+   "base_z": 611.105,
+   "top_z": 615.832,
+   "height_m": 4.727,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LLQ",
+   "name": "Basic Wall:Brick Dbl - 230:2003087",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    3.454,
+    -2474.221
+   ],
+   "end": [
+    6.816,
+    -2473.362
+   ],
+   "length_m": 3.47,
+   "thickness_m": 0.23,
+   "base_z": 610.85,
+   "top_z": 614.294,
+   "height_m": 3.444,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LLh",
+   "name": "Basic Wall:Brick Dbl - 230:2003134",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    17.736,
+    -2470.452
+   ],
+   "end": [
+    16.524,
+    -2465.714
+   ],
+   "length_m": 4.89,
+   "thickness_m": 0.23,
+   "base_z": 610.973,
+   "top_z": 615.832,
+   "height_m": 4.859,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LJ8",
+   "name": "Basic Wall:Brick Single - 110:2003229",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    4.936,
+    -2466.23
+   ],
+   "end": [
+    6.734,
+    -2473.264
+   ],
+   "length_m": 7.26,
+   "thickness_m": 0.11,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LII",
+   "name": "Basic Wall:Brick Single - 110:2003271",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    7.765,
+    -2473.238
+   ],
+   "end": [
+    7.044,
+    -2470.418
+   ],
+   "length_m": 2.91,
+   "thickness_m": 0.11,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LHC",
+   "name": "Basic Wall:Brick Single - 110:2003353",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    2.748,
+    -2471.46
+   ],
+   "end": [
+    6.004,
+    -2470.628
+   ],
+   "length_m": 3.36,
+   "thickness_m": 0.11,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LGI",
+   "name": "Basic Wall:Brick Single - 110:2003399",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    9.476,
+    -2469.797
+   ],
+   "end": [
+    10.14,
+    -2472.393
+   ],
+   "length_m": 2.68,
+   "thickness_m": 0.11,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LGe",
+   "name": "Basic Wall:Brick Single - 110:2003453",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    8.337,
+    -2465.361
+   ],
+   "end": [
+    9.181,
+    -2468.664
+   ],
+   "length_m": 3.41,
+   "thickness_m": 0.11,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LUn",
+   "name": "Basic Wall:Brick Single - 110:2003556",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    5.82,
+    -2469.467
+   ],
+   "end": [
+    9.115,
+    -2468.625
+   ],
+   "length_m": 3.4,
+   "thickness_m": 0.11,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LO2",
+   "name": "Basic Wall:Brick Veneer - 250:2003927",
+   "class": "IfcWallStandardCase",
+   "storey": "SUNKEN LOUNGE",
+   "start": [
+    9.77,
+    -2460.37
+   ],
+   "end": [
+    14.959,
+    -2459.044
+   ],
+   "length_m": 5.355,
+   "thickness_m": 0.25,
+   "base_z": 610.571,
+   "top_z": 615.303,
+   "height_m": 4.732,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LOZ",
+   "name": "Basic Wall:Brick Veneer - 250:2003958",
+   "class": "IfcWallStandardCase",
+   "storey": "SUNKEN LOUNGE",
+   "start": [
+    14.869,
+    -2459.196
+   ],
+   "end": [
+    15.952,
+    -2463.435
+   ],
+   "length_m": 4.375,
+   "thickness_m": 0.25,
+   "base_z": 610.591,
+   "top_z": 614.296,
+   "height_m": 3.705,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_L4R",
+   "name": "Basic Wall:Brick Single - 110:2004174",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    6.977,
+    -2470.379
+   ],
+   "end": [
+    9.516,
+    -2469.73
+   ],
+   "length_m": 2.62,
+   "thickness_m": 0.11,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_LEd",
+   "name": "Basic Wall:Brick Dbl - 230:2004594",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    11.093,
+    -2464.537
+   ],
+   "end": [
+    1.376,
+    -2467.021
+   ],
+   "length_m": 10.03,
+   "thickness_m": 0.23,
+   "base_z": 610.993,
+   "top_z": 614.288,
+   "height_m": 3.295,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_MZR",
+   "name": "Basic Wall:Brick Dbl - 230:2010382",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    16.085,
+    -2464.459
+   ],
+   "end": [
+    16.754,
+    -2464.288
+   ],
+   "length_m": 0.69,
+   "thickness_m": 0.23,
+   "base_z": 610.893,
+   "top_z": 616.15,
+   "height_m": 5.257,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_MZc",
+   "name": "Basic Wall:Brick Dbl - 230:2010419",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    16.671,
+    -2464.428
+   ],
+   "end": [
+    16.914,
+    -2465.377
+   ],
+   "length_m": 0.98,
+   "thickness_m": 0.23,
+   "base_z": 610.902,
+   "top_z": 616.15,
+   "height_m": 5.248,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_MYU",
+   "name": "Basic Wall:Brick Dbl - 230:2010443",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    17.054,
+    -2465.46
+   ],
+   "end": [
+    16.385,
+    -2465.631
+   ],
+   "length_m": 0.69,
+   "thickness_m": 0.23,
+   "base_z": 610.943,
+   "top_z": 616.15,
+   "height_m": 5.207,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "0KCnN2DaX7PvAkNQ7qEoB2",
+   "name": "Basic Wall:Brick Dbl - 230:2017471",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    16.225,
+    -2464.542
+   ],
+   "end": [
+    16.468,
+    -2465.491
+   ],
+   "length_m": 0.98,
+   "thickness_m": 0.23,
+   "base_z": 611.65,
+   "top_z": 616.15,
+   "height_m": 4.5,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "0vMDoBT4jF6uHrkJ9_aDpn",
+   "name": "Basic Wall:Brick Dbl - 230:2030549",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    16.168,
+    -2464.319
+   ],
+   "end": [
+    15.942,
+    -2463.437
+   ],
+   "length_m": 0.91,
+   "thickness_m": 0.23,
+   "base_z": 610.65,
+   "top_z": 614.683,
+   "height_m": 4.033,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "2wDYk6e3LBvu5N7mtwfK3$",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Vert) - 160:2046879",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    7.864,
+    -2473.212
+   ],
+   "end": [
+    9.026,
+    -2477.756
+   ],
+   "length_m": 4.69,
+   "thickness_m": 0.16,
+   "base_z": 611.482,
+   "top_z": 614.425,
+   "height_m": 2.943,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "2wDYk6e3LBvu5N7mtwfK3S",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2046908",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    11.226,
+    -2483.82
+   ],
+   "end": [
+    5.411,
+    -2485.307
+   ],
+   "length_m": 6.002,
+   "thickness_m": 0.16,
+   "base_z": 611.58,
+   "top_z": 616.063,
+   "height_m": 4.483,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "2wDYk6e3LBvu5N7mtwfK2u",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2046936",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    5.469,
+    -2485.209
+   ],
+   "end": [
+    3.859,
+    -2478.912
+   ],
+   "length_m": 6.5,
+   "thickness_m": 0.16,
+   "base_z": 611.471,
+   "top_z": 614.165,
+   "height_m": 2.694,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "2wDYk6e3LBvu5N7mtwfK2S",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2046972",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    3.956,
+    -2478.97
+   ],
+   "end": [
+    7.756,
+    -2477.998
+   ],
+   "length_m": 3.922,
+   "thickness_m": 0.16,
+   "base_z": 611.467,
+   "top_z": 615.439,
+   "height_m": 3.972,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "2wDYk6e3LBvu5N7mtwfKUF",
+   "name": "Basic Wall:Stud - 90:2047215",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    7.471,
+    -2484.697
+   ],
+   "end": [
+    6.671,
+    -2481.568
+   ],
+   "length_m": 3.23,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 614.41,
+   "height_m": 2.76,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1U19rtFCXC_gHOWq6AbtWq",
+   "name": "Basic Wall:Stud - 90:2062952",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    12.236,
+    -2469.024
+   ],
+   "end": [
+    9.513,
+    -2469.72
+   ],
+   "length_m": 2.81,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.479,
+   "height_m": 3.829,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1U19rtFCXC_gHOWq6AbtwU",
+   "name": "Basic Wall:Stud - 90:2063554",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    12.203,
+    -2469.079
+   ],
+   "end": [
+    12.929,
+    -2471.918
+   ],
+   "length_m": 2.93,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1U19rtFCXC_gHOWq6AbuaV",
+   "name": "Basic Wall:Stud - 90:2067267",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    9.063,
+    -2467.977
+   ],
+   "end": [
+    10.918,
+    -2467.503
+   ],
+   "length_m": 1.915,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 614.165,
+   "height_m": 2.515,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1i2heFT_L8wQWb2fDx1MY6",
+   "name": "Basic Wall:Brick Dbl - 230:2070998",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    7.79,
+    -2473.113
+   ],
+   "end": [
+    12.857,
+    -2471.817
+   ],
+   "length_m": 5.23,
+   "thickness_m": 0.23,
+   "base_z": 611.444,
+   "top_z": 614.294,
+   "height_m": 2.85,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "3u5YVL2hvFWheiTv8xi9Sy",
+   "name": "Basic Wall:Stud - 90:2075647",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    7.765,
+    -2478.032
+   ],
+   "end": [
+    8.937,
+    -2477.732
+   ],
+   "length_m": 1.21,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 614.35,
+   "height_m": 2.7,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawIw2",
+   "name": "Basic Wall:Stud - 90:2100955",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    9.771,
+    -2470.728
+   ],
+   "end": [
+    12.406,
+    -2470.054
+   ],
+   "length_m": 2.72,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.037,
+   "height_m": 3.387,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawJBx",
+   "name": "Basic Wall:Stud - 90:2101922",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    11.951,
+    -2467.91
+   ],
+   "end": [
+    11.166,
+    -2468.111
+   ],
+   "length_m": 0.81,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.735,
+   "height_m": 4.085,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawJAQ",
+   "name": "Basic Wall:Stud - 90:2101955",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    11.396,
+    -2469.192
+   ],
+   "end": [
+    10.289,
+    -2464.862
+   ],
+   "length_m": 4.47,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.832,
+   "height_m": 4.182,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawJA_",
+   "name": "Basic Wall:Stud - 90:2101991",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    10.74,
+    -2466.444
+   ],
+   "end": [
+    11.525,
+    -2466.244
+   ],
+   "length_m": 0.81,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.005,
+   "height_m": 3.355,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawJhB",
+   "name": "Basic Wall:Stud - 90:2103954",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    9.803,
+    -2470.673
+   ],
+   "end": [
+    9.568,
+    -2469.753
+   ],
+   "length_m": 0.95,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.44,
+   "height_m": 3.79,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawJtx",
+   "name": "Basic Wall:Stud - 90:2104738",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    6.805,
+    -2473.318
+   ],
+   "end": [
+    7.672,
+    -2473.096
+   ],
+   "length_m": 0.895,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 614.284,
+   "height_m": 2.634,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGiC",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2108245",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    9.519,
+    -2477.465
+   ],
+   "end": [
+    11.129,
+    -2483.763
+   ],
+   "length_m": 6.5,
+   "thickness_m": 0.16,
+   "base_z": 611.576,
+   "top_z": 616.063,
+   "height_m": 4.487,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "3wAeOhVdT9KvkRhqaAx1ZP",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2118269",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    7.756,
+    -2477.998
+   ],
+   "end": [
+    9.083,
+    -2477.659
+   ],
+   "length_m": 1.37,
+   "thickness_m": 0.16,
+   "base_z": 614.35,
+   "top_z": 615.885,
+   "height_m": 1.535,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875G6n",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2175980",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    13.021,
+    -2472.741
+   ],
+   "end": [
+    17.884,
+    -2471.497
+   ],
+   "length_m": 5.02,
+   "thickness_m": 0.16,
+   "base_z": 611.361,
+   "top_z": 614.934,
+   "height_m": 3.573,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": true
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875GWC",
+   "name": "Basic Wall:Brick Dbl - 230:2177617",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    17.11,
+    -2470.73
+   ],
+   "end": [
+    17.875,
+    -2470.535
+   ],
+   "length_m": 0.79,
+   "thickness_m": 0.23,
+   "base_z": 610.85,
+   "top_z": 614.294,
+   "height_m": 3.444,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875N2x",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2179814",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    13.078,
+    -2472.643
+   ],
+   "end": [
+    12.895,
+    -2471.926
+   ],
+   "length_m": 0.74,
+   "thickness_m": 0.16,
+   "base_z": 611.05,
+   "top_z": 614.867,
+   "height_m": 3.817,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875NpS",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2182785",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    17.244,
+    -2471.578
+   ],
+   "end": [
+    16.883,
+    -2470.164
+   ],
+   "length_m": 1.46,
+   "thickness_m": 0.16,
+   "base_z": 614.165,
+   "top_z": 614.867,
+   "height_m": 0.702,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875NtK",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2183049",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    12.896,
+    -2471.926
+   ],
+   "end": [
+    12.634,
+    -2470.899
+   ],
+   "length_m": 1.06,
+   "thickness_m": 0.16,
+   "base_z": 614.165,
+   "top_z": 614.647,
+   "height_m": 0.482,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "14FDXopyP9dOT2c3SpdAJR",
+   "name": "Basic Wall:Brick Dbl - 230:2213010",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    10.217,
+    -2464.761
+   ],
+   "end": [
+    9.752,
+    -2464.88
+   ],
+   "length_m": 0.48,
+   "thickness_m": 0.23,
+   "base_z": 612.505,
+   "top_z": 613.855,
+   "height_m": 1.35,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "14FDXopyP9dOT2c3SpdAa8",
+   "name": "Basic Wall:Stud - 90:2214209",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    8.992,
+    -2477.765
+   ],
+   "end": [
+    10.562,
+    -2483.907
+   ],
+   "length_m": 6.34,
+   "thickness_m": 0.09,
+   "base_z": 614.35,
+   "top_z": 615.5,
+   "height_m": 1.15,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "19da$wrdT6GxMeds2EJ5d3",
+   "name": "Basic Wall:Brick Dbl - 230:2218310",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    12.198,
+    -2471.986
+   ],
+   "end": [
+    12.857,
+    -2471.817
+   ],
+   "length_m": 0.68,
+   "thickness_m": 0.23,
+   "base_z": 611.65,
+   "top_z": 613.855,
+   "height_m": 2.205,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "0s_WQUyjX9$gBE7BhObM4Z",
+   "name": "Basic Wall:Brick Veneer - 250:2268465",
+   "class": "IfcWallStandardCase",
+   "storey": "SUNKEN LOUNGE",
+   "start": [
+    10.944,
+    -2464.457
+   ],
+   "end": [
+    9.922,
+    -2460.46
+   ],
+   "length_m": 4.125,
+   "thickness_m": 0.25,
+   "base_z": 610.751,
+   "top_z": 614.165,
+   "height_m": 3.414,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "0s_WQUyjX9$gBE7BhObMA7",
+   "name": "Basic Wall:Brick Veneer - 250:2268821",
+   "class": "IfcWallStandardCase",
+   "storey": "SUNKEN LOUNGE",
+   "start": [
+    10.769,
+    -2463.774
+   ],
+   "end": [
+    10.546,
+    -2462.902
+   ],
+   "length_m": 0.9,
+   "thickness_m": 0.25,
+   "base_z": 611.65,
+   "top_z": 613.75,
+   "height_m": 2.1,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3RZtgXqF9FRAmon6ekysEn",
+   "name": "Basic Wall:90 Stud + 2 Bat + Clad (Tile) - 160:2271777",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    9.461,
+    -2477.562
+   ],
+   "end": [
+    9.083,
+    -2477.659
+   ],
+   "length_m": 0.39,
+   "thickness_m": 0.16,
+   "base_z": 611.35,
+   "top_z": 616.011,
+   "height_m": 4.661,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "3LmaQBWX59WRQ5Cqgsb48C",
+   "name": "Basic Wall:Stud - 90:2317165",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    8.457,
+    -2480.093
+   ],
+   "end": [
+    9.474,
+    -2479.833
+   ],
+   "length_m": 1.05,
+   "thickness_m": 0.09,
+   "base_z": 614.05,
+   "top_z": 615.833,
+   "height_m": 1.783,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "0YX9W_LAb23wFXlsDwDImi",
+   "name": "Basic Wall:Stud - 90:2322583",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    10.008,
+    -2479.703
+   ],
+   "end": [
+    9.476,
+    -2479.839
+   ],
+   "length_m": 0.55,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 614.35,
+   "height_m": 2.7,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "0686ZZcNT4Rg8GDy9EE$9E",
+   "name": "Basic Wall:Stud - 90:2621902",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    17.027,
+    -2470.87
+   ],
+   "end": [
+    16.97,
+    -2470.647
+   ],
+   "length_m": 0.23,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 614.595,
+   "height_m": 2.945,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "09hPKwSJn43wbrETM$jCD9",
+   "name": "Basic Wall:Brick Dbl - 230:2627715",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    17.555,
+    -2469.744
+   ],
+   "end": [
+    17.079,
+    -2467.884
+   ],
+   "length_m": 1.92,
+   "thickness_m": 0.23,
+   "base_z": 613.235,
+   "top_z": 613.835,
+   "height_m": 0.6,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  },
+  {
+   "GlobalId": "1TuTOGKq1Evw_GuEnc$5mO",
+   "name": "Basic Wall:Stud - 90:2752744",
+   "class": "IfcWallStandardCase",
+   "storey": "FFL",
+   "start": [
+    8.367,
+    -2480.107
+   ],
+   "end": [
+    4.5,
+    -2481.096
+   ],
+   "length_m": 3.992,
+   "thickness_m": 0.09,
+   "base_z": 611.65,
+   "top_z": 615.047,
+   "height_m": 3.397,
+   "thickness_source": "material_layer_set",
+   "is_external_pset": true,
+   "axis_from_bbox": false,
+   "hosts_external_opening": false
+  }
+ ],
+ "slabs": [
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Lbi",
+   "name": "Floor:Conc 100:2006201",
+   "class": "IfcSlab",
+   "storey": "SUNKEN LOUNGE",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     15.891,
+     -2463.337
+    ],
+    [
+     11.008,
+     -2464.585
+    ],
+    [
+     9.929,
+     -2460.366
+    ],
+    [
+     14.812,
+     -2459.117
+    ],
+    [
+     15.891,
+     -2463.337
+    ]
+   ],
+   "boundary_z": [
+    611.07,
+    611.07,
+    611.07,
+    611.07,
+    611.07
+   ],
+   "thickness_m": 0.1,
+   "base_z": 610.97,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     9.929,
+     -2464.585,
+     610.97
+    ],
+    [
+     15.891,
+     -2459.117,
+     611.07
+    ]
+   ],
+   "z_min": 610.97,
+   "z_max": 611.07,
+   "oriented_dims_m": [
+    5.04,
+    4.356
+   ],
+   "area_m2": 21.95
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_La6",
+   "name": "Floor:Generic 150mm:2006227",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     17.764,
+     -2470.563
+    ],
+    [
+     3.343,
+     -2474.249
+    ],
+    [
+     1.488,
+     -2466.993
+    ],
+    [
+     15.909,
+     -2463.306
+    ],
+    [
+     17.764,
+     -2470.563
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.15,
+   "base_z": 611.5,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     1.488,
+     -2474.249,
+     611.5
+    ],
+    [
+     17.764,
+     -2463.306,
+     611.65
+    ]
+   ],
+   "z_min": 611.5,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    14.885,
+    7.49
+   ],
+   "area_m2": 111.48
+  },
+  {
+   "GlobalId": "0vMDoBT4jF6uHrkJ9_aGJa",
+   "name": "Floor:Tiles - 20:2040768",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     10.086,
+     -2472.407
+    ],
+    [
+     7.761,
+     -2473.001
+    ],
+    [
+     7.301,
+     -2471.199
+    ],
+    [
+     7.247,
+     -2471.213
+    ],
+    [
+     7.069,
+     -2470.515
+    ],
+    [
+     7.122,
+     -2470.502
+    ],
+    [
+     7.098,
+     -2470.405
+    ],
+    [
+     9.423,
+     -2469.81
+    ],
+    [
+     10.086,
+     -2472.407
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     7.069,
+     -2473.001,
+     611.632
+    ],
+    [
+     10.086,
+     -2469.81,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    2.68,
+    2.456
+   ],
+   "area_m2": 6.47
+  },
+  {
+   "GlobalId": "0U2HW1izbFcAR7ynxSCct3",
+   "name": "Floor:Conc 100:2052433",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     11.151,
+     -2483.85
+    ],
+    [
+     5.474,
+     -2485.301
+    ],
+    [
+     3.859,
+     -2478.984
+    ],
+    [
+     7.821,
+     -2477.971
+    ],
+    [
+     6.682,
+     -2473.515
+    ],
+    [
+     7.864,
+     -2473.212
+    ],
+    [
+     9.003,
+     -2477.669
+    ],
+    [
+     9.536,
+     -2477.533
+    ],
+    [
+     11.151,
+     -2483.85
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.1,
+   "base_z": 611.55,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     3.859,
+     -2485.301,
+     611.55
+    ],
+    [
+     11.151,
+     -2473.212,
+     611.65
+    ]
+   ],
+   "z_min": 611.55,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    11.121,
+    5.859
+   ],
+   "area_m2": 43.82
+  },
+  {
+   "GlobalId": "1U19rtFCXC_gHOWq6AbuSq",
+   "name": "Floor:Tiles - 20:2065768",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     12.395,
+     -2470.011
+    ],
+    [
+     9.76,
+     -2470.684
+    ],
+    [
+     9.513,
+     -2469.72
+    ],
+    [
+     12.148,
+     -2469.047
+    ],
+    [
+     12.395,
+     -2470.011
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     9.513,
+     -2470.684,
+     611.632
+    ],
+    [
+     12.395,
+     -2469.047,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    2.72,
+    0.995
+   ],
+   "area_m2": 2.71
+  },
+  {
+   "GlobalId": "1U19rtFCXC_gHOWq6AbuVv",
+   "name": "Floor:Tiles - 20:2065829",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     12.872,
+     -2471.695
+    ],
+    [
+     10.193,
+     -2472.38
+    ],
+    [
+     9.782,
+     -2470.771
+    ],
+    [
+     12.461,
+     -2470.087
+    ],
+    [
+     12.872,
+     -2471.695
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     9.782,
+     -2472.38,
+     611.632
+    ],
+    [
+     12.872,
+     -2470.087,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    2.765,
+    1.661
+   ],
+   "area_m2": 4.59
+  },
+  {
+   "GlobalId": "1i2heFT_L8wQWb2fDx1LAP",
+   "name": "Floor:Tiles - 20:2073545",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     7.844,
+     -2478.058
+    ],
+    [
+     8.368,
+     -2480.108
+    ],
+    [
+     4.5,
+     -2481.096
+    ],
+    [
+     3.976,
+     -2479.047
+    ],
+    [
+     7.844,
+     -2478.058
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     3.976,
+     -2481.096,
+     611.632
+    ],
+    [
+     8.368,
+     -2478.058,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    3.992,
+    2.116
+   ],
+   "area_m2": 8.45
+  },
+  {
+   "GlobalId": "3u5YVL2hvFWheiTv8xi96K",
+   "name": "Floor:Threshold:2075991",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     7.712,
+     -2473.251
+    ],
+    [
+     6.845,
+     -2473.473
+    ],
+    [
+     6.816,
+     -2473.362
+    ],
+    [
+     7.683,
+     -2473.14
+    ],
+    [
+     7.712,
+     -2473.251
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.1,
+   "base_z": 611.55,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     6.816,
+     -2473.473,
+     611.55
+    ],
+    [
+     7.712,
+     -2473.14,
+     611.65
+    ]
+   ],
+   "z_min": 611.55,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    0.896,
+    0.115
+   ],
+   "area_m2": 0.1
+  },
+  {
+   "GlobalId": "3u5YVL2hvFWheiTv0xi8yX",
+   "name": "Basic Roof:Tile Roof - 150:2077666",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "ROOF",
+   "boundary": [
+    [
+     11.246,
+     -2483.898
+    ],
+    [
+     9.596,
+     -2477.445
+    ],
+    [
+     3.781,
+     -2478.932
+    ],
+    [
+     5.431,
+     -2485.384
+    ],
+    [
+     11.246,
+     -2483.898
+    ]
+   ],
+   "boundary_z": [
+    616.063,
+    616.063,
+    614.113,
+    614.113,
+    616.063
+   ],
+   "thickness_m": 0.158,
+   "base_z": 614.113,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     3.781,
+     -2485.384,
+     614.113
+    ],
+    [
+     11.246,
+     -2477.445,
+     616.221
+    ]
+   ],
+   "z_min": 614.113,
+   "z_max": 616.221,
+   "oriented_dims_m": [
+    6.661,
+    6.002
+   ],
+   "area_m2": 39.97
+  },
+  {
+   "GlobalId": "1yRmmNFYX2SxIm7TjldJ_X",
+   "name": "Basic Roof:Metal Roof - 180:2079779",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "ROOF",
+   "boundary": [
+    [
+     1.509,
+     -2467.54
+    ],
+    [
+     -2.236,
+     -2468.497
+    ],
+    [
+     0.637,
+     -2479.735
+    ],
+    [
+     4.382,
+     -2478.778
+    ],
+    [
+     1.509,
+     -2467.54
+    ]
+   ],
+   "boundary_z": [
+    613.589,
+    613.089,
+    613.089,
+    613.589,
+    613.589
+   ],
+   "thickness_m": 0.181,
+   "base_z": 613.089,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     -2.236,
+     -2479.735,
+     613.089
+    ],
+    [
+     4.382,
+     -2467.54,
+     613.77
+    ]
+   ],
+   "z_min": 613.089,
+   "z_max": 613.77,
+   "oriented_dims_m": [
+    11.6,
+    3.865
+   ],
+   "area_m2": 44.84
+  },
+  {
+   "GlobalId": "1ALpR7xhP80gwTXB1TAx1T",
+   "name": "Floor:Conc 100:2097452",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     9.355,
+     -2464.982
+    ],
+    [
+     8.512,
+     -2465.197
+    ],
+    [
+     8.483,
+     -2465.086
+    ],
+    [
+     8.227,
+     -2465.151
+    ],
+    [
+     7.725,
+     -2463.19
+    ],
+    [
+     9.687,
+     -2462.688
+    ],
+    [
+     10.189,
+     -2464.65
+    ],
+    [
+     9.326,
+     -2464.87
+    ],
+    [
+     9.355,
+     -2464.982
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.1,
+   "base_z": 611.55,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     7.725,
+     -2465.197,
+     611.55
+    ],
+    [
+     10.189,
+     -2462.688,
+     611.65
+    ]
+   ],
+   "z_min": 611.55,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    2.14,
+    2.025
+   ],
+   "area_m2": 4.2
+  },
+  {
+   "GlobalId": "3wAeOhVdT9KvkRhqiAx0YR",
+   "name": "Basic Roof:Generic - 90:2114111",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "ROOF",
+   "boundary": [
+    [
+     10.077,
+     -2464.214
+    ],
+    [
+     9.687,
+     -2462.688
+    ],
+    [
+     7.155,
+     -2463.335
+    ],
+    [
+     7.546,
+     -2464.861
+    ],
+    [
+     10.077,
+     -2464.214
+    ]
+   ],
+   "boundary_z": [
+    613.992,
+    613.992,
+    613.992,
+    613.992,
+    613.992
+   ],
+   "thickness_m": 0.09,
+   "base_z": 613.992,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     7.155,
+     -2464.861,
+     613.992
+    ],
+    [
+     10.077,
+     -2462.688,
+     614.082
+    ]
+   ],
+   "z_min": 613.992,
+   "z_max": 614.082,
+   "oriented_dims_m": [
+    2.613,
+    1.575
+   ],
+   "area_m2": 4.12
+  },
+  {
+   "GlobalId": "0TQ5J1RbHCyvKImbq8UvOw",
+   "name": "Floor:Brick Pavers Stack - 75:2122375",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     18.849,
+     -2474.626
+    ],
+    [
+     13.83,
+     -2475.909
+    ],
+    [
+     13.226,
+     -2473.545
+    ],
+    [
+     8.35,
+     -2474.791
+    ],
+    [
+     7.942,
+     -2473.193
+    ],
+    [
+     12.817,
+     -2471.946
+    ],
+    [
+     13.035,
+     -2472.799
+    ],
+    [
+     18.054,
+     -2471.516
+    ],
+    [
+     18.849,
+     -2474.626
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.075,
+   "base_z": 611.575,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     7.942,
+     -2475.909,
+     611.575
+    ],
+    [
+     18.849,
+     -2471.516,
+     611.65
+    ]
+   ],
+   "z_min": 611.575,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    10.213,
+    4.09
+   ],
+   "area_m2": 24.93
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb_8G",
+   "name": "Floor:Timber (Horiz) - 20:2164886",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     17.624,
+     -2470.48
+    ],
+    [
+     12.01,
+     -2471.915
+    ],
+    [
+     11.319,
+     -2469.212
+    ],
+    [
+     12.225,
+     -2468.981
+    ],
+    [
+     11.962,
+     -2467.954
+    ],
+    [
+     12.224,
+     -2467.887
+    ],
+    [
+     11.351,
+     -2464.472
+    ],
+    [
+     15.798,
+     -2463.335
+    ],
+    [
+     17.624,
+     -2470.48
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     11.319,
+     -2471.915,
+     611.632
+    ],
+    [
+     17.624,
+     -2463.335,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    7.375,
+    5.795
+   ],
+   "area_m2": 37.5
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb_6U",
+   "name": "Floor:Timber (Horiz) - 20:2165528",
+   "class": "IfcSlab",
+   "storey": "SUNKEN LOUNGE",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     15.798,
+     -2463.335
+    ],
+    [
+     12.625,
+     -2464.146
+    ],
+    [
+     12.334,
+     -2463.008
+    ],
+    [
+     12.248,
+     -2462.957
+    ],
+    [
+     12.226,
+     -2462.996
+    ],
+    [
+     11.606,
+     -2462.629
+    ],
+    [
+     11.629,
+     -2462.59
+    ],
+    [
+     11.488,
+     -2462.506
+    ],
+    [
+     10.626,
+     -2462.727
+    ],
+    [
+     10.039,
+     -2460.431
+    ],
+    [
+     14.748,
+     -2459.227
+    ],
+    [
+     15.798,
+     -2463.335
+    ]
+   ],
+   "boundary_z": [
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.052,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     10.039,
+     -2464.146,
+     611.052
+    ],
+    [
+     15.798,
+     -2459.227,
+     611.072
+    ]
+   ],
+   "z_min": 611.052,
+   "z_max": 611.072,
+   "oriented_dims_m": [
+    4.86,
+    4.24
+   ],
+   "area_m2": 17.92
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb_Tq",
+   "name": "Floor:Timber (Horiz) - 20:2166258",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     2.735,
+     -2471.406
+    ],
+    [
+     1.628,
+     -2467.076
+    ],
+    [
+     4.883,
+     -2466.244
+    ],
+    [
+     5.773,
+     -2469.727
+    ],
+    [
+     5.827,
+     -2469.713
+    ],
+    [
+     6.005,
+     -2470.411
+    ],
+    [
+     5.952,
+     -2470.424
+    ],
+    [
+     5.99,
+     -2470.574
+    ],
+    [
+     2.735,
+     -2471.406
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     1.628,
+     -2471.406,
+     611.632
+    ],
+    [
+     6.005,
+     -2466.244,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    4.469,
+    3.415
+   ],
+   "area_m2": 15.05
+  },
+  {
+   "GlobalId": "1haW3J0DCMpQlpkvd0R$oi",
+   "name": "Floor:Timber (Horiz) - 20:2166258:2",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     3.426,
+     -2474.11
+    ],
+    [
+     2.762,
+     -2471.513
+    ],
+    [
+     6.017,
+     -2470.681
+    ],
+    [
+     6.028,
+     -2470.725
+    ],
+    [
+     6.082,
+     -2470.711
+    ],
+    [
+     6.26,
+     -2471.408
+    ],
+    [
+     6.207,
+     -2471.422
+    ],
+    [
+     6.681,
+     -2473.277
+    ],
+    [
+     3.426,
+     -2474.11
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     2.762,
+     -2474.11,
+     611.632
+    ],
+    [
+     6.681,
+     -2470.681,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    3.415,
+    2.681
+   ],
+   "area_m2": 9.04
+  },
+  {
+   "GlobalId": "1h05c$V5EtYEPctNNUY2IC",
+   "name": "Floor:Timber (Horiz) - 20:2166258:3",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     5.807,
+     -2469.414
+    ],
+    [
+     4.99,
+     -2466.216
+    ],
+    [
+     8.284,
+     -2465.374
+    ],
+    [
+     9.101,
+     -2468.572
+    ],
+    [
+     7.841,
+     -2468.893
+    ],
+    [
+     7.855,
+     -2468.947
+    ],
+    [
+     7.119,
+     -2469.135
+    ],
+    [
+     7.105,
+     -2469.082
+    ],
+    [
+     5.807,
+     -2469.414
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     4.99,
+     -2469.414,
+     611.632
+    ],
+    [
+     9.101,
+     -2465.374,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    3.4,
+    3.356
+   ],
+   "area_m2": 11.26
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb$f8",
+   "name": "Floor:Timber (Horiz) - 20:2166990",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     11.351,
+     -2464.472
+    ],
+    [
+     10.261,
+     -2464.75
+    ],
+    [
+     11.134,
+     -2468.165
+    ],
+    [
+     12.224,
+     -2467.887
+    ],
+    [
+     11.351,
+     -2464.472
+    ]
+   ],
+   "boundary_z": [
+    611.632,
+    611.632,
+    611.632,
+    611.632,
+    611.632
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     10.261,
+     -2472.646,
+     611.632
+    ],
+    [
+     17.254,
+     -2464.472,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    3.525,
+    1.125
+   ],
+   "area_m2": 3.97
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb$dZ",
+   "name": "Floor:Timber (Horiz) - 20:2167653",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     7.143,
+     -2471.389
+    ],
+    [
+     6.445,
+     -2471.568
+    ],
+    [
+     6.432,
+     -2471.514
+    ],
+    [
+     6.349,
+     -2471.535
+    ],
+    [
+     6.313,
+     -2471.395
+    ],
+    [
+     6.26,
+     -2471.408
+    ],
+    [
+     6.082,
+     -2470.711
+    ],
+    [
+     6.135,
+     -2470.697
+    ],
+    [
+     6.058,
+     -2470.397
+    ],
+    [
+     6.005,
+     -2470.411
+    ],
+    [
+     5.827,
+     -2469.713
+    ],
+    [
+     5.88,
+     -2469.699
+    ],
+    [
+     5.834,
+     -2469.52
+    ],
+    [
+     7.132,
+     -2469.188
+    ],
+    [
+     7.119,
+     -2469.135
+    ],
+    [
+     7.816,
+     -2468.957
+    ],
+    [
+     7.83,
+     -2469.01
+    ],
+    [
+     10.95,
+     -2468.212
+    ],
+    [
+     10.99,
+     -2468.372
+    ],
+    [
+     11.044,
+     -2468.359
+    ],
+    [
+     11.222,
+     -2469.056
+    ],
+    [
+     11.169,
+     -2469.07
+    ],
+    [
+     11.223,
+     -2469.283
+    ],
+    [
+     10.385,
+     -2469.497
+    ],
+    [
+     10.374,
+     -2469.454
+    ],
+    [
+     6.964,
+     -2470.325
+    ],
+    [
+     7.016,
+     -2470.529
+    ],
+    [
+     7.069,
+     -2470.515
+    ],
+    [
+     7.247,
+     -2471.213
+    ],
+    [
+     7.194,
+     -2471.226
+    ],
+    [
+     7.216,
+     -2471.314
+    ],
+    [
+     7.129,
+     -2471.336
+    ],
+    [
+     7.143,
+     -2471.389
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     5.827,
+     -2471.568,
+     611.632
+    ],
+    [
+     11.223,
+     -2468.212,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    5.391,
+    2.189
+   ],
+   "area_m2": 6.79
+  },
+  {
+   "GlobalId": "1e0z4QHc90YQJ0DRpUb$up",
+   "name": "Floor:Timber (Horiz) - 20:2167989",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     11.169,
+     -2469.07
+    ],
+    [
+     11.222,
+     -2469.056
+    ],
+    [
+     11.044,
+     -2468.359
+    ],
+    [
+     10.99,
+     -2468.372
+    ],
+    [
+     10.95,
+     -2468.212
+    ],
+    [
+     11.134,
+     -2468.165
+    ],
+    [
+     11.396,
+     -2469.192
+    ],
+    [
+     11.212,
+     -2469.239
+    ],
+    [
+     11.169,
+     -2469.07
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     10.95,
+     -2469.239,
+     611.632
+    ],
+    [
+     11.396,
+     -2468.165,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    1.06,
+    0.191
+   ],
+   "area_m2": 0.16
+  },
+  {
+   "GlobalId": "0r_jG5yEEZxIibJth0IHuL",
+   "name": "Floor:Timber (Horiz) - 20:2167989:2",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     6.432,
+     -2471.514
+    ],
+    [
+     6.445,
+     -2471.568
+    ],
+    [
+     7.143,
+     -2471.389
+    ],
+    [
+     7.129,
+     -2471.336
+    ],
+    [
+     7.216,
+     -2471.314
+    ],
+    [
+     7.683,
+     -2473.14
+    ],
+    [
+     6.816,
+     -2473.362
+    ],
+    [
+     6.349,
+     -2471.535
+    ],
+    [
+     6.432,
+     -2471.514
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     6.349,
+     -2473.362,
+     611.632
+    ],
+    [
+     7.683,
+     -2471.314,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    1.886,
+    0.895
+   ],
+   "area_m2": 1.65
+  },
+  {
+   "GlobalId": "0il5rdRzDAjv4cWJceg2GQ",
+   "name": "Floor:Generic 150mm:2194697",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     17.167,
+     -2471.598
+    ],
+    [
+     13.069,
+     -2472.646
+    ],
+    [
+     12.857,
+     -2471.817
+    ],
+    [
+     16.955,
+     -2470.77
+    ],
+    [
+     17.167,
+     -2471.598
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.15,
+   "base_z": 611.5,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     12.857,
+     -2472.646,
+     611.5
+    ],
+    [
+     17.167,
+     -2470.77,
+     611.65
+    ]
+   ],
+   "z_min": 611.5,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    4.23,
+    0.856
+   ],
+   "area_m2": 3.62
+  },
+  {
+   "GlobalId": "0byOE5rnTF2AbdpspvzjbN",
+   "name": "Floor:Tiles - 20:2234982",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     9.366,
+     -2464.984
+    ],
+    [
+     8.474,
+     -2465.212
+    ],
+    [
+     8.445,
+     -2465.096
+    ],
+    [
+     8.227,
+     -2465.151
+    ],
+    [
+     7.725,
+     -2463.19
+    ],
+    [
+     9.687,
+     -2462.688
+    ],
+    [
+     10.189,
+     -2464.65
+    ],
+    [
+     9.336,
+     -2464.868
+    ],
+    [
+     9.366,
+     -2464.984
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.63,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     7.725,
+     -2465.212,
+     611.63
+    ],
+    [
+     10.189,
+     -2462.688,
+     611.65
+    ]
+   ],
+   "z_min": 611.63,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    2.145,
+    2.025
+   ],
+   "area_m2": 4.21
+  },
+  {
+   "GlobalId": "0byOE5rnTF2Abdpspvzjcd",
+   "name": "Floor:Tiles - 20:2235030",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     10.95,
+     -2467.448
+    ],
+    [
+     9.04,
+     -2467.937
+    ],
+    [
+     8.35,
+     -2465.239
+    ],
+    [
+     10.261,
+     -2464.75
+    ],
+    [
+     10.95,
+     -2467.448
+    ]
+   ],
+   "boundary_z": [
+    611.65,
+    611.65,
+    611.65,
+    611.65,
+    611.65
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.63,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     8.35,
+     -2467.937,
+     611.63
+    ],
+    [
+     10.95,
+     -2464.75,
+     611.65
+    ]
+   ],
+   "z_min": 611.63,
+   "z_max": 611.65,
+   "oriented_dims_m": [
+    2.785,
+    1.973
+   ],
+   "area_m2": 5.49
+  },
+  {
+   "GlobalId": "3LmaQBWX59WRQ5CqYsb4TL",
+   "name": "Basic Roof:Transparent Roof - 30:2317876",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "ROOF",
+   "boundary": [
+    [
+     18.849,
+     -2474.626
+    ],
+    [
+     18.059,
+     -2471.535
+    ],
+    [
+     13.04,
+     -2472.818
+    ],
+    [
+     13.83,
+     -2475.909
+    ],
+    [
+     18.849,
+     -2474.626
+    ]
+   ],
+   "boundary_z": [
+    614.62,
+    614.62,
+    614.62,
+    614.62,
+    614.62
+   ],
+   "thickness_m": 0.03,
+   "base_z": 614.62,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     13.04,
+     -2475.909,
+     614.62
+    ],
+    [
+     18.849,
+     -2471.535,
+     614.65
+    ]
+   ],
+   "z_min": 614.62,
+   "z_max": 614.65,
+   "oriented_dims_m": [
+    5.181,
+    3.19
+   ],
+   "area_m2": 16.53
+  },
+  {
+   "GlobalId": "364lIzLQLBTfLWyoyKr0t_",
+   "name": "Floor:Conc 100:2317975",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     18.849,
+     -2474.626
+    ],
+    [
+     13.83,
+     -2475.909
+    ],
+    [
+     13.234,
+     -2473.574
+    ],
+    [
+     8.358,
+     -2474.82
+    ],
+    [
+     7.949,
+     -2473.222
+    ],
+    [
+     12.825,
+     -2471.975
+    ],
+    [
+     13.048,
+     -2472.847
+    ],
+    [
+     18.066,
+     -2471.564
+    ],
+    [
+     18.849,
+     -2474.626
+    ]
+   ],
+   "boundary_z": [
+    611.575,
+    611.575,
+    611.575,
+    611.575,
+    611.575,
+    611.575,
+    611.575,
+    611.575,
+    611.575
+   ],
+   "thickness_m": 0.1,
+   "base_z": 611.475,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     7.949,
+     -2475.909,
+     611.475
+    ],
+    [
+     18.849,
+     -2471.564,
+     611.575
+    ]
+   ],
+   "z_min": 611.475,
+   "z_max": 611.575,
+   "oriented_dims_m": [
+    10.213,
+    4.06
+   ],
+   "area_m2": 24.67
+  },
+  {
+   "GlobalId": "0f4PoXK1z8IhsysdfM2gky",
+   "name": "Floor:Conc 100:2327953",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     0.514,
+     -2479.767
+    ],
+    [
+     -2.359,
+     -2468.528
+    ],
+    [
+     1.509,
+     -2467.54
+    ],
+    [
+     4.382,
+     -2478.778
+    ],
+    [
+     0.514,
+     -2479.767
+    ]
+   ],
+   "boundary_z": [
+    611.535,
+    611.13,
+    611.13,
+    611.535,
+    611.535
+   ],
+   "thickness_m": 0.1,
+   "base_z": 611.03,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     -2.359,
+     -2479.767,
+     611.03
+    ],
+    [
+     4.382,
+     -2467.54,
+     611.535
+    ]
+   ],
+   "z_min": 611.03,
+   "z_max": 611.535,
+   "oriented_dims_m": [
+    11.6,
+    3.992
+   ],
+   "area_m2": 46.31
+  },
+  {
+   "GlobalId": "1hd733ye5D0evFE9tT7Ih1",
+   "name": "Floor:CORK - 20:2334540",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     11.051,
+     -2483.782
+    ],
+    [
+     5.546,
+     -2485.19
+    ],
+    [
+     4.5,
+     -2481.096
+    ],
+    [
+     8.455,
+     -2480.085
+    ],
+    [
+     7.931,
+     -2478.036
+    ],
+    [
+     8.018,
+     -2478.014
+    ],
+    [
+     7.996,
+     -2477.927
+    ],
+    [
+     7.909,
+     -2477.949
+    ],
+    [
+     6.769,
+     -2473.492
+    ],
+    [
+     7.787,
+     -2473.232
+    ],
+    [
+     8.926,
+     -2477.689
+    ],
+    [
+     8.839,
+     -2477.711
+    ],
+    [
+     8.861,
+     -2477.798
+    ],
+    [
+     9.481,
+     -2477.64
+    ],
+    [
+     11.051,
+     -2483.782
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     4.5,
+     -2485.19,
+     611.632
+    ],
+    [
+     11.051,
+     -2473.232,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    11.031,
+    5.682
+   ],
+   "area_m2": 32.3
+  },
+  {
+   "GlobalId": "1hd733ye5D0evFE9tT7HG$",
+   "name": "Floor:CORK - 20:2335154",
+   "class": "IfcSlab",
+   "storey": "SUNKEN LOUNGE",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     15.798,
+     -2463.335
+    ],
+    [
+     12.625,
+     -2464.146
+    ],
+    [
+     12.334,
+     -2463.008
+    ],
+    [
+     12.248,
+     -2462.957
+    ],
+    [
+     12.226,
+     -2462.996
+    ],
+    [
+     11.606,
+     -2462.629
+    ],
+    [
+     11.629,
+     -2462.59
+    ],
+    [
+     11.488,
+     -2462.506
+    ],
+    [
+     10.63,
+     -2462.726
+    ],
+    [
+     10.043,
+     -2460.429
+    ],
+    [
+     14.748,
+     -2459.227
+    ],
+    [
+     15.798,
+     -2463.335
+    ]
+   ],
+   "boundary_z": [
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.052,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     10.043,
+     -2464.146,
+     611.052
+    ],
+    [
+     15.798,
+     -2459.227,
+     611.072
+    ]
+   ],
+   "z_min": 611.052,
+   "z_max": 611.072,
+   "oriented_dims_m": [
+    4.856,
+    4.241
+   ],
+   "area_m2": 17.91
+  },
+  {
+   "GlobalId": "1hd733ye5D0evFE9tT7HVu",
+   "name": "Floor:CORK - 20:2335349",
+   "class": "IfcSlab",
+   "storey": "SUNKEN LOUNGE",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     12.625,
+     -2464.146
+    ],
+    [
+     11.093,
+     -2464.537
+    ],
+    [
+     10.63,
+     -2462.726
+    ],
+    [
+     11.488,
+     -2462.506
+    ],
+    [
+     11.629,
+     -2462.59
+    ],
+    [
+     11.606,
+     -2462.629
+    ],
+    [
+     12.226,
+     -2462.996
+    ],
+    [
+     12.248,
+     -2462.957
+    ],
+    [
+     12.334,
+     -2463.008
+    ],
+    [
+     12.625,
+     -2464.146
+    ]
+   ],
+   "boundary_z": [
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072,
+    611.072
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.052,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     10.63,
+     -2464.537,
+     611.052
+    ],
+    [
+     12.625,
+     -2462.506,
+     611.072
+    ]
+   ],
+   "z_min": 611.052,
+   "z_max": 611.072,
+   "oriented_dims_m": [
+    1.871,
+    1.581
+   ],
+   "area_m2": 2.68
+  },
+  {
+   "GlobalId": "2g3Dp9uAr6evjyIl5JCfb9",
+   "name": "Floor:Timber (Horiz) - 20:2336165",
+   "class": "IfcSlab",
+   "storey": "FFL",
+   "PredefinedType": "FLOOR",
+   "boundary": [
+    [
+     12.225,
+     -2468.981
+    ],
+    [
+     11.212,
+     -2469.239
+    ],
+    [
+     11.169,
+     -2469.07
+    ],
+    [
+     11.222,
+     -2469.056
+    ],
+    [
+     11.044,
+     -2468.359
+    ],
+    [
+     10.99,
+     -2468.372
+    ],
+    [
+     10.95,
+     -2468.212
+    ],
+    [
+     11.962,
+     -2467.954
+    ],
+    [
+     12.225,
+     -2468.981
+    ]
+   ],
+   "boundary_z": [
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652,
+    611.652
+   ],
+   "thickness_m": 0.02,
+   "base_z": 611.632,
+   "geometry_source": "extrusion",
+   "bbox": [
+    [
+     10.95,
+     -2469.239,
+     611.632
+    ],
+    [
+     12.225,
+     -2467.954,
+     611.652
+    ]
+   ],
+   "z_min": 611.632,
+   "z_max": 611.652,
+   "oriented_dims_m": [
+    1.06,
+    1.046
+   ],
+   "area_m2": 1.07
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Mum",
+   "name": "Basic Roof:Tile Roof - 210:2010085",
+   "class": "IfcRoof",
+   "storey": "FCL",
+   "PredefinedType": null,
+   "boundary": [
+    [
+     2.944,
+     -2474.95
+    ],
+    [
+     12.933,
+     -2472.397
+    ],
+    [
+     12.654,
+     -2471.307
+    ],
+    [
+     16.975,
+     -2470.202
+    ],
+    [
+     17.101,
+     -2470.696
+    ],
+    [
+     17.251,
+     -2471.282
+    ],
+    [
+     18.462,
+     -2470.972
+    ],
+    [
+     17.396,
+     -2466.8
+    ],
+    [
+     1.875,
+     -2470.767
+    ]
+   ],
+   "boundary_z": [
+    614.227,
+    614.227,
+    614.705,
+    614.705,
+    614.489,
+    614.232,
+    614.232,
+    616.06,
+    616.06
+   ],
+   "plane": {
+    "normal": [
+     0.096759,
+     -0.378561,
+     0.920505
+    ],
+    "point": [
+     2.944,
+     -2474.95,
+     614.227
+    ],
+    "slope_deg": 23.0
+   },
+   "top_face_z_min": 614.227,
+   "top_face_z_max": 616.06,
+   "base_z": 613.999,
+   "thickness_m": null,
+   "geometry_source": "brep_top_face",
+   "bbox": [
+    [
+     0.806,
+     -2474.95,
+     613.999
+    ],
+    [
+     18.462,
+     -2462.617,
+     616.06
+    ]
+   ],
+   "z_min": 613.999,
+   "z_max": 616.06,
+   "oriented_dims_m": [
+    16.02,
+    4.318
+   ],
+   "area_m2": 64.13,
+   "eave_z": 614.227,
+   "ridge_z": 616.06,
+   "soffit_z_min": 613.999
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Mgt",
+   "name": "Basic Roof:Tile Roof - 210:2010978",
+   "class": "IfcRoof",
+   "storey": "FCL",
+   "PredefinedType": null,
+   "boundary": [
+    [
+     15.258,
+     -2458.434
+    ],
+    [
+     12.208,
+     -2459.214
+    ],
+    [
+     14.037,
+     -2466.37
+    ],
+    [
+     16.325,
+     -2462.617
+    ],
+    [
+     16.327,
+     -2462.617
+    ]
+   ],
+   "boundary_z": [
+    614.227,
+    615.53,
+    615.53,
+    614.227,
+    614.227
+   ],
+   "plane": {
+    "normal": [
+     0.370762,
+     0.094774,
+     0.92388
+    ],
+    "point": [
+     15.258,
+     -2458.434,
+     614.227
+    ],
+    "slope_deg": 22.5
+   },
+   "top_face_z_min": 614.227,
+   "top_face_z_max": 615.53,
+   "base_z": 613.999,
+   "thickness_m": null,
+   "geometry_source": "brep_top_face",
+   "bbox": [
+    [
+     9.159,
+     -2466.37,
+     613.999
+    ],
+    [
+     16.327,
+     -2458.434,
+     615.53
+    ]
+   ],
+   "z_min": 613.999,
+   "z_max": 615.53,
+   "oriented_dims_m": [
+    7.386,
+    3.148
+   ],
+   "area_m2": 18.42,
+   "eave_z": 614.227,
+   "ridge_z": 615.53,
+   "soffit_z_min": 613.999
+  },
+  {
+   "GlobalId": "3u5YVL2hvFWheiTv8xi8yX",
+   "name": "Basic Roof:Tile Roof - 150:2077666",
+   "class": "IfcRoof",
+   "storey": "FFL",
+   "PredefinedType": null,
+   "geometry_source": "none",
+   "aggregates": [
+    "3u5YVL2hvFWheiTv0xi8yX"
+   ]
+  },
+  {
+   "GlobalId": "1yRmmNFYX2SxIm7TbldJ_X",
+   "name": "Basic Roof:Metal Roof - 180:2079779",
+   "class": "IfcRoof",
+   "storey": "FFL",
+   "PredefinedType": null,
+   "geometry_source": "none",
+   "aggregates": [
+    "1yRmmNFYX2SxIm7TjldJ_X"
+   ]
+  },
+  {
+   "GlobalId": "00sWLGDuj7eOJQbkLpaPpf",
+   "name": "Basic Roof:Tile Roof -:2084416",
+   "class": "IfcRoof",
+   "storey": "FFL",
+   "PredefinedType": null,
+   "boundary": [
+    [
+     13.04,
+     -2472.818
+    ],
+    [
+     18.059,
+     -2471.535
+    ],
+    [
+     17.669,
+     -2470.009
+    ],
+    [
+     12.65,
+     -2471.292
+    ]
+   ],
+   "boundary_z": [
+    615.38,
+    615.38,
+    614.711,
+    614.711
+   ],
+   "plane": {
+    "normal": [
+     -0.096767,
+     0.378559,
+     0.920505
+    ],
+    "point": [
+     13.04,
+     -2472.818,
+     615.38
+    ],
+    "slope_deg": 23.0
+   },
+   "top_face_z_min": 614.711,
+   "top_face_z_max": 615.38,
+   "base_z": 614.166,
+   "thickness_m": null,
+   "geometry_source": "brep_top_face",
+   "bbox": [
+    [
+     12.592,
+     -2472.818,
+     614.166
+    ],
+    [
+     18.059,
+     -2469.782,
+     615.38
+    ]
+   ],
+   "z_min": 614.166,
+   "z_max": 615.38,
+   "oriented_dims_m": [
+    5.18,
+    1.575
+   ],
+   "area_m2": 8.16,
+   "eave_z": 614.711,
+   "ridge_z": 615.38,
+   "soffit_z_min": 614.166
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawHRq",
+   "name": "Basic Roof:Generic - 200:2111149",
+   "class": "IfcRoof",
+   "storey": "FFL",
+   "PredefinedType": null,
+   "boundary": [
+    [
+     7.736,
+     -2477.921
+    ],
+    [
+     9.064,
+     -2477.581
+    ],
+    [
+     7.842,
+     -2472.804
+    ],
+    [
+     6.599,
+     -2473.472
+    ]
+   ],
+   "boundary_z": [
+    614.451,
+    614.595,
+    614.595,
+    614.451
+   ],
+   "plane": {
+    "normal": [
+     -0.101272,
+     -0.025887,
+     0.994522
+    ],
+    "point": [
+     7.736,
+     -2477.921,
+     614.451
+    ],
+    "slope_deg": 6.0
+   },
+   "top_face_z_min": 614.451,
+   "top_face_z_max": 614.595,
+   "base_z": 614.25,
+   "thickness_m": null,
+   "geometry_source": "brep_top_face",
+   "bbox": [
+    [
+     6.599,
+     -2477.921,
+     614.25
+    ],
+    [
+     9.064,
+     -2472.804,
+     614.595
+    ]
+   ],
+   "z_min": 614.25,
+   "z_max": 614.595,
+   "oriented_dims_m": [
+    4.931,
+    1.371
+   ],
+   "area_m2": 6.52,
+   "eave_z": 614.451,
+   "ridge_z": 614.595,
+   "soffit_z_min": 614.25
+  },
+  {
+   "GlobalId": "3wAeOhVdT9KvkRhqaAx0YR",
+   "name": "Basic Roof:Generic - 90:2114111",
+   "class": "IfcRoof",
+   "storey": "FFL",
+   "PredefinedType": null,
+   "geometry_source": "none",
+   "aggregates": [
+    "3wAeOhVdT9KvkRhqiAx0YR"
+   ]
+  },
+  {
+   "GlobalId": "3LmaQBWX59WRQ5Cqgsb4TL",
+   "name": "Basic Roof:Transparent Roof - 30:2317876",
+   "class": "IfcRoof",
+   "storey": "FFL",
+   "PredefinedType": null,
+   "geometry_source": "none",
+   "aggregates": [
+    "3LmaQBWX59WRQ5CqYsb4TL"
+   ]
+  }
+ ],
+ "openings": [
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Lxz",
+   "name": "ASA_Hinge - Single:0720 x 2040mm:2005800",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3$t2OdyM9BHxB$DH9l_LJ8",
+   "centre": [
+    5.915,
+    -2470.062
+   ],
+   "placement_origin": [
+    6.068,
+    -2470.436,
+    611.65
+   ],
+   "width_m": 0.8,
+   "height_m": 2.1,
+   "sill_z": 611.65,
+   "top_z": 613.75,
+   "bbox_dims_m": [
+    0.305,
+    0.802,
+    2.1
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Lwr",
+   "name": "ASA_Hinge - Single:0720 x 2040mm:2005856",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3$t2OdyM9BHxB$DH9l_LJ8",
+   "centre": [
+    6.171,
+    -2471.06
+   ],
+   "placement_origin": [
+    6.323,
+    -2471.434,
+    611.65
+   ],
+   "width_m": 0.8,
+   "height_m": 2.1,
+   "sill_z": 611.65,
+   "top_z": 613.75,
+   "bbox_dims_m": [
+    0.305,
+    0.802,
+    2.1
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Lvk",
+   "name": "ASA_Hinge - Single:0720 x 2040mm:2005947",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3$t2OdyM9BHxB$DH9l_LII",
+   "centre": [
+    7.159,
+    -2470.864
+   ],
+   "placement_origin": [
+    7.006,
+    -2470.49,
+    611.65
+   ],
+   "width_m": 0.8,
+   "height_m": 2.1,
+   "sill_z": 611.65,
+   "top_z": 613.75,
+   "bbox_dims_m": [
+    0.305,
+    0.802,
+    2.1
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_Lu0",
+   "name": "ASA_Hinge - Single:0720 x 2040mm:2005973",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3$t2OdyM9BHxB$DH9l_LUn",
+   "centre": [
+    7.467,
+    -2469.046
+   ],
+   "placement_origin": [
+    7.094,
+    -2469.198,
+    611.65
+   ],
+   "width_m": 0.8,
+   "height_m": 2.1,
+   "sill_z": 611.65,
+   "top_z": 613.75,
+   "bbox_dims_m": [
+    0.803,
+    0.305,
+    2.1
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "1U19rtFCXC_gHOWq6AbtbS",
+   "name": "ASA_Slider - Cavity:870 x 2040:2063104",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "1U19rtFCXC_gHOWq6AbtWq",
+   "centre": [
+    10.78,
+    -2469.396
+   ],
+   "placement_origin": [
+    12.063,
+    -2469.115,
+    611.65
+   ],
+   "width_m": 1.815,
+   "height_m": 2.089,
+   "sill_z": 611.65,
+   "top_z": 613.739,
+   "bbox_dims_m": [
+    1.005,
+    0.365,
+    2.089
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "1U19rtFCXC_gHOWq6AbugQ",
+   "name": "ASA_Slider - Cavity:870 x 2040:2066630",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "1U19rtFCXC_gHOWq6AbtwU",
+   "centre": [
+    12.747,
+    -2471.207
+   ],
+   "placement_origin": [
+    12.466,
+    -2469.925,
+    611.65
+   ],
+   "width_m": 1.815,
+   "height_m": 2.089,
+   "sill_z": 611.65,
+   "top_z": 613.739,
+   "bbox_dims_m": [
+    0.365,
+    1.005,
+    2.089
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "3u5YVL2hvFWheiTv8xi9Ut",
+   "name": "ASA_Hinge - Single:0870 x 2040mm:2075508",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3u5YVL2hvFWheiTv8xi9Sy",
+   "centre": [
+    8.428,
+    -2477.863
+   ],
+   "placement_origin": [
+    8.877,
+    -2477.701,
+    611.65
+   ],
+   "width_m": 0.95,
+   "height_m": 2.1,
+   "sill_z": 611.65,
+   "top_z": 613.75,
+   "bbox_dims_m": [
+    0.943,
+    0.323,
+    2.1
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawJQb",
+   "name": "ASA_Concealed Cavity Slider:1060 x 2400:2103036",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3iKap$tjf78BujapxawJAQ",
+   "centre": [
+    11.265,
+    -2468.679
+   ],
+   "placement_origin": [
+    10.828,
+    -2467.15,
+    611.65
+   ],
+   "width_m": 2.196,
+   "height_m": 2.476,
+   "sill_z": 611.65,
+   "top_z": 614.126,
+   "bbox_dims_m": [
+    0.436,
+    1.21,
+    2.476
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawJte",
+   "name": "ASA_Hinge - Square Set:820 x 2340:2104753",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3iKap$tjf78BujapxawJtx",
+   "centre": [
+    7.232,
+    -2473.182
+   ],
+   "placement_origin": [
+    7.625,
+    -2473.062,
+    611.65
+   ],
+   "width_m": 0.82,
+   "height_m": 2.34,
+   "sill_z": 611.65,
+   "top_z": 613.99,
+   "bbox_dims_m": [
+    0.804,
+    0.24,
+    2.34
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "14FDXopyP9dOT2c3SpdDFA",
+   "name": "ASA_Concealed Cavity Slider:1060 x 2400:2208643",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3iKap$tjf78BujapxawJAQ",
+   "centre": [
+    10.421,
+    -2465.375
+   ],
+   "placement_origin": [
+    10.858,
+    -2466.904,
+    611.65
+   ],
+   "width_m": 2.196,
+   "height_m": 2.476,
+   "sill_z": 611.65,
+   "top_z": 614.126,
+   "bbox_dims_m": [
+    0.437,
+    1.21,
+    2.476
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "0_$dJcAsDAVetf2qhZytzO",
+   "name": "Door - Solidcore:Door - Solidcore:2221869",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": null,
+   "centre": [
+    8.943,
+    -2465.088
+   ],
+   "placement_origin": [
+    8.942,
+    -2465.082,
+    611.65
+   ],
+   "width_m": 0.87,
+   "height_m": 2.29,
+   "sill_z": 611.65,
+   "top_z": 613.94,
+   "bbox_dims_m": [
+    0.852,
+    0.249,
+    2.29
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "3Yk0x45Ef64gPYPTOtKETG",
+   "name": "Door-Sliding-Weather_Shield-Contemporary-2_Panel:Default load type catalog:2604246",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "2wDYk6e3LBvu5N7mtwfKTt",
+   "centre": [
+    7.13,
+    -2475.097
+   ],
+   "placement_origin": [
+    6.639,
+    -2473.629,
+    611.65
+   ],
+   "width_m": 3.11,
+   "height_m": 2.25,
+   "sill_z": 611.65,
+   "top_z": 613.938,
+   "bbox_dims_m": [
+    0.981,
+    3.09,
+    2.288
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "3Yk0x45Ef64gPYPTOtKEL0",
+   "name": "Door-Sliding-Weather_Shield-Contemporary-2_Panel:Default load type catalog:2604742",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "2wDYk6e3LBvu5N7mtwfK3$",
+   "centre": [
+    8.247,
+    -2474.834
+   ],
+   "placement_origin": [
+    8.737,
+    -2476.303,
+    611.65
+   ],
+   "width_m": 3.11,
+   "height_m": 2.25,
+   "sill_z": 611.65,
+   "top_z": 613.938,
+   "bbox_dims_m": [
+    0.981,
+    3.09,
+    2.288
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "3Yk0x45Ef64gPYPTOtK9gf",
+   "name": "ASA_Sliding Door - 3 Panel:3400w X 2850h:2605359",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "3ovkTmdwT0zPHaNU875G6n",
+   "centre": [
+    15.142,
+    -2472.198
+   ],
+   "placement_origin": [
+    16.77,
+    -2471.7,
+    611.65
+   ],
+   "width_m": 3.4,
+   "height_m": 2.85,
+   "sill_z": 611.65,
+   "top_z": 614.5,
+   "bbox_dims_m": [
+    3.314,
+    0.919,
+    2.85
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "1TuTOGKq1Evw_GuEnc$5m0",
+   "name": "ASA_Slider - Cavity:1100 x 2340:2752752",
+   "class": "IfcDoor",
+   "storey": "FFL",
+   "host_wall": "1TuTOGKq1Evw_GuEnc$5mO",
+   "centre": [
+    6.989,
+    -2480.459
+   ],
+   "placement_origin": [
+    5.395,
+    -2480.913,
+    611.65
+   ],
+   "width_m": 2.275,
+   "height_m": 2.389,
+   "sill_z": 611.65,
+   "top_z": 614.039,
+   "bbox_dims_m": [
+    1.227,
+    0.423,
+    2.389
+   ],
+   "is_external": false
+  },
+  {
+   "GlobalId": "00sWLGDuj7eOJQbkLpaPHF",
+   "name": "Skylight:780 x 1180:2082534",
+   "class": "IfcWindow",
+   "storey": "FCL",
+   "host_wall": null,
+   "centre": [
+    12.789,
+    -2467.005
+   ],
+   "placement_origin": [
+    13.228,
+    -2468.282,
+    612.03
+   ],
+   "width_m": 0.835,
+   "height_m": 1.235,
+   "sill_z": 615.436,
+   "top_z": 615.99,
+   "bbox_dims_m": [
+    1.09,
+    1.319,
+    0.554
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "00sWLGDuj7eOJQbkLpaPNC",
+   "name": "Skylight:780 x 1180:2082661",
+   "class": "IfcWindow",
+   "storey": "FCL",
+   "host_wall": null,
+   "centre": [
+    15.129,
+    -2466.407
+   ],
+   "placement_origin": [
+    15.568,
+    -2467.684,
+    612.03
+   ],
+   "width_m": 0.835,
+   "height_m": 1.235,
+   "sill_z": 615.436,
+   "top_z": 615.99,
+   "bbox_dims_m": [
+    1.09,
+    1.319,
+    0.554
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "3$D2m$6v96CQOBoIWi3FrV",
+   "name": "Skylight:780 x 780:2382217",
+   "class": "IfcWindow",
+   "storey": "FCL",
+   "host_wall": null,
+   "centre": [
+    8.28,
+    -2469.573
+   ],
+   "placement_origin": [
+    7.796,
+    -2468.117,
+    612.326
+   ],
+   "width_m": 0.835,
+   "height_m": 0.835,
+   "sill_z": 615.731,
+   "top_z": 616.129,
+   "bbox_dims_m": [
+    0.999,
+    0.962,
+    0.398
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "1T8WujuSv8FB5ItFh$njEZ",
+   "name": "No reveals:850 x 350:2415925",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "2wDYk6e3LBvu5N7mtwfK2u",
+   "centre": [
+    4.314,
+    -2480.659
+   ],
+   "placement_origin": [
+    4.123,
+    -2480.269,
+    613.4
+   ],
+   "width_m": 0.85,
+   "height_m": 0.35,
+   "sill_z": 613.4,
+   "top_z": 613.75,
+   "bbox_dims_m": [
+    0.272,
+    0.839,
+    0.35
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0z7XIcvnXB4OmJ5WgwnPCv",
+   "name": "Sgl Horz Bars:Sgl Horz Bars 2400H 600w:2418256",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "2wDYk6e3LBvu5N7mtwfK3S",
+   "centre": [
+    6.565,
+    -2485.012
+   ],
+   "placement_origin": [
+    6.846,
+    -2484.857,
+    611.65
+   ],
+   "width_m": 0.6,
+   "height_m": 2.4,
+   "sill_z": 611.65,
+   "top_z": 614.05,
+   "bbox_dims_m": [
+    0.66,
+    0.37,
+    2.4
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0z7XIcvnXB4OmJ5WgwnPvg",
+   "name": "Sgl Horz Bars:Sgl Horz Bars 2400H 1050w:2419459",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "2wDYk6e3LBvu5N7mtwfK3S",
+   "centre": [
+    10.019,
+    -2484.129
+   ],
+   "placement_origin": [
+    10.518,
+    -2483.919,
+    611.65
+   ],
+   "width_m": 1.05,
+   "height_m": 2.4,
+   "sill_z": 611.65,
+   "top_z": 614.05,
+   "bbox_dims_m": [
+    1.096,
+    0.482,
+    2.4
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0z7XIcvnXB4OmJ5WgwnPjg",
+   "name": "Sgl Plain:1950h 2980w:2420227",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "3iKap$tjf78BujapxawGiC",
+   "centre": [
+    10.614,
+    -2481.748
+   ],
+   "placement_origin": [
+    10.165,
+    -2480.314,
+    612.1
+   ],
+   "width_m": 2.98,
+   "height_m": 1.95,
+   "sill_z": 612.1,
+   "top_z": 614.05,
+   "bbox_dims_m": [
+    0.96,
+    2.966,
+    1.95
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0z7XIcvnXB4OmJ5WgwnOLb",
+   "name": "Sgl Plain:1950h 800w:2420748",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "2wDYk6e3LBvu5N7mtwfK2S",
+   "centre": [
+    6.428,
+    -2478.338
+   ],
+   "placement_origin": [
+    6.807,
+    -2478.158,
+    611.81
+   ],
+   "width_m": 0.8,
+   "height_m": 1.95,
+   "sill_z": 611.81,
+   "top_z": 613.76,
+   "bbox_dims_m": [
+    0.855,
+    0.42,
+    1.95
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0c6wi9gLLBXw_L_XJ5dmI2",
+   "name": "Dbl Plain:Dbl Plain 1350H 2160W:2429689",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "3$t2OdyM9BHxB$DH9l_LEd",
+   "centre": [
+    3.238,
+    -2466.546
+   ],
+   "placement_origin": [
+    2.306,
+    -2466.902,
+    612.505
+   ],
+   "width_m": 1.96,
+   "height_m": 1.53,
+   "sill_z": 612.505,
+   "top_z": 614.035,
+   "bbox_dims_m": [
+    1.995,
+    0.775,
+    1.53
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0c6wi9gLLBXw_L_XJ5dm01",
+   "name": "Dbl Plain:Dbl Plain 1350H 2160W:2430586",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "3$t2OdyM9BHxB$DH9l_LEd",
+   "centre": [
+    6.619,
+    -2465.681
+   ],
+   "placement_origin": [
+    5.687,
+    -2466.038,
+    612.505
+   ],
+   "width_m": 1.96,
+   "height_m": 1.53,
+   "sill_z": 612.505,
+   "top_z": 614.035,
+   "bbox_dims_m": [
+    1.995,
+    0.775,
+    1.53
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0c6wi9gLLBXw_L_XJ5dm5L",
+   "name": "Dbl Plain:Dbl Plain 1350H 2160W:2430766",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "3$t2OdyM9BHxB$DH9l_LLQ",
+   "centre": [
+    5.009,
+    -2473.823
+   ],
+   "placement_origin": [
+    5.941,
+    -2473.467,
+    612.505
+   ],
+   "width_m": 1.96,
+   "height_m": 1.53,
+   "sill_z": 612.505,
+   "top_z": 614.035,
+   "bbox_dims_m": [
+    1.995,
+    0.775,
+    1.53
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "0c6wi9gLLBXw_L_XJ5dmwJ",
+   "name": "Sgl Plain:w600  h1265:2431208",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "1i2heFT_L8wQWb2fDx1MY6",
+   "centre": [
+    11.199,
+    -2472.242
+   ],
+   "placement_origin": [
+    11.472,
+    -2472.053,
+    612.66
+   ],
+   "width_m": 0.6,
+   "height_m": 1.265,
+   "sill_z": 612.66,
+   "top_z": 613.925,
+   "bbox_dims_m": [
+    0.678,
+    0.439,
+    1.265
+   ],
+   "is_external": true
+  },
+  {
+   "GlobalId": "3hGxYL6Bj9hwXllwEJK2D_",
+   "name": "Sgl Plain:w600  h750:2770650",
+   "class": "IfcWindow",
+   "storey": "FFL",
+   "host_wall": "1i2heFT_L8wQWb2fDx1MY6",
+   "centre": [
+    8.631,
+    -2472.898
+   ],
+   "placement_origin": [
+    9.224,
+    -2472.627,
+    612.965
+   ],
+   "width_m": 1.26,
+   "height_m": 0.96,
+   "sill_z": 612.965,
+   "top_z": 613.925,
+   "bbox_dims_m": [
+    1.317,
+    0.602,
+    0.96
+   ],
+   "is_external": true
+  }
+ ],
+ "spaces": [],
+ "curtain_walls": [
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_NM5",
+   "name": "Curtain Wall:Glazing - Timber 50x140mm:2011216",
+   "storey": "SUNKEN LOUNGE",
+   "bbox": [
+    [
+     10.991,
+     -2460.122,
+     611.37
+    ],
+    [
+     13.738,
+     -2459.293,
+     613.52
+    ]
+   ],
+   "n_panels": 4,
+   "n_mullions": 15,
+   "plan_extent_m": [
+    2.747,
+    0.829
+   ],
+   "base_z": 611.37,
+   "top_z": 613.52
+  },
+  {
+   "GlobalId": "3$t2OdyM9BHxB$DH9l_NLB",
+   "name": "Curtain Wall:Glazing - Timber 50x140mm:2011294",
+   "storey": "SUNKEN LOUNGE",
+   "bbox": [
+    [
+     14.928,
+     -2462.51,
+     611.37
+    ],
+    [
+     15.789,
+     -2459.636,
+     613.52
+    ]
+   ],
+   "n_panels": 1,
+   "n_mullions": 4,
+   "plan_extent_m": [
+    0.861,
+    2.874
+   ],
+   "base_z": 611.37,
+   "top_z": 613.52
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGLh",
+   "name": "Curtain Wall:Breeze Block:2106674",
+   "storey": "FFL",
+   "bbox": [
+    [
+     7.133,
+     -2463.335,
+     610.775
+    ],
+    [
+     9.684,
+     -2462.602,
+     614.255
+    ]
+   ],
+   "n_panels": 108,
+   "n_mullions": 0,
+   "plan_extent_m": [
+    2.551,
+    0.733
+   ],
+   "base_z": 610.775,
+   "top_z": 614.255
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875HxE",
+   "name": "Curtain Wall:Batten Scrern- Vertical 2:2174099",
+   "storey": "FFL",
+   "bbox": [
+    [
+     -2.373,
+     -2468.517,
+     611.13
+    ],
+    [
+     1.505,
+     -2467.509,
+     613.77
+    ]
+   ],
+   "n_panels": 54,
+   "n_mullions": 53,
+   "plan_extent_m": [
+    3.878,
+    1.008
+   ],
+   "base_z": 611.13,
+   "top_z": 613.77
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875G8C",
+   "name": "Curtain Wall:Batten Scrern- Vertical 2:2175057",
+   "storey": "FFL",
+   "bbox": [
+    [
+     0.519,
+     -2479.797,
+     611.1
+    ],
+    [
+     3.781,
+     -2478.947,
+     613.689
+    ]
+   ],
+   "n_panels": 45,
+   "n_mullions": 44,
+   "plan_extent_m": [
+    3.262,
+    0.85
+   ],
+   "base_z": 611.1,
+   "top_z": 613.689
+  },
+  {
+   "GlobalId": "0_$dJcAsDAVetf2qhZytwM",
+   "name": "Curtain Wall:Glazing - Timber 50x140mm:2221795",
+   "storey": "FFL",
+   "bbox": [
+    [
+     8.455,
+     -2465.27,
+     611.65
+    ],
+    [
+     9.768,
+     -2464.808,
+     613.99
+    ]
+   ],
+   "n_panels": 1,
+   "n_mullions": 6,
+   "plan_extent_m": [
+    1.313,
+    0.462
+   ],
+   "base_z": 611.65,
+   "top_z": 613.99
+  },
+  {
+   "GlobalId": "0byOE5rnTF2AbdpspvzjwL",
+   "name": "Curtain Wall:Batten Scrern- Vertical 2:2235812",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.251,
+     -2478.734,
+     611.1
+    ],
+    [
+     4.391,
+     -2474.434,
+     613.77
+    ]
+   ],
+   "n_panels": 0,
+   "n_mullions": 60,
+   "plan_extent_m": [
+    1.14,
+    4.3
+   ],
+   "base_z": 611.1,
+   "top_z": 613.77
+  },
+  {
+   "GlobalId": "3JJmDAXpv5gAWSxK72RiLN",
+   "name": "Curtain Wall:Breeze Block:2285666",
+   "storey": "FFL",
+   "bbox": [
+    [
+     17.972,
+     -2475.491,
+     611.575
+    ],
+    [
+     19.064,
+     -2471.535,
+     613.895
+    ]
+   ],
+   "n_panels": 112,
+   "n_mullions": 0,
+   "plan_extent_m": [
+    1.092,
+    3.956
+   ],
+   "base_z": 611.575,
+   "top_z": 613.895
+  },
+  {
+   "GlobalId": "3PyrKWDZ59CAQ6waQd5ffa",
+   "name": "Curtain Wall:Glazing - uPVC 90x 70mm:2385970",
+   "storey": "FFL",
+   "bbox": [
+    [
+     4.276,
+     -2480.229,
+     611.66
+    ],
+    [
+     5.142,
+     -2479.998,
+     613.76
+    ]
+   ],
+   "n_panels": 1,
+   "n_mullions": 0,
+   "plan_extent_m": [
+    0.866,
+    0.231
+   ],
+   "base_z": 611.66,
+   "top_z": 613.76
+  }
+ ],
+ "proxies": [
+  {
+   "GlobalId": "1pQ_Ch_t93Q88GaSfF47A8",
+   "name": "Property:2023809",
+   "storey": "SITE PLAN",
+   "bbox": null,
+   "plan_extent_m": null,
+   "z_min": null,
+   "z_max": null
+  },
+  {
+   "GlobalId": "00tEQvwlX5nRYZGJGqhyta",
+   "name": "Cooktop - 6:900 x 500:2090059",
+   "storey": "FFL",
+   "bbox": [
+    [
+     16.257,
+     -2468.488,
+     612.55
+    ],
+    [
+     16.965,
+     -2467.493,
+     612.574
+    ]
+   ],
+   "plan_extent_m": [
+    0.708,
+    0.995
+   ],
+   "z_min": 612.55,
+   "z_max": 612.574
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGUI",
+   "name": "a_bush14x:a_bush14x:2107339",
+   "storey": "FFL",
+   "bbox": [
+    [
+     9.965,
+     -2464.56,
+     610.741
+    ],
+    [
+     10.742,
+     -2463.789,
+     611.684
+    ]
+   ],
+   "plan_extent_m": [
+    0.777,
+    0.771
+   ],
+   "z_min": 610.741,
+   "z_max": 611.684
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGUo",
+   "name": "a_bush16x:a_bush16x:2107371",
+   "storey": "FFL",
+   "bbox": [
+    [
+     9.812,
+     -2463.795,
+     610.925
+    ],
+    [
+     10.6,
+     -2463.059,
+     611.742
+    ]
+   ],
+   "plan_extent_m": [
+    0.788,
+    0.736
+   ],
+   "z_min": 610.925,
+   "z_max": 611.742
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGUX",
+   "name": "a_bush24x:a_bush24x:2107384",
+   "storey": "FFL",
+   "bbox": [
+    [
+     9.509,
+     -2463.216,
+     610.867
+    ],
+    [
+     10.449,
+     -2462.276,
+     611.622
+    ]
+   ],
+   "plan_extent_m": [
+    0.94,
+    0.94
+   ],
+   "z_min": 610.867,
+   "z_max": 611.622
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGXQ",
+   "name": "a_bush23x:a_bush23x:2107395",
+   "storey": "FFL",
+   "bbox": [
+    [
+     8.99,
+     -2462.538,
+     610.845
+    ],
+    [
+     10.19,
+     -2461.393,
+     611.611
+    ]
+   ],
+   "plan_extent_m": [
+    1.2,
+    1.145
+   ],
+   "z_min": 610.845,
+   "z_max": 611.611
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGfF",
+   "name": "a_bush16x:a_bush16x:2107926",
+   "storey": "FFL",
+   "bbox": [
+    [
+     6.343,
+     -2465.406,
+     610.995
+    ],
+    [
+     7.131,
+     -2464.67,
+     611.812
+    ]
+   ],
+   "plan_extent_m": [
+    0.788,
+    0.736
+   ],
+   "z_min": 610.995,
+   "z_max": 611.812
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGfe",
+   "name": "a_bush18x:a_bush18x:2107953",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.078,
+     -2466.429,
+     610.984
+    ],
+    [
+     4.562,
+     -2464.933,
+     611.974
+    ]
+   ],
+   "plan_extent_m": [
+    1.484,
+    1.496
+   ],
+   "z_min": 610.984,
+   "z_max": 611.974
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGfa",
+   "name": "a_bush23x:a_bush23x:2107965",
+   "storey": "FFL",
+   "bbox": [
+    [
+     5.202,
+     -2465.929,
+     611.006
+    ],
+    [
+     6.402,
+     -2464.784,
+     611.772
+    ]
+   ],
+   "plan_extent_m": [
+    1.2,
+    1.145
+   ],
+   "z_min": 611.006,
+   "z_max": 611.772
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGeD",
+   "name": "a_bush24x:a_bush24x:2107988",
+   "storey": "FFL",
+   "bbox": [
+    [
+     2.402,
+     -2466.451,
+     611.001
+    ],
+    [
+     3.342,
+     -2465.511,
+     611.756
+    ]
+   ],
+   "plan_extent_m": [
+    0.94,
+    0.94
+   ],
+   "z_min": 611.001,
+   "z_max": 611.756
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGgR",
+   "name": "a_bush14x:a_bush14x:2108098",
+   "storey": "FFL",
+   "bbox": [
+    [
+     4.424,
+     -2465.927,
+     610.911
+    ],
+    [
+     5.201,
+     -2465.156,
+     611.854
+    ]
+   ],
+   "plan_extent_m": [
+    0.777,
+    0.771
+   ],
+   "z_min": 610.911,
+   "z_max": 611.854
+  },
+  {
+   "GlobalId": "3iKap$tjf78BujapxawGg8",
+   "name": "a_bush23x:a_bush23x:2108113",
+   "storey": "FFL",
+   "bbox": [
+    [
+     6.952,
+     -2465.482,
+     610.986
+    ],
+    [
+     8.152,
+     -2464.336,
+     611.752
+    ]
+   ],
+   "plan_extent_m": [
+    1.2,
+    1.146
+   ],
+   "z_min": 610.986,
+   "z_max": 611.752
+  },
+  {
+   "GlobalId": "3l2UHw0TH4whT9nAFe6jfz",
+   "name": "a_tree21x-25:a_tree21x-25:2112816",
+   "storey": "FFL",
+   "bbox": [
+    [
+     10.25,
+     -2485.275,
+     611.749
+    ],
+    [
+     16.156,
+     -2479.024,
+     619.466
+    ]
+   ],
+   "plan_extent_m": [
+    5.906,
+    6.251
+   ],
+   "z_min": 611.749,
+   "z_max": 619.466
+  },
+  {
+   "GlobalId": "3l2UHw0TH4whT9nAFe6jhD",
+   "name": "a_tree20x-18:a_tree20x-18:2112896",
+   "storey": "FFL",
+   "bbox": [
+    [
+     18.727,
+     -2478.95,
+     611.679
+    ],
+    [
+     22.891,
+     -2475.036,
+     617.209
+    ]
+   ],
+   "plan_extent_m": [
+    4.164,
+    3.914
+   ],
+   "z_min": 611.679,
+   "z_max": 617.209
+  },
+  {
+   "GlobalId": "3l2UHw0TH4whT9nAFe6jhu",
+   "name": "a_tree35x-26:a_tree35x-26:2112949",
+   "storey": "FFL",
+   "bbox": [
+    [
+     11.701,
+     -2491.974,
+     612.13
+    ],
+    [
+     17.771,
+     -2485.779,
+     620.165
+    ]
+   ],
+   "plan_extent_m": [
+    6.07,
+    6.195
+   ],
+   "z_min": 612.13,
+   "z_max": 620.165
+  },
+  {
+   "GlobalId": "3l2UHw0TH4whT9nAFe6jg7",
+   "name": "a_tree01x-18:a_tree01x-18:2112970",
+   "storey": "FFL",
+   "bbox": [
+    [
+     6.534,
+     -2491.548,
+     612.245
+    ],
+    [
+     8.964,
+     -2488.983,
+     617.803
+    ]
+   ],
+   "plan_extent_m": [
+    2.43,
+    2.565
+   ],
+   "z_min": 612.245,
+   "z_max": 617.803
+  },
+  {
+   "GlobalId": "3l2UHw0TH4whT9nAFe6jgg",
+   "name": "a_tree01x-18:a_tree01x-18:2112999",
+   "storey": "FFL",
+   "bbox": [
+    [
+     -0.306,
+     -2479.022,
+     611.465
+    ],
+    [
+     2.124,
+     -2476.457,
+     617.023
+    ]
+   ],
+   "plan_extent_m": [
+    2.43,
+    2.565
+   ],
+   "z_min": 611.465,
+   "z_max": 617.023
+  },
+  {
+   "GlobalId": "3l2UHw0TH4whT9nAFe6jbJ",
+   "name": "a_tree01x-18:a_tree01x-18:2113054",
+   "storey": "FFL",
+   "bbox": [
+    [
+     0.5,
+     -2483.306,
+     611.71
+    ],
+    [
+     2.93,
+     -2480.741,
+     617.268
+    ]
+   ],
+   "plan_extent_m": [
+    2.43,
+    2.565
+   ],
+   "z_min": 611.71,
+   "z_max": 617.268
+  },
+  {
+   "GlobalId": "3l2UHw0TH4whT9nAFe6jbm",
+   "name": "a_tree20x-18:a_tree20x-18:2113085",
+   "storey": "FFL",
+   "bbox": [
+    [
+     20.79,
+     -2486.79,
+     612.115
+    ],
+    [
+     24.953,
+     -2482.875,
+     617.644
+    ]
+   ],
+   "plan_extent_m": [
+    4.163,
+    3.915
+   ],
+   "z_min": 612.115,
+   "z_max": 617.644
+  },
+  {
+   "GlobalId": "3wAeOhVdT9KvkRhqaAx1vd",
+   "name": "Generic Models 1:Generic Models 1:2118851",
+   "storey": "FFL",
+   "bbox": [
+    [
+     10.32,
+     -2483.161,
+     614.05
+    ],
+    [
+     11.494,
+     -2480.163,
+     614.08
+    ]
+   ],
+   "plan_extent_m": [
+    1.174,
+    2.998
+   ],
+   "z_min": 614.05,
+   "z_max": 614.08
+  },
+  {
+   "GlobalId": "3wAeOhVdT9KvkRhqaAx1$0",
+   "name": "Generic Models 2:Generic Models 2:2119012",
+   "storey": "FFL",
+   "bbox": [
+    [
+     6.305,
+     -2485.597,
+     614.05
+    ],
+    [
+     10.669,
+     -2484.074,
+     614.08
+    ]
+   ],
+   "plan_extent_m": [
+    4.364,
+    1.523
+   ],
+   "z_min": 614.05,
+   "z_max": 614.08
+  },
+  {
+   "GlobalId": "3wAeOhVdT9KvkRhqaAx1mt",
+   "name": "Generic Models 3:Generic Models 3:2119315",
+   "storey": "FFL",
+   "bbox": [
+    [
+     5.522,
+     -2478.458,
+     614.05
+    ],
+    [
+     7.087,
+     -2477.651,
+     614.08
+    ]
+   ],
+   "plan_extent_m": [
+    1.565,
+    0.807
+   ],
+   "z_min": 614.05,
+   "z_max": 614.08
+  },
+  {
+   "GlobalId": "3oVd6i_pPBfAMgphvo1MKi",
+   "name": "Bicycle_Bike_14509:Bicycle_Bike_14509:2158563",
+   "storey": "FFL",
+   "bbox": [
+    [
+     2.099,
+     -2478.987,
+     611.519
+    ],
+    [
+     4.062,
+     -2478.407,
+     612.542
+    ]
+   ],
+   "plan_extent_m": [
+    1.963,
+    0.58
+   ],
+   "z_min": 611.519,
+   "z_max": 612.542
+  },
+  {
+   "GlobalId": "3oVd6i_pPBfAMgphvo1Nh9",
+   "name": "Bicycle_Bike_14509:Bicycle_Bike_14509:2158598",
+   "storey": "FFL",
+   "bbox": [
+    [
+     1.946,
+     -2478.387,
+     611.497
+    ],
+    [
+     3.909,
+     -2477.806,
+     612.521
+    ]
+   ],
+   "plan_extent_m": [
+    1.963,
+    0.581
+   ],
+   "z_min": 611.497,
+   "z_max": 612.521
+  },
+  {
+   "GlobalId": "3oVd6i_pPBfAMgphvo1Nf$",
+   "name": "Bicycle_Bike_14509:Bicycle_Bike_14509:2158768",
+   "storey": "FFL",
+   "bbox": [
+    [
+     1.792,
+     -2477.786,
+     611.475
+    ],
+    [
+     3.755,
+     -2477.205,
+     612.499
+    ]
+   ],
+   "plan_extent_m": [
+    1.963,
+    0.581
+   ],
+   "z_min": 611.475,
+   "z_max": 612.499
+  },
+  {
+   "GlobalId": "16YZklDmnBt8AqNbOcVXY8",
+   "name": "WATER TANK:5000L SKINNY:2161587",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.65,
+     -2485.047,
+     611.65
+    ],
+    [
+     5.116,
+     -2481.922,
+     613.51
+    ]
+   ],
+   "plan_extent_m": [
+    1.466,
+    3.125
+   ],
+   "z_min": 611.65,
+   "z_max": 613.51
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875G40",
+   "name": "a_bush16x:a_bush16x:2175837",
+   "storey": "FFL",
+   "bbox": [
+    [
+     5.786,
+     -2477.322,
+     611.647
+    ],
+    [
+     6.575,
+     -2476.587,
+     612.463
+    ]
+   ],
+   "plan_extent_m": [
+    0.789,
+    0.735
+   ],
+   "z_min": 611.647,
+   "z_max": 612.463
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875G43",
+   "name": "a_bush18x:a_bush18x:2175838",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.976,
+     -2478.453,
+     611.615
+    ],
+    [
+     5.46,
+     -2476.957,
+     612.605
+    ]
+   ],
+   "plan_extent_m": [
+    1.484,
+    1.496
+   ],
+   "z_min": 611.615,
+   "z_max": 612.605
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875G42",
+   "name": "a_bush23x:a_bush23x:2175839",
+   "storey": "FFL",
+   "bbox": [
+    [
+     6.303,
+     -2478.09,
+     611.647
+    ],
+    [
+     7.503,
+     -2476.945,
+     612.413
+    ]
+   ],
+   "plan_extent_m": [
+    1.2,
+    1.145
+   ],
+   "z_min": 611.647,
+   "z_max": 612.413
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875G4z",
+   "name": "a_bush24x:a_bush24x:2175840",
+   "storey": "FFL",
+   "bbox": [
+    [
+     4.77,
+     -2477.348,
+     611.625
+    ],
+    [
+     5.71,
+     -2476.407,
+     612.38
+    ]
+   ],
+   "plan_extent_m": [
+    0.94,
+    0.941
+   ],
+   "z_min": 611.625,
+   "z_max": 612.38
+  },
+  {
+   "GlobalId": "3ovkTmdwT0zPHaNU875G4$",
+   "name": "a_bush23x:a_bush23x:2175842",
+   "storey": "FFL",
+   "bbox": [
+    [
+     5.133,
+     -2478.308,
+     611.647
+    ],
+    [
+     6.333,
+     -2477.163,
+     612.413
+    ]
+   ],
+   "plan_extent_m": [
+    1.2,
+    1.145
+   ],
+   "z_min": 611.647,
+   "z_max": 612.413
+  },
+  {
+   "GlobalId": "0luqVweWL0MfaEpkDGK9bs",
+   "name": "Generic Models 4:Generic Models 4:2185978",
+   "storey": "FCL",
+   "bbox": [
+    [
+     13.515,
+     -2473.133,
+     614.5
+    ],
+    [
+     16.921,
+     -2471.855,
+     614.53
+    ]
+   ],
+   "plan_extent_m": [
+    3.406,
+    1.278
+   ],
+   "z_min": 614.5,
+   "z_max": 614.53
+  },
+  {
+   "GlobalId": "0_$dJcAsDAVetf2qhZytH7",
+   "name": "Generic Models 5:Generic Models 3:2223154",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.21,
+     -2475.227,
+     613.962
+    ],
+    [
+     6.829,
+     -2473.338,
+     613.992
+    ]
+   ],
+   "plan_extent_m": [
+    3.619,
+    1.889
+   ],
+   "z_min": 613.962,
+   "z_max": 613.992
+  },
+  {
+   "GlobalId": "0byOE5rnTF2Abdpspvzjvw",
+   "name": "a_bush16x:a_bush16x:2235723",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.168,
+     -2479.881,
+     611.647
+    ],
+    [
+     3.957,
+     -2479.145,
+     612.463
+    ]
+   ],
+   "plan_extent_m": [
+    0.789,
+    0.736
+   ],
+   "z_min": 611.647,
+   "z_max": 612.463
+  },
+  {
+   "GlobalId": "0byOE5rnTF2Abdpspvzjv$",
+   "name": "a_bush24x:a_bush24x:2235726",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.06,
+     -2481.088,
+     611.625
+    ],
+    [
+     4.0,
+     -2480.148,
+     612.38
+    ]
+   ],
+   "plan_extent_m": [
+    0.94,
+    0.94
+   ],
+   "z_min": 611.625,
+   "z_max": 612.38
+  },
+  {
+   "GlobalId": "0byOE5rnTF2Abdpspvzjv_",
+   "name": "a_bush23x:a_bush23x:2235727",
+   "storey": "FFL",
+   "bbox": [
+    [
+     3.155,
+     -2482.099,
+     611.647
+    ],
+    [
+     4.354,
+     -2480.954,
+     612.413
+    ]
+   ],
+   "plan_extent_m": [
+    1.199,
+    1.145
+   ],
+   "z_min": 611.647,
+   "z_max": 612.413
+  },
+  {
+   "GlobalId": "09Cw$ewTT9TfKJnXYvQQqV",
+   "name": "Generic Models 6:Generic Models 6:2289297",
+   "storey": "SUNKEN LOUNGE",
+   "bbox": [
+    [
+     17.257,
+     -2469.131,
+     611.05
+    ],
+    [
+     18.039,
+     -2467.845,
+     611.95
+    ]
+   ],
+   "plan_extent_m": [
+    0.782,
+    1.286
+   ],
+   "z_min": 611.05,
+   "z_max": 611.95
+  },
+  {
+   "GlobalId": "1TEmCTfz5Bhx7ykAQdp0Xz",
+   "name": "Generic Models 7:Generic Models 7:2289356",
+   "storey": "SUNKEN LOUNGE",
+   "bbox": [
+    [
+     17.12,
+     -2467.643,
+     611.02
+    ],
+    [
+     17.813,
+     -2466.95,
+     613.12
+    ]
+   ],
+   "plan_extent_m": [
+    0.693,
+    0.693
+   ],
+   "z_min": 611.02,
+   "z_max": 613.12
+  },
+  {
+   "GlobalId": "01JOc4TZvDXwa4I53YKz9m",
+   "name": "Slab Edge:380 x 250:2292568",
+   "storey": "SUNKEN LOUNGE",
+   "bbox": [
+    [
+     9.929,
+     -2464.585,
+     610.72
+    ],
+    [
+     15.891,
+     -2459.117,
+     610.97
+    ]
+   ],
+   "plan_extent_m": [
+    5.962,
+    5.468
+   ],
+   "z_min": 610.72,
+   "z_max": 610.97
+  },
+  {
+   "GlobalId": "2PaxKJj4nCPhngPfbuSwsA",
+   "name": "Slab Edge:600 x 300:2299944",
+   "storey": "SUNKEN LOUNGE",
+   "bbox": [
+    [
+     3.859,
+     -2485.301,
+     611.215
+    ],
+    [
+     11.151,
+     -2472.67,
+     611.515
+    ]
+   ],
+   "plan_extent_m": [
+    7.292,
+    12.631
+   ],
+   "z_min": 611.215,
+   "z_max": 611.515
+  },
+  {
+   "GlobalId": "0f4PoXK1z8IhsysdfM2gxW",
+   "name": "Toposolid:Toposolid 1:2326733",
+   "storey": "SITE PLAN",
+   "bbox": [
+    [
+     -5.329,
+     -2491.309,
+     609.701
+    ],
+    [
+     25.245,
+     -2451.544,
+     612.583
+    ]
+   ],
+   "plan_extent_m": [
+    30.574,
+    39.765
+   ],
+   "z_min": 609.701,
+   "z_max": 612.583
+  },
+  {
+   "GlobalId": "3i1dy6_IjDMOSLJkRZ1lAT",
+   "name": "Toposolid:Toposolid 1:2331190",
+   "storey": "SITE PLAN",
+   "bbox": [
+    [
+     -4.249,
+     -2468.38,
+     609.701
+    ],
+    [
+     0.957,
+     -2456.034,
+     611.136
+    ]
+   ],
+   "plan_extent_m": [
+    5.206,
+    12.346
+   ],
+   "z_min": 609.701,
+   "z_max": 611.136
+  },
+  {
+   "GlobalId": "2f$zR1bZj0ivSFlqy9Qokb",
+   "name": "Electrical Fixtures  SMOKE ALARM:Electrical Fixtures  SMOKE ALARM:2368316",
+   "storey": "FCL",
+   "bbox": [
+    [
+     6.602,
+     -2470.489,
+     614.122
+    ],
+    [
+     6.722,
+     -2470.369,
+     614.165
+    ]
+   ],
+   "plan_extent_m": [
+    0.12,
+    0.12
+   ],
+   "z_min": 614.122,
+   "z_max": 614.165
+  },
+  {
+   "GlobalId": "1NuOulHsv0fg_wXGkr9ogS",
+   "name": "Oven - Built in:(595w x 596h x 569d):2615547",
+   "storey": "FFL",
+   "bbox": [
+    [
+     16.971,
+     -2471.536,
+     612.574
+    ],
+    [
+     17.674,
+     -2470.838,
+     613.17
+    ]
+   ],
+   "plan_extent_m": [
+    0.703,
+    0.698
+   ],
+   "z_min": 612.574,
+   "z_max": 613.17
+  },
+  {
+   "GlobalId": "1NuOulHsv0fg_wXGkr9oq8",
+   "name": "Oven Small - Built In:595w x 456h x 571d Obsidian Black:2617199",
+   "storey": "FFL",
+   "bbox": [
+    [
+     16.979,
+     -2471.536,
+     612.118
+    ],
+    [
+     17.676,
+     -2470.838,
+     612.574
+    ]
+   ],
+   "plan_extent_m": [
+    0.697,
+    0.698
+   ],
+   "z_min": 612.118,
+   "z_max": 612.574
+  }
+ ],
+ "site_toposurface": {
+  "GlobalId": "0Kf9TtacPDyhpiKNVbpmo$",
+  "name": "Surface:2008230",
+  "n_vertices": 375,
+  "bbox": [
+   [
+    -6.738,
+    -2493.191,
+    609.63
+   ],
+   [
+    25.489,
+    -2446.537,
+    612.63
+   ]
+  ],
+  "z_min": 609.63,
+  "z_max": 612.63,
+  "note": "Deduplicated vertices of the IfcSite toposurface, raw IFC world coords in metres, z is AHD. Faces omitted.",
+  "n_unique_vertices": 101,
+  "vertices": [
+   [
+    24.216,
+    -2490.341,
+    612.545
+   ],
+   [
+    25.244,
+    -2491.888,
+    612.63
+   ],
+   [
+    25.489,
+    -2491.194,
+    612.63
+   ],
+   [
+    25.226,
+    -2490.292,
+    612.583
+   ],
+   [
+    25.206,
+    -2490.214,
+    612.579
+   ],
+   [
+    24.123,
+    -2485.708,
+    612.38
+   ],
+   [
+    24.114,
+    -2485.942,
+    612.38
+   ],
+   [
+    24.37,
+    -2492.348,
+    612.63
+   ],
+   [
+    23.976,
+    -2490.353,
+    612.532
+   ],
+   [
+    22.759,
+    -2490.414,
+    612.484
+   ],
+   [
+    22.271,
+    -2490.438,
+    612.472
+   ],
+   [
+    17.869,
+    -2490.655,
+    612.41
+   ],
+   [
+    15.725,
+    -2491.033,
+    612.38
+   ],
+   [
+    16.338,
+    -2490.731,
+    612.38
+   ],
+   [
+    23.317,
+    -2482.826,
+    612.13
+   ],
+   [
+    24.034,
+    -2485.629,
+    612.357
+   ],
+   [
+    23.326,
+    -2482.707,
+    612.13
+   ],
+   [
+    23.28,
+    -2482.682,
+    612.124
+   ],
+   [
+    22.469,
+    -2479.507,
+    611.88
+   ],
+   [
+    22.47,
+    -2479.505,
+    611.88
+   ],
+   [
+    20.902,
+    -2473.378,
+    611.476
+   ],
+   [
+    14.847,
+    -2446.644,
+    609.63
+   ],
+   [
+    22.468,
+    -2479.504,
+    611.88
+   ],
+   [
+    22.464,
+    -2479.487,
+    611.879
+   ],
+   [
+    22.448,
+    -2479.425,
+    611.875
+   ],
+   [
+    19.792,
+    -2469.036,
+    611.128
+   ],
+   [
+    18.676,
+    -2464.669,
+    610.825
+   ],
+   [
+    12.843,
+    -2491.627,
+    612.38
+   ],
+   [
+    14.98,
+    -2491.228,
+    612.38
+   ],
+   [
+    13.188,
+    -2490.887,
+    612.308
+   ],
+   [
+    15.502,
+    -2490.773,
+    612.347
+   ],
+   [
+    5.473,
+    -2493.191,
+    612.38
+   ],
+   [
+    14.798,
+    -2490.807,
+    612.332
+   ],
+   [
+    11.186,
+    -2490.986,
+    612.351
+   ],
+   [
+    9.195,
+    -2491.709,
+    612.38
+   ],
+   [
+    10.811,
+    -2491.24,
+    612.38
+   ],
+   [
+    10.135,
+    -2491.177,
+    612.38
+   ],
+   [
+    6.497,
+    -2491.218,
+    612.279
+   ],
+   [
+    10.7,
+    -2491.01,
+    612.363
+   ],
+   [
+    10.759,
+    -2491.007,
+    612.365
+   ],
+   [
+    10.035,
+    -2491.043,
+    612.368
+   ],
+   [
+    10.096,
+    -2491.04,
+    612.37
+   ],
+   [
+    8.98,
+    -2491.095,
+    612.335
+   ],
+   [
+    5.441,
+    -2491.27,
+    612.283
+   ],
+   [
+    4.557,
+    -2491.314,
+    612.281
+   ],
+   [
+    4.528,
+    -2491.315,
+    612.29
+   ],
+   [
+    0.004,
+    -2477.772,
+    611.517
+   ],
+   [
+    -0.752,
+    -2474.814,
+    611.342
+   ],
+   [
+    -5.848,
+    -2457.069,
+    610.38
+   ],
+   [
+    0.149,
+    -2478.337,
+    611.529
+   ],
+   [
+    0.499,
+    -2479.707,
+    611.641
+   ],
+   [
+    -1.688,
+    -2471.152,
+    611.189
+   ],
+   [
+    15.916,
+    -2453.874,
+    610.149
+   ],
+   [
+    17.416,
+    -2459.739,
+    610.553
+   ],
+   [
+    12.542,
+    -2452.244,
+    610.125
+   ],
+   [
+    13.18,
+    -2448.979,
+    609.88
+   ],
+   [
+    12.348,
+    -2452.294,
+    610.13
+   ],
+   [
+    10.407,
+    -2452.79,
+    610.177
+   ],
+   [
+    10.287,
+    -2452.148,
+    610.13
+   ],
+   [
+    12.603,
+    -2452.229,
+    610.124
+   ],
+   [
+    3.84,
+    -2454.469,
+    610.372
+   ],
+   [
+    4.097,
+    -2454.403,
+    610.38
+   ],
+   [
+    5.459,
+    -2451.137,
+    610.13
+   ],
+   [
+    5.658,
+    -2454.004,
+    610.412
+   ],
+   [
+    5.57,
+    -2453.545,
+    610.38
+   ],
+   [
+    6.333,
+    -2453.831,
+    610.38
+   ],
+   [
+    7.441,
+    -2451.067,
+    610.13
+   ],
+   [
+    3.684,
+    -2454.508,
+    610.372
+   ],
+   [
+    12.652,
+    -2452.216,
+    610.122
+   ],
+   [
+    14.544,
+    -2449.375,
+    609.88
+   ],
+   [
+    15.048,
+    -2451.604,
+    610.027
+   ],
+   [
+    15.264,
+    -2451.548,
+    610.006
+   ],
+   [
+    15.318,
+    -2451.535,
+    610.001
+   ],
+   [
+    14.697,
+    -2446.537,
+    609.63
+   ],
+   [
+    10.175,
+    -2448.813,
+    609.88
+   ],
+   [
+    6.555,
+    -2448.994,
+    609.88
+   ],
+   [
+    0.619,
+    -2452.078,
+    610.13
+   ],
+   [
+    -0.959,
+    -2450.176,
+    609.88
+   ],
+   [
+    0.502,
+    -2455.322,
+    610.379
+   ],
+   [
+    0.489,
+    -2455.325,
+    610.379
+   ],
+   [
+    0.327,
+    -2455.367,
+    610.38
+   ],
+   [
+    -1.476,
+    -2452.82,
+    610.13
+   ],
+   [
+    -1.909,
+    -2455.698,
+    610.38
+   ],
+   [
+    -1.883,
+    -2455.932,
+    610.398
+   ],
+   [
+    -4.731,
+    -2456.66,
+    610.388
+   ],
+   [
+    -4.831,
+    -2456.587,
+    610.38
+   ],
+   [
+    -4.794,
+    -2456.676,
+    610.388
+   ],
+   [
+    -4.127,
+    -2461.611,
+    610.704
+   ],
+   [
+    -4.805,
+    -2458.956,
+    610.578
+   ],
+   [
+    -5.348,
+    -2456.832,
+    610.38
+   ],
+   [
+    -4.821,
+    -2456.683,
+    610.388
+   ],
+   [
+    -5.352,
+    -2456.818,
+    610.379
+   ],
+   [
+    -5.282,
+    -2456.801,
+    610.38
+   ],
+   [
+    2.563,
+    -2454.795,
+    610.372
+   ],
+   [
+    -2.916,
+    -2451.126,
+    609.88
+   ],
+   [
+    -2.385,
+    -2450.808,
+    609.88
+   ],
+   [
+    -3.425,
+    -2453.632,
+    610.13
+   ],
+   [
+    -3.056,
+    -2451.139,
+    609.88
+   ],
+   [
+    -5.97,
+    -2454.355,
+    610.13
+   ],
+   [
+    -5.194,
+    -2454.029,
+    610.13
+   ],
+   [
+    -6.738,
+    -2454.192,
+    610.13
+   ]
+  ],
+  "fall_m": 3.0
+ },
+ "counts": {
+  "IfcPlate": 326,
+  "IfcMember": 184,
+  "IfcWallStandardCase": 52,
+  "IfcBuildingElementProxy": 45,
+  "IfcFurnishingElement": 45,
+  "IfcOpeningElement": 38,
+  "IfcSlab": 32,
+  "IfcDistributionPort": 28,
+  "IfcFlowTerminal": 26,
+  "IfcDoor": 15,
+  "IfcWall": 15,
+  "IfcWindow": 13,
+  "IfcAnnotation": 10,
+  "IfcCurtainWall": 9,
+  "IfcBeam": 8,
+  "IfcRoof": 8,
+  "IfcCovering": 4,
+  "IfcBuildingStorey": 4,
+  "IfcColumn": 3,
+  "IfcFlowSegment": 3,
+  "IfcStair": 2,
+  "IfcStairFlight": 2,
+  "IfcRailing": 1,
+  "IfcFlowController": 1,
+  "IfcBuilding": 1,
+  "IfcSite": 1
+ },
+ "lot_bbox_m": {
+  "min": [
+   -8.414,
+   -2493.681,
+   609.49
+  ],
+  "max": [
+   25.489,
+   -2446.537,
+   621.28
+  ],
+  "size": [
+   33.903,
+   47.144,
+   11.79
+  ]
+ },
+ "lot_bbox_m_including_outliers": {
+  "min": [
+   -8.414,
+   -2651.375,
+   347.0
+  ],
+  "max": [
+   317.147,
+   -2446.537,
+   621.28
+  ],
+  "size": [
+   325.561,
+   204.837,
+   274.28
+  ]
+ },
+ "outlier_elements": [
+  {
+   "class": "IfcBeam",
+   "GlobalId": "14zzc_$eH00fQgH7ksvHKP",
+   "name": "POWER LINE CLEARANCE:POWER LINE Clear- 2.7:2780398",
+   "bbox": [
+    [
+     314.356,
+     -2651.375,
+     347.0
+    ],
+    [
+     317.147,
+     -2645.772,
+     352.4
+    ]
+   ]
+  }
+ ],
+ "walls_axis_from_bbox": [],
+ "sanity": {
+  "ground_floor_z": {
+   "expected_m": 611.65,
+   "found_m": 611.65,
+   "pass": true,
+   "note": "z is already AHD; RefElevation=0, no IfcMapConversion. Nothing to add."
+  },
+  "existing_house_footprint": {
+   "expected_m": [
+    16.0,
+    8.6
+   ],
+   "found": {
+    "roof_pitch_plane_2010085": [
+     16.02,
+     4.318
+    ],
+    "two_pitches_span_m": 8.636,
+    "internal_slab_2006227": [
+     14.885,
+     7.49
+    ]
+   },
+   "pass": true
+  },
+  "garage_footprint": {
+   "expected_m": [
+    11.6,
+    3.9
+   ],
+   "found": {
+    "metal_roof_2079779": [
+     11.6,
+     3.865
+    ],
+    "slab_2327953": [
+     11.6,
+     3.992
+    ]
+   },
+   "pass": true
+  },
+  "roof_levels": {
+   "expected_ridge_m": 616.06,
+   "expected_eave_m": 613.93,
+   "existing_residence_roof": {
+    "3$t2OdyM9BHxB$DH9l_Mum": {
+     "name": "Basic Roof:Tile Roof - 210:2010085",
+     "ridge_z_top_of_tile": 616.06,
+     "eave_z_top_of_tile": 614.227,
+     "eave_z_lowest_point_of_roof_solid": 613.999,
+     "slope_deg": 23.0
+    },
+    "3$t2OdyM9BHxB$DH9l_Mgt": {
+     "name": "Basic Roof:Tile Roof - 210:2010978",
+     "ridge_z_top_of_tile": 615.53,
+     "eave_z_top_of_tile": 614.227,
+     "eave_z_lowest_point_of_roof_solid": 613.999,
+     "slope_deg": 22.5
+    }
+   },
+   "found_max_ridge_m": 616.06,
+   "found_min_eave_m_any_roof": 614.227,
+   "pass_ridge": true,
+   "note": "Ridge matches exactly at 616.06 (top of tile). Eave: the expected 613.93 sits 69 mm below the lowest point of the modelled roof solid (613.999, the bottom of the fascia edge); the top of the tiles at the eave is 614.227. So the expected eave figure is measured slightly below the modelled roof, most likely at the wall plate or gutter line rather than the roof body. Difference is 69 mm, not a units or placement error."
+  }
+ },
+ "notes": [
+  "Pset_WallCommon.IsExternal is True on ALL 67 walls, including 20 'Stud - 90' partitions that clearly sit inside the building and carry internal cavity-slider doors. The flag is unusable as an internal/external discriminator. Use wall type name, hosts_external_opening, or a perimeter test instead. Door and window IsExternal, by contrast, looks correct.",
+  "Door/window width_m and height_m are the IFC OverallWidth/OverallHeight of the whole unit, which for cavity sliders is the full pocket assembly, not the leaf: 'ASA_Slider - Cavity:870 x 2040' reports 1.815 m wide. bbox_dims_m gives the modelled extent as a cross-check. Trust the family name for nominal leaf size.",
+  "Doors and windows are real, individually placed families with distinct types, sizes and hosts (ASA_Hinge, ASA_Slider - Cavity, ASA_Sliding Door 3 Panel, Sgl/Dbl Plain, Skylight), not blocked-out voids. 24 of 28 are hosted in a wall via IfcRelFillsElement; the 3 skylights are roof-hosted and one 'Door - Solidcore' has no host and cuts nothing.",
+  "Interior partitions are genuinely modelled: 20 'Stud - 90' walls at 0.09 m plus 'Brick Single - 110', carrying internal cavity-slider doors. This is a real construction model, not a massing block-out.",
+  "Trees and shrubs are modelled as IfcBuildingElementProxy families (a_tree01x/20x/21x/35x, a_bush14x-24x) with real canopy extents and heights - see proxies. Seven tree instances appear. Reconcile against the surveyed protected-tree schedule before using them; canopy radii here are Revit family geometry, not surveyed crowns.",
+  "Two Revit Toposolids and the IfcSite toposurface are present. The IfcSite surface spans 32.2 x 46.7 m with a 3.0 m fall, wider than the block itself, so its fall exceeds the block's own fall. Its 101 unique vertices are included as levels.",
+  "One element sits far outside the site: IfcBeam 'POWER LINE CLEARANCE:POWER LINE Clear- 2.7:2780398' at roughly x 315, y -2648, z 347-352. It is about 300 m away and 260 m below everything else and is a stray Revit copy. It is excluded from lot_bbox_m and listed in outlier_elements. Ignore it."
+ ]
+}
