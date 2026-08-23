@@ -89,5 +89,8 @@
  },
  "_sun": {
   "gridHours": 368.8
+ },
+ "_roofs": {
+  "partial": 2
  }
 }

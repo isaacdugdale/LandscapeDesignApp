@@ -156,6 +156,18 @@ const fitDeg = -fit.th * 180 / Math.PI;
 say('grid angle ' + gridDeg.toFixed(4) + ' deg, fitted rotation ' + fitDeg.toFixed(4)
   + ' deg, offset ' + fit.dx.toFixed(3) + ' ' + fit.dy.toFixed(3) + (fit.flip ? ', flipped' : ''));
 
+const shoelace = poly => {
+  let a = 0;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++)
+    a += poly[j][0] * poly[i][1] - poly[i][0] * poly[j][1];
+  return Math.abs(a) / 2;
+};
+/* The building grid angle as sine and cosine, used to un-turn an axis-aligned
+   IFC bounding box back into the rectangle inside it. Both the glazing and the
+   roof coverage test need it. */
+const th0 = gridDeg * Math.PI / 180;
+const c0 = Math.abs(Math.cos(th0)), s0 = Math.abs(Math.sin(th0)), c2 = c0 * c0 - s0 * s0;
+
 /* ---- 4. transform everything ---- */
 
 const storeys = H.storeys.map(s => [s.name, r3(s.world_z_m)]);
@@ -168,16 +180,53 @@ const walls = H.walls.filter(w => w.start && w.end).map(w => {
 });
 
 /* Floors first, because the external wall test needs them. IfcRoof entries that
-   only aggregate a slab already listed carry no geometry, and are dropped. */
-const slabs = H.slabs.filter(s => s.boundary && s.boundary.length >= 3).map(s => ({
-  poly: s.boundary.map(T), bz: s.boundary_z || null,
-  kind: (s.class === 'IfcRoof' || s.PredefinedType === 'ROOF') ? 'roof' : 'floor',
-  z0: s.z_min, z1: s.z_max, thick: s.thickness_m, st: s.storey, name: s.name,
-  plane: s.plane || null, eave: s.eave_z != null ? s.eave_z : null,
-  ridge: s.ridge_z != null ? s.ridge_z : null, area: s.area_m2, id: s.GlobalId
-}));
+   only aggregate a slab already listed carry no geometry, and are dropped.
+
+   A roof arrives as one entry per solid with a list of its upward faces. A
+   gable has two and they are kept as two, because a section cutting the roof
+   has to meet both slopes. Older exports carry a single face at the top level
+   and no list, and those still read: the fallback below makes a one-face list
+   out of them. */
+const facesOf = s => {
+  if (Array.isArray(s.faces) && s.faces.length) return s.faces;
+  if (!s.boundary) return [];
+  /* Where the roof came off a brep, the face carries its own z and the solid's
+     bbox does not: s.z_min sits at the fascia soffit, 228 mm under the eave.
+     Where it came off an extrusion, boundary_z is the base polygon and the
+     solid rises above it by its thickness, so the bbox is the one to read. */
+  const brep = s.geometry_source === 'brep_top_face';
+  return [{boundary: s.boundary, boundary_z: s.boundary_z, plane: s.plane || null,
+           z_min: brep ? s.top_face_z_min : s.z_min,
+           z_max: brep ? s.top_face_z_max : s.z_max}];
+};
+const isRoof = s => s.class === 'IfcRoof' || s.PredefinedType === 'ROOF';
+const slabs = [];
+H.slabs.forEach(s => {
+  if (!s.boundary || s.boundary.length < 3) return;
+  const common = {kind: isRoof(s) ? 'roof' : 'floor', thick: s.thickness_m,
+                  st: s.storey, name: s.name, area: s.area_m2, id: s.GlobalId};
+  if (!isRoof(s)) {
+    slabs.push(Object.assign({poly: s.boundary.map(T), bz: s.boundary_z || null,
+      z0: s.z_min, z1: s.z_max, plane: null,
+      eave: s.eave_z != null ? s.eave_z : null,
+      ridge: s.ridge_z != null ? s.ridge_z : null}, common));
+    return;
+  }
+  const fs = facesOf(s);
+  fs.forEach((fc, i) => {
+    if (!fc.boundary || fc.boundary.length < 3) return;
+    const zs = fc.boundary_z || null;
+    const lo = fc.z_min != null ? fc.z_min : (zs ? Math.min.apply(null, zs) : s.z_min);
+    const hi = fc.z_max != null ? fc.z_max : (zs ? Math.max.apply(null, zs) : s.z_max);
+    slabs.push(Object.assign({poly: fc.boundary.map(T), bz: zs,
+      z0: lo, z1: hi, plane: fc.plane || null, eave: lo, ridge: hi,
+      face: i, faces: fs.length}, common));
+  });
+});
 const dropped = H.slabs.length - slabs.length;
-if (dropped) say(dropped + ' slab records carry no geometry and are dropped (aggregate wrappers)');
+if (dropped > 0) say(dropped + ' slab records carry no geometry and are dropped (aggregate wrappers)');
+const multi = slabs.filter(s => s.kind === 'roof' && s.faces > 1).length;
+if (multi) say(multi + ' roof faces come from solids with more than one slope');
 
 const floors = slabs.filter(s => s.kind === 'floor');
 const inPoly = (p, poly) => {
@@ -237,8 +286,6 @@ const openings = H.openings.map(o => {
    which is solvable while cos 2theta stays away from zero, and at 14.37 degrees
    it is 0.877. Which way round the panel runs is not decided by algebra, so
    both are tried and the one that rebuilds the given box is kept. */
-const th0 = gridDeg * Math.PI / 180;
-const c0 = Math.abs(Math.cos(th0)), s0 = Math.abs(Math.sin(th0)), c2 = c0 * c0 - s0 * s0;
 let cwFallback = 0;
 const cwalls = H.curtain_walls.map(c => {
   const Wx = c.bbox[1][0] - c.bbox[0][0], Wy = c.bbox[1][1] - c.bbox[0][1];
@@ -262,6 +309,46 @@ const cwalls = H.curtain_walls.map(c => {
 });
 if (cwFallback) say(cwFallback + ' of ' + cwalls.length + ' glazing panels could not be un-boxed and keep their bounding box');
 
+/* ---- 4b. does every roof face come across? ---- */
+
+/* A roof solid's own bounding box is in the IFC world frame, turned off the
+   building grid, so it says nothing directly. Un-turning it the way the glazing
+   is un-turned gives the roof's plan rectangle, and that is the area its faces
+   should add up to. A gable whose second slope was dropped covers half of it.
+
+   This is the test that would have caught the tile roof over the existing
+   house: exported as 16.02 by 4.318 where the solid's box un-turns to 16.02 by
+   8.636. Ridge and eave were right, so nothing else noticed. */
+const unboxArea = (Wx, Wy) => {
+  if (Math.abs(c2) < 0.2) return null;
+  let best = null;
+  [[Wx, Wy], [Wy, Wx]].forEach(([A, B]) => {
+    const L = (A * c0 - B * s0) / c2, t = (B * c0 - A * s0) / c2;
+    if (L <= 0 || t <= 0) return;
+    const gx = L * c0 + t * s0, gy = L * s0 + t * c0;
+    const err = Math.min(Math.abs(gx - Wx) + Math.abs(gy - Wy),
+                         Math.abs(gx - Wy) + Math.abs(gy - Wx));
+    if (err < 0.01 && (!best || err < best.err)) best = {a: L * t, err: err};
+  });
+  return best ? best.a : null;
+};
+const partialRoofs = [];
+H.slabs.forEach(sl => {
+  if (!(sl.class === 'IfcRoof' || sl.PredefinedType === 'ROOF') || !sl.bbox) return;
+  const solid = unboxArea(sl.bbox[1][0] - sl.bbox[0][0], sl.bbox[1][1] - sl.bbox[0][1]);
+  if (!solid || solid < 2) return;
+  const covered = slabs.filter(x => x.id === sl.GlobalId && x.kind === 'roof')
+    .reduce((n, x) => n + shoelace(x.poly), 0);
+  if (covered < solid * 0.75)
+    partialRoofs.push({name: sl.name, covered: r2(covered), solid: r2(solid)});
+});
+if (partialRoofs.length) {
+  say(partialRoofs.length + ' roof' + (partialRoofs.length === 1 ? '' : 's')
+    + ' came across with only part of the solid, so a section through them draws part of a roof:');
+  partialRoofs.forEach(r => say('  ' + r.covered + ' m2 of ' + r.solid + ' m2  ' + r.name));
+  say('  re-run tools/ifc/extract.py against the IFC to pick up every upward face');
+}
+
 /* ---- 5. the massing, rebuilt from the roofs ---- */
 
 /* BOXH gave every building one ridge and one eave, and project-data.json
@@ -275,12 +362,6 @@ const roofs = slabs.filter(s => s.kind === 'roof');
    not a centroid: these roof outlines are L shaped and hipped, and the average
    of an L's corners lands outside the L. Sutherland and Hodgman clips the roof
    against the box, which is convex, so the clip is exact. */
-const shoelace = poly => {
-  let a = 0;
-  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++)
-    a += poly[j][0] * poly[i][1] - poly[i][0] * poly[j][1];
-  return Math.abs(a) / 2;
-};
 const clipBox = (poly, x0, y0, x1, y1) => {
   const edges = [[1, 0, x0], [-1, 0, -x1], [0, 1, y0], [0, -1, -y1]];  /* ax+by >= c */
   let out = poly.slice();
@@ -553,6 +634,7 @@ const out = {
   BOXH: boxh.filter(Boolean),
   OUTLINE: OUTLINE,
   BLDS: BLDS,
+  ROOF_PARTIAL: partialRoofs,
   FOOTPRINT: footprint_m2,
   FOOTPRINT_NEW: footprint_new_m2
 };

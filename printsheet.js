@@ -1979,6 +1979,9 @@ window.PRINTSHEET = (function () {
       + '<li>Roof lines are the heights the model carries. The ' + H.ROOF.length + ' roofs set the ridges and eaves the sun map uses.</li>'
       + '<li>The ground is the surveyor\u2019s surface, dashed where the design finishes it.</li>'
       + '<li>From ' + esc(H.SRC) + ', placed by tools/house-extract.js.</li>'
+      + ((H.ROOF_PARTIAL && H.ROOF_PARTIAL.length)
+         ? '<li>' + H.ROOF_PARTIAL.length + ' roofs came across as one pitch of their two, so the section draws part of them. Their ridge and eave are right.</li>'
+         : '')
       + '</ul>'
       + '<h3 class="ps-h3">Every level the model carries</h3>'
       + '<table class="ps-tbl"><thead><tr><th>RL</th><th class="ps-num">Off FFL mm</th>'

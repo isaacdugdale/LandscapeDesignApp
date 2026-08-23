@@ -73,7 +73,7 @@ disappears if it left no trace worth keeping. Git history is the log.
 - The site plan draws the model's outline, split into existing and new work.
   The footprint is 265.5 m² against the 284.4 m² the boxes claimed.
 
-Live build at the time of writing: **v45**.
+Live build at the time of writing: **v46**.
 
 ## Todo
 
@@ -97,11 +97,15 @@ Roughly in order. Nothing here is urgent and each is a spare-tokens job.
    fitted surface. Clamping the fallback to the nearest triangle edge would
    remove the step; it would also change levels, so it is a decision rather
    than a fix.
-5. **The second pitch of the main roof.** The extract took one planar face per
-   roof, so the tile roof over the existing house came across as one pitch of
-   its two. The ridge and the eave are right, so the massing and the sun map are
-   right. The section draws half a roof. Re-export with every top face and run
-   `tools/house-extract.js` again.
+5. **Two roofs are half there, and the fix needs the IFC.** `top_face` in
+   `tools/ifc/extract.py` kept the largest upward face, and both slopes of a
+   gable point up, so both tile roofs came across as one pitch. The extractor
+   now takes every upward face and `tools/house-extract.js` reads them, but the
+   data cannot be regenerated here: the IFC is on Isaac's machine. Run
+   `python3 tools/ifc/extract.py '<file>.ifc' source/house.json`, push
+   `source/house.json`, then `node tools/house-extract.js > house-data.js` and
+   `node tools/check.js --update`. The `_roofs.partial` baseline goes from 2 to
+   0. Ridge and eave are unaffected, so only the section changes.
 6. **Checks still tests footprints as six boxes.** `BLDR` is built from `BOXH`,
    and the model's outline is 19.0 m² smaller. Moving Checks onto it would free
    ground along the walls and move every scheme's issue count, so it wants its

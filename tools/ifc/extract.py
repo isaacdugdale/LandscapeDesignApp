@@ -199,16 +199,25 @@ def outer_poly_from_extrusion(el):
                 return base, float(np.linalg.norm(vec)), vec
     return None,None,None
 
-def top_face(FS):
-    best=None;ba=0
+def top_faces(FS, min_area=0.5):
+    """Every upward planar face of a solid, largest first.
+
+    This used to keep only the largest, which lost a pitch on every gable: both
+    slopes of a gable point upward and only one came out. The tile roof over the
+    existing house went across as 16.02 by 4.318 when the solid is 16.02 by
+    8.636, so the section drew half a roof. Ridge and eave were unaffected,
+    being the top and bottom of the one face that survived."""
+    out=[]
     for poly in FS:
         n=newell(poly); L=np.linalg.norm(n)
         if L<1e-9: continue
         u=n/L
         if u[2]<0.05: continue
         a=L/2
-        if a>ba: ba=a; best=(poly,u)
-    return best
+        if a<min_area: continue
+        out.append((poly,u,a))
+    out.sort(key=lambda t:-t[2])
+    return out
 
 def poly2d(P):
     return [[rnd(p[0]),rnd(p[1])] for p in P]
@@ -226,14 +235,24 @@ for el in list(f.by_type("IfcSlab"))+list(f.by_type("IfcRoof")):
         ent["base_z"]=rnd(float(min(base[:,2].min(),(base+vec)[:,2].min())))
         ent["geometry_source"]="extrusion"
     elif FS:
-        tf=top_face(FS)
-        if tf:
-            poly,u=tf
+        tfs=top_faces(FS)
+        if tfs:
+            def face_ent(poly,u):
+                return {"boundary":poly2d(poly),
+                        "boundary_z":[rnd(z) for z in poly[:,2]],
+                        "plane":{"normal":[rnd(x,6) for x in u],
+                                 "point":[rnd(x) for x in poly[0]],
+                                 "slope_deg":rnd(math.degrees(math.acos(min(1,abs(u[2])))),3)},
+                        "z_min":rnd(float(poly[:,2].min())),
+                        "z_max":rnd(float(poly[:,2].max()))}
+            ent["faces"]=[face_ent(poly,u) for poly,u,a in tfs]
+            # the largest face stays at the top level, so a reader written
+            # against the single-face export keeps working
+            poly,u,_=tfs[0]
             ent["boundary"]=poly2d(poly); ent["boundary_z"]=[rnd(z) for z in poly[:,2]]
-            ent["plane"]={"normal":[rnd(x,6) for x in u],
-                          "point":[rnd(x) for x in poly[0]],
-                          "slope_deg":rnd(math.degrees(math.acos(min(1,abs(u[2])))),3)}
-            ent["top_face_z_min"]=rnd(float(poly[:,2].min())); ent["top_face_z_max"]=rnd(float(poly[:,2].max()))
+            ent["plane"]=ent["faces"][0]["plane"]
+            ent["top_face_z_min"]=rnd(min(fc["z_min"] for fc in ent["faces"]))
+            ent["top_face_z_max"]=rnd(max(fc["z_max"] for fc in ent["faces"]))
         ent["base_z"]=bb[0][2] if bb else None
         ent["thickness_m"]=None
         ent["geometry_source"]="brep_top_face"

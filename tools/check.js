@@ -163,6 +163,20 @@ console.log('house');
   ok('the new work half is the smaller of the two',
      HH.BLDS.find(b => b.k === 'proposed').d.length < HH.BLDS.find(b => b.k === 'existing').d.length);
 
+  /* Two tile roofs came across as one pitch of their two, so a section through
+     them draws part of a roof. Ridge and eave are right, being the top and
+     bottom of the face that survived, so the massing and the sun map are not
+     affected. tools/ifc/extract.py now takes every upward face; this holds the
+     count until that has been run against the IFC again. When it has, this
+     fails and the number to put here is zero. */
+  ok('every partial roof is one of the two known ones',
+     HH.ROOF_PARTIAL.every(r => /2010085|2010978/.test(r.name)),
+     HH.ROOF_PARTIAL.map(r => r.name).join(', '));
+  ok('a partial roof still carries its full ridge and eave', (() => {
+    const b = HH.BOXH.find(x => x[0] === 'existing house');
+    return b && Math.abs(b[5] - 616.06) < 0.005;
+  })(), 'the surviving face runs ridge to eave, so the massing is unhurt');
+
   /* A door has to be in the wall it says it is in, or the section cuts a hole
      in thin air. Checked as a distance from the host wall's axis. */
   const stray = HH.OPEN.filter(o => {
@@ -227,6 +241,7 @@ for (const s of D.SCHEMES) ok('scheme ' + s.id + ' has notes', (s.notes || '').l
   for (const p of pts) for (const d of [355, 172, 264]) tot += a.sunHours(p[0], p[1], d, 0.9);
   ok('the sun map is finite', isFinite(tot), String(tot));
   seen._sun = { gridHours: +tot.toFixed(1) };
+  seen._roofs = { partial: window.DUFFY_HOUSE.ROOF_PARTIAL.length };
 }
 
 /* ---------- prose ---------- */
