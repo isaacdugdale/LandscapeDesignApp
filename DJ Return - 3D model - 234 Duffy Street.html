@@ -1,0 +1,1759 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DJ Return - 3D model - 234 Duffy Street</title>
+<style>
+  :root{ --bg:#141414; --panel:#1c1c1c; --line:#2e2e2e; --txt:#e8e6e2;
+         --dim:#8d8a85; --accent:#c98a4b; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--txt);overflow:hidden}
+  #app{display:flex;height:100%}
+  #panel{width:338px;min-width:338px;height:100%;overflow-y:auto;background:var(--panel);
+    border-right:1px solid var(--line);padding:14px 14px 40px}
+  #view{flex:1;position:relative}
+  body.nopanel #panel{display:none}
+  #panelToggle{position:absolute;left:8px;top:8px;z-index:5;width:26px;height:26px;
+    display:grid;place-content:center;cursor:pointer;font-size:11px;
+    background:rgba(28,28,28,.9);color:var(--txt);border:1px solid var(--line);border-radius:4px}
+  #panelToggle:hover{background:#333;border-color:#555}
+  canvas{display:block}
+  h1{font-size:14px;margin:0 0 2px;letter-spacing:.02em}
+  .sub{font-size:11px;color:var(--dim);line-height:1.45;margin:0 0 12px}
+  h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);
+    margin:16px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+  .row{display:flex;align-items:center;gap:7px;margin:5px 0}
+  .row label{flex:1;font-size:11.5px;color:#c9c6c1}
+  .row input[type=range]{flex:1.1;min-width:0;accent-color:var(--accent);height:16px}
+  .row input[type=number]{width:56px;background:#101010;color:var(--txt);border:1px solid var(--line);
+    border-radius:3px;padding:3px 4px;font-size:11px;font-family:inherit;text-align:right}
+  .row input[type=color]{width:34px;height:22px;background:none;border:1px solid var(--line);
+    border-radius:3px;padding:0;cursor:pointer}
+  .chk{display:flex;align-items:center;gap:6px;font-size:11.5px;margin:4px 0;color:#c9c6c1;cursor:pointer}
+  .chk input{accent-color:var(--accent)}
+  .btns{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+  button{background:#262626;color:var(--txt);border:1px solid var(--line);border-radius:3px;
+    padding:5px 9px;font-size:11px;font-family:inherit;cursor:pointer}
+  button:hover{background:#333;border-color:#444}
+  button.p{background:#3a2b1c;border-color:#5a422a}
+  #out{font-size:11.5px;line-height:1.55}
+  #out .k{display:flex;justify-content:space-between;gap:8px;padding:2.5px 0;border-bottom:1px solid #232323}
+  #out .k span:first-child{color:var(--dim)}
+  #out .k span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+  .flag{margin-top:7px;padding:6px 8px;border-radius:3px;font-size:11px;line-height:1.45}
+  .flag.w{background:#2e1b1a;border:1px solid #5c2b28;color:#f0b3b0}
+  .flag.n{background:#22201a;border:1px solid #4a4436;color:#ddd3b8}
+  .flag.o{background:#1b241b;border:1px solid #2f4a2f;color:#b8d9b8}
+  textarea{width:100%;height:160px;background:#101010;color:var(--txt);border:1px solid var(--line);
+    border-radius:3px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;padding:6px;margin-top:6px}
+  #hint{position:absolute;left:12px;bottom:10px;font-size:10.5px;color:#7a7772;
+    background:rgba(0,0,0,.45);padding:5px 9px;border-radius:3px;pointer-events:none}
+  #err{position:absolute;inset:0;display:none;place-content:center;text-align:center;padding:40px;
+    font-size:13px;line-height:1.6;color:#f0b3b0}
+  .note{font-size:10.5px;color:var(--dim);line-height:1.45;margin:6px 0 0}
+  h2.sec{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:baseline}
+  h2.sec:hover{color:#e3a869}
+  h2.sec .chev{font-size:8px;opacity:.75;transition:transform .12s ease}
+  h2.sec.shut .chev{transform:rotate(-90deg)}
+  h2.sec.shut{color:var(--dim);border-bottom-color:#242424}
+  .secbar{font-size:10.5px;color:var(--dim);margin:-6px 0 10px}
+  .secbar a{color:var(--accent);cursor:pointer;text-decoration:none}
+  .secbar a:hover{text-decoration:underline}
+</style>
+
+<div id="app">
+<div id="panel">
+  <h1>DJ Return &mdash; 3D model</h1>
+  <p class="sub">234 Duffy Street, Ainslie. Drag to orbit, scroll to zoom, shift-drag to pan.
+  Keys 1&ndash;7 switch views, F to walk. Defaults are the brief as issued to Mill.</p>
+  <p class="secbar"><a id="expandAll">expand all</a> &nbsp;&middot;&nbsp; <a id="collapseAll">collapse all</a></p>
+
+  <div class="btns">
+    <button class="p" data-view="axo">1 Axo</button>
+    <button class="p" data-view="dining">2 Dining</button>
+    <button class="p" data-view="lounge">3 Lounge</button>
+    <button class="p" data-view="deck">4 Decks</button>
+    <button class="p" data-view="plan">5 Plan</button>
+    <button class="p" data-view="step">6 Steps</button>
+    <button class="p" data-view="kitchen">7 Kitchen</button>
+    <button class="p" id="walkbtn" style="background:#1c3040;border-color:#2f4f66">F Walk</button>
+  </div>
+
+  <div id="g-dims"></div>
+  <h2>Overall</h2><div id="g-overall"></div>
+  <h2>Deck recess</h2><div id="g-recess"></div>
+  <h2>Now playing bin (DJ&rsquo;s right)</h2><div id="g-np"></div>
+  <h2>Equipment</h2><div id="g-equip"></div>
+  <h2>Subwoofer (Yamaha DXS15XLF)</h2><div id="g-sub"></div>
+  <h2>Record storage</h2><div id="g-rec"></div>
+  <h2>Bench seat (by builder)</h2><div id="g-seat"></div>
+  <h2>Kitchen (Mill QU-0473)</h2><div id="g-kit"></div>
+
+  <h2>Dining table</h2><div id="g-tbl"></div>
+  <h2>Walk around</h2><div id="g-walk"></div>
+  <h2>Display</h2><div id="g-look"></div>
+
+  <h2>Live readout</h2>
+  <div id="out"></div>
+  <div id="flags"></div>
+
+  <h2>Presets / export</h2>
+  <div class="btns">
+    <button id="reset">Reset to brief</button>
+    <button id="tweak">40 lip / 490 recess</button>
+    <button id="above">Cubbies above bolster</button>
+    <button id="comfy">Comfortable lounge seat</button>
+    <button id="subBench">Sub: end of bench</button>
+    <button id="subStep">Sub: foot of steps</button>
+    <button id="subAmp">Sub: try the amp bay</button>
+    <button id="copy">Show spec text</button>
+    <button id="save" style="background:#26382a;border-color:#3c5a41">Save</button>
+  </div>
+  <p class="note" id="savestat"></p>
+  <textarea id="spec" style="display:none" readonly></textarea>
+  <p class="note">Working model for design coordination. Dimensions are scaled off the Enfold plans and are to be confirmed at measure up.</p>
+</div>
+
+<div id="view">
+  <div id="panelToggle" title="Hide or show the panel (key P)">&#9664;</div>
+  <div id="hint">drag orbit &nbsp;&middot;&nbsp; scroll zoom &nbsp;&middot;&nbsp; shift-drag pan &nbsp;&middot;&nbsp; keys 1&ndash;7 &nbsp;&middot;&nbsp; D dimensions &nbsp;&middot;&nbsp; F walk</div>
+  <div id="err">Could not load the 3D library.<br>This file needs an internet connection the first time you open it,
+  because it pulls three.js from a CDN.</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+if(typeof THREE==='undefined'){document.getElementById('err').style.display='grid';return;}
+
+/* =====================================================================
+   Coordinates, all in mm, taken off the Enfold R3 plan
+     Y  = up, 0 = dining finished floor level (RL 611650)
+     Z  = depth, 0 = dining face of Carcase A, +Z toward the lounge (east)
+     X  = along the unit, +X = north
+   Design maths below is written with X measured 0 at the north end running
+   south, which is how the 2D sheets are dimensioned. The draw helpers negate
+   X on placement so the scene is right-handed and reads the correct way round:
+   the DJ faces +Z (east), so the DJ's LEFT is +X (north, the steps) and the
+   DJ's RIGHT is -X (south, the existing buffet).
+   Level change sits on the Carcase A / B joint at Z = 400.
+   Dining room is -Z. Sunken lounge is +Z, 580 lower.
+   ===================================================================== */
+
+var BRIEF = {
+  LA:2940, LB:3660, DA:400, DB:400, TOP:1000, BT:32, STEP:580,
+  KICK:100, KICKSET:30, STEPN:4, STEPG:300,
+  ROOMN:4860, LOUNGEW:4240, BUFD:720, FCL:2515,
+  RECW:1700, RECD:490, LIP:40, DROP:165, RECPOS:50,
+  NPW:360, NPD:140, NPDROP:165, NPX:60, NPZ:200, showNP:true,
+  TTH:162, PAD:0,
+  showDRW:true, DRWH:100, DRWN:5,
+  showSub:true, SUBX:40, SUBZ:858, SUBENC:true, showSweep:true, SWEEPT:24, SWEEPRUN:450,
+  CUBSTART:450, TIERS:3, BAYS:7, T:18, FILL:70,
+  SEAT:420, SEATD:960, SEATL:3070, BOLD:180, BOLH:350, BOLGAP:200, CUSH:110,
+  /* --- kitchen, from Mill 'Kitchen Plan Veiw & Elevations' 26.03.2026 ---
+     Mill's sheet reads left = EAST. Oven tower at the west end, tall units at
+     the east end next to the DJ return. Run: 25 | tall 875 | 25 | coffee 900 |
+     25 | fridge 940 | 25 | bench 3890 | 25 | ovens 600 | 25 = 7355. */
+  showKitchen:true, KZ0:400, KDEP:720, KBENCH:920, KWALL:875, KTALL:2400,
+  KFRIDGE:940, KOVEN:600, KGAP:400, KRUN:7355, BULKY:2000, showBulk:true,
+  OVENBASE:706, OVENH:597, OVENN:2,
+  KNOOK:900, KPANTRY:600, islCentre:true,
+  showNookGear:true, NSINKW:150,
+  KBIN:450, KSINK:900, KDW:610, KSTOVE:900, KGAP2:403, KBENCH1:352,
+  wideStove:false, KSLIM:150,
+  SLACK:'bench', CORNSH:3, showCorner:true,
+  showPend:true, PENDH:750,
+  EYE:1650, SPEED:28,
+  SECS:'g-equip|g-sub|g-walk|g-look', DIMSCOPE:'all', panelOff:false,
+  showTable:true, TBLL:1800, TBLW:900, TBLH:750, TBLX:1470, TBLZ:-1800,
+  binInRun:false, stoneOverGap:true,
+  ISLW:2800, ISLD:1200, ISLX:639, ISLZ:-6404, ISLOH:20,
+  SLABL:3350, SLABW:2020, showSlab:true,
+  walnut:'#7a4f33', ply:'#c9ad7f', mel:'#efece6', stone:'#efeeea',
+  showDecks:true, showRecords:true, showContext:true, showSeat:true,
+  showDoors:true, showFigure:true, showLabels:true, cutaway:false, showDims:false,
+  showWalls:true
+};
+var P = Object.assign({},BRIEF);
+
+/* ---- saved settings. Only keys that still exist and still match type are
+   restored, so an old save cannot break the model after a change. ---- */
+var SKEY='duffy.djreturn.v1', RESTORED=0;
+try{
+  var raw=window.localStorage&&localStorage.getItem(SKEY);
+  if(raw){ var o=JSON.parse(raw);
+    Object.keys(BRIEF).forEach(function(k){
+      if(o[k]!==undefined && typeof o[k]===typeof BRIEF[k]){ P[k]=o[k]; RESTORED++; } });
+  }
+}catch(e){ RESTORED=0; }
+
+/* published equipment footprints */
+var TTW=453, TTD=360, TTH_PUB=162, RXW=728, RXD=470, RXH=118.4;
+/* Yamaha DXS15XLF, published. Thomann's bullet says 450 x 587 H x 600 D,
+   their own spec table says 600 H x 587 D. Treated as 450 x 600 x 600, 40 kg. */
+var SUBW=450, SUBH=600, SUBD=600, SUBKG=40;
+/* Ascaso Dream PID, manufacturer: 245 W x 345 H x 280 D, 10 kg, side-removable tank.
+   Benchy Sparkling Zero, KegLand: 290 W x 380 H x 420 D, plus 100 front clearance. */
+var ESPW=245, ESPH=345, ESPD=280, BENW=290, BENH=380, BEND=420, BENCLR=100;
+
+var CTRL=[
+ ['g-overall','LA','Carcase A length (dining side)',2000,4200,10],
+ ['g-overall','LB','Carcase B length (lounge side)',2000,4600,10],
+ ['g-overall','DA','Carcase A depth',250,700,10],
+ ['g-overall','DB','Carcase B depth',250,700,10],
+ ['g-overall','TOP','Benchtop height above dining FFL',820,1250,5],
+
+ ['g-recess','RECW','Recess width',900,2600,10],
+ ['g-recess','RECD','Recess depth',350,700,5],
+ ['g-recess','LIP','Front lip width',0,300,5],
+ ['g-recess','DROP','Drop below benchtop surface',90,260,1],
+ ['g-recess','RECPOS','Position along Carcase A (%)',0,100,1],
+ ['g-recess','DRWH','Slim drawer band height',60,180,5],
+ ['g-recess','DRWN','Number of slim drawers',2,10,1],
+
+ ['g-np','NPW','Bin width (record is 315)',300,600,5],
+ ['g-np','NPD','Bin depth, sets capacity',60,400,5],
+ ['g-np','NPDROP','Well depth below benchtop',80,320,5],
+ ['g-np','NPZ','Set back from the front edge',0,400,10],
+ ['g-np','NPX','Offset from the south end',0,900,10],
+
+ ['g-equip','TTH','Turntable plinth height',90,200,1],
+ ['g-equip','PAD','Isolation pad thickness',0,80,1],
+
+ ['g-sub','SUBX','Sub position along the unit',-1200,3600,10],
+ ['g-sub','SUBZ','Sub position, depth',-600,4200,10],
+ ['g-sub','SWEEPRUN','S sweep run, box top to seat',150,1200,10],
+ ['g-sub','SWEEPT','S sweep ply thickness',12,40,2],
+
+ ['g-rec','CUBSTART','Cubbies start above lounge FFL',300,1000,5],
+ ['g-rec','TIERS','Number of tiers',1,5,1],
+ ['g-rec','BAYS','Number of bays',3,12,1],
+ ['g-rec','T','Shelf / divider thickness',12,32,1],
+ ['g-rec','FILL','Record fill (%)',0,100,1],
+
+ ['g-seat','SEAT','Seat height above lounge FFL',300,700,5],
+ ['g-seat','SEATD','Seat depth',450,1000,10],
+ ['g-seat','SEATL','Seat run length',0,4600,10],
+ ['g-seat','BOLD','Back bolster depth',0,300,5],
+ ['g-seat','BOLH','Back bolster height above seat',0,600,10],
+ ['g-seat','BOLGAP','Gap, bolster to Carcase B',0,200,5],
+ ['g-seat','CUSH','Seat cushion thickness',60,160,5],
+
+ ['g-kit','KBIN','Bin',300,700,10],
+ ['g-kit','KSINK','Sink cabinet',600,1200,10],
+ ['g-kit','KDW','Dishwasher',500,700,10],
+ ['g-kit','KSTOVE','Stove',500,1200,10],
+ ['g-kit','KBENCH1','Bench, dishwasher to stove',0,1200,10],
+ ['g-kit','KSLIM','Slim drawer beside the wide bank',0,600,10],
+ ['g-kit','CORNSH','Corner display shelves',1,6,1],
+ ['g-kit','PENDH','Pendant above the bench',450,1200,10],
+ ['g-tbl','TBLL','Table length',1200,2600,10],
+ ['g-tbl','TBLW','Table width',700,1200,10],
+ ['g-tbl','TBLH','Table height',680,820,5],
+ ['g-tbl','TBLX','Position along the DJ return',-600,3600,10],
+ ['g-tbl','TBLZ','Position, island to DJ',-3400,-300,10],
+ ['g-walk','EYE','Eye height  (1650 = 180cm person)',1200,1900,10],
+ ['g-walk','SPEED','Walking speed',5,90,1],
+ ['g-kit','KGAP2','Landing, stove to oven tower',0,900,5],
+ ['g-kit','KPANTRY','Pantry drawer bank',300,2000,10],
+ ['g-kit','KNOOK','Coffee nook',0,1400,10],
+ ['g-kit','NSINKW','Drip tray width',0,400,10],
+ ['g-kit','KDEP','Run depth',550,800,10],
+ ['g-kit','BULKY','Bulkhead soffit height',1800,2400,10],
+ ['g-kit','OVENBASE','Oven stack, base height',300,1200,10],
+ ['g-kit','KBENCH','Benchtop height',850,1000,5],
+ ['g-kit','KFRIDGE','Fridge opening',700,1100,10],
+ ['g-kit','KGAP','Gap at the east end for the DJ return',0,900,10],
+ ['g-kit','KOVEN','Oven tower width',500,900,10],
+ ['g-kit','ISLW','Island length',1800,3400,10],
+ ['g-kit','ISLD','Island depth',900,1500,10],
+ ['g-kit','ISLOH','Island stone overhang',0,350,5],
+ ['g-kit','ISLZ','Island position, east-west',-7200,-2500,10],
+ ['g-kit','ISLX','Island position, north-south',300,2400,10],
+
+];
+
+/* ---- collapsible panel sections ---- */
+function applyPanel(){
+  document.body.className = P.panelOff?'nopanel':'';
+  var t=document.getElementById('panelToggle');
+  if(t){ t.innerHTML = P.panelOff?'&#9654;':'&#9664;'; }
+  if(typeof resize==='function') resize();
+}
+function secList(){ return (P.SECS||'').split('|').filter(Boolean); }
+function applySecs(){
+  var c=secList();
+  [].forEach.call(document.querySelectorAll('#panel h2'),function(h){
+    var g=h.nextElementSibling;
+    if(!g||!/^g-/.test(g.id||'')) return;
+    var shut=c.indexOf(g.id)>=0;
+    g.style.display=shut?'none':'';
+    h.className=shut?'sec shut':'sec';
+  });
+}
+function wireSecs(){
+  [].forEach.call(document.querySelectorAll('#panel h2'),function(h){
+    var g=h.nextElementSibling;
+    if(!g||!/^g-/.test(g.id||'')) return;
+    h.className='sec';
+    h.insertAdjacentHTML('beforeend','<span class="chev">&#9660;</span>');
+    h.addEventListener('click',function(){
+      var c=secList(), i=c.indexOf(g.id);
+      if(i<0) c.push(g.id); else c.splice(i,1);
+      P.SECS=c.join('|'); applySecs();
+    });
+  });
+  var all=[];
+  [].forEach.call(document.querySelectorAll('#panel h2'),function(h){
+    var g=h.nextElementSibling; if(g&&/^g-/.test(g.id||'')) all.push(g.id); });
+  document.getElementById('panelToggle').addEventListener('click',function(){
+    P.panelOff=!P.panelOff; applyPanel(); });
+  document.getElementById('expandAll').addEventListener('click',function(){ P.SECS=''; applySecs(); });
+  document.getElementById('collapseAll').addEventListener('click',function(){ P.SECS=all.join('|'); applySecs(); });
+  applySecs(); applyPanel();
+}
+
+var _q=false;
+function requestBuild(){                       /* one rebuild per frame while dragging */
+  if(_q) return; _q=true;
+  if(typeof requestAnimationFrame==='function')
+    requestAnimationFrame(function(){ _q=false; build(); });
+  else { _q=false; build(); }
+}
+function mkRow(parent,key,label,min,max,step){
+  var d=document.createElement('div'); d.className='row';
+  d.innerHTML='<label>'+label+'</label>'+
+    '<input type="range" min="'+min+'" max="'+max+'" step="'+step+'">'+
+    '<input type="number" min="'+min+'" max="'+max+'" step="'+step+'">';
+  var r=d.children[1], n=d.children[2];
+  r.value=P[key]; n.value=P[key];
+  function set(v,coalesce){ v=Math.max(min,Math.min(max,Number(v)||0));
+    P[key]=v; r.value=v; n.value=v; if(coalesce) requestBuild(); else build(); }
+  r.addEventListener('input',function(){set(r.value,true)});
+  n.addEventListener('change',function(){set(n.value,false)});
+  d._set=function(v){r.value=v;n.value=v;};
+  document.getElementById(parent).appendChild(d); return d;
+}
+var rows={}; CTRL.forEach(function(c){ rows[c[1]]=mkRow(c[0],c[1],c[2],c[3],c[4],c[5]); });
+
+function mkSel(parent,key,label,opts){
+  var d=document.createElement('div'); d.className='row';
+  d.innerHTML='<label>'+label+'</label><select style="flex:1.1;min-width:0;background:#101010;'+
+    'color:var(--txt);border:1px solid var(--line);border-radius:3px;padding:3px 4px;'+
+    'font-size:11px;font-family:inherit"></select>';
+  var sel=d.children[1];
+  opts.forEach(function(o){ var op=document.createElement('option');
+    op.value=o[0]; op.textContent=o[1]; sel.appendChild(op); });
+  sel.value=P[key];
+  sel.addEventListener('change',function(){ P[key]=sel.value; build(); });
+  document.getElementById(parent).appendChild(d);
+  return sel;
+}
+function mkChk(parent,key,label){
+  var d=document.createElement('label'); d.className='chk';
+  d.innerHTML='<input type="checkbox"'+(P[key]?' checked':'')+'><span>'+label+'</span>';
+  d.firstChild.addEventListener('change',function(e){P[key]=e.target.checked;build();});
+  document.getElementById(parent).appendChild(d); return d.firstChild;
+}
+function mkCol(parent,key,label){
+  var d=document.createElement('div'); d.className='row';
+  d.innerHTML='<label>'+label+'</label><input type="color" value="'+P[key]+'">';
+  d.children[1].addEventListener('input',function(e){P[key]=e.target.value;dropMatCache();requestBuild();});
+  document.getElementById(parent).appendChild(d); return d.children[1];
+}
+var sels={ DIMSCOPE:mkSel('g-dims','DIMSCOPE','Dimensions show',[
+    ['all','Everything'],['dj','DJ return only'],['kit','Kitchen only'],['room','Room and steps only']]),
+  SLACK:mkSel('g-kit','SLACK','Slack absorbed by',[
+  ['bench','Bench, dishwasher to stove'],['pantry','Pantry drawer bank'],['nook','Coffee nook']]) };
+var chks={
+  showDRW:    mkChk('g-recess','showDRW','Slim drawer band under the recess'),
+  showNP:     mkChk('g-np','showNP','Show the now playing bin'),
+  showSub:    mkChk('g-sub','showSub','Show the subwoofer'),
+  SUBENC:     mkChk('g-sub','SUBENC','Draw a ply enclosure round it'),
+  showSweep:  mkChk('g-sub','showSweep','S-curved ply sweep down to the seat'),
+  showDecks:  mkChk('g-equip','showDecks','Show decks'),
+  showRecords:mkChk('g-rec','showRecords','Show records'),
+  showSeat:   mkChk('g-seat','showSeat','Show bench seat and bolsters'),
+  showDims:   mkChk('g-dims','showDims','Show dimensions  (key D)'),
+  showTable:  mkChk('g-tbl','showTable','Show the table and chairs'),
+  showKitchen:mkChk('g-kit','showKitchen','Show the kitchen'),
+  showBulk:   mkChk('g-kit','showBulk','Gyprock bulkhead over the bench'),
+  showNookGear:mkChk('g-kit','showNookGear','Coffee machine and sparkling tap'),
+  islCentre:  mkChk('g-kit','islCentre','Centre the island on the bench run'),
+  showCorner: mkChk('g-kit','showCorner','Corner display shelving over the DJ return'),
+  showPend:   mkChk('g-kit','showPend','Resinate 1800 pendant over the island'),
+  wideStove:  mkChk('g-kit','wideStove','No slim cupboards: one wide drawer bank under the cooktop'),
+  binInRun:   mkChk('g-kit','binInRun','Bin cabinet in the bench run'),
+  stoneOverGap:mkChk('g-kit','stoneOverGap','Stone over the last landing'),
+  showSlab:   mkChk('g-look','showSlab','Lay the 3350 x 2020 slab out on the floor'),
+  showWalls:  mkChk('g-look','showWalls','Room walls'),
+  cutaway:    mkChk('g-look','cutaway','Cut away the benchtop'),
+  showDoors:  mkChk('g-look','showDoors','Doors on the dining side'),
+  showFigure: mkChk('g-look','showFigure','Figure for scale (1750 tall)'),
+  showLabels: mkChk('g-look','showLabels','Room labels on the floor'),
+  showContext:mkChk('g-look','showContext','Floors, steps, buffet')
+};
+var cols={ walnut:mkCol('g-look','walnut','Walnut'),
+           ply:mkCol('g-look','ply','Plywood, Carcase B'),
+           stone:mkCol('g-look','stone','Stone benchtop'),
+           mel:mkCol('g-look','mel','Carcase melamine') };
+
+/* ----------------------------------------------------------- renderer */
+var view=document.getElementById('view');
+var renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+
+var scene=new THREE.Scene(); scene.background=new THREE.Color(0x1a1a1a);
+var camera=new THREE.PerspectiveCamera(38,1,20,60000);
+scene.add(new THREE.HemisphereLight(0xdfe6ee,0x2a2622,0.72));
+var sun=new THREE.DirectionalLight(0xfff2e0,1.45);
+sun.position.set(-2600,4600,-3400); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+var sc=sun.shadow.camera; sc.left=-4200; sc.right=4200; sc.top=4200; sc.bottom=-4200;
+sc.near=100; sc.far=16000;
+sun.target.position.set(-1830,300,500); scene.add(sun.target); scene.add(sun);
+var fillL=new THREE.DirectionalLight(0xcfe0ff,0.5); fillL.position.set(3200,1600,4200); scene.add(fillL);
+
+/* ----------------------------------------------------------- orbit */
+var orb={theta:2.35,phi:1.05,rad:7400,tx:-1830,ty:350,tz:400};
+
+/* ---- walk mode. Camera is a person on the floor: eye height follows whichever
+   level you are standing on, and simple footprint collision stops you walking
+   through the joinery. ---- */
+var WALK=false, KEYS={}, BLOCK=[];
+var EYE0={x:400,z:-1800,yaw:-0.75,pitch:-0.10};  // open dining floor, looking at the DJ return
+var eye={x:EYE0.x,z:EYE0.z,yaw:EYE0.yaw,pitch:EYE0.pitch};
+function floorY(wx,wz){
+  var G=P.STEPG, N=Math.max(1,Math.round(P.STEPN)), rise=P.STEP/N;
+  if(wz<P.DA) return 0;                                  // dining, upper level
+  if(wx>=0&&wx<=1200){                                   // on the steps
+    var t=Math.floor((wz-P.DA)/G);
+    if(t<N-1) return -(t+1)*rise;
+  }
+  return -P.STEP;                                        // sunken lounge
+}
+function blk(x0,z0,w,d,topY){
+  if(!(w>0)||!(d>0)) return;
+  BLOCK.push({x0:-(x0+w),x1:-x0,z0:z0,z1:z0+d,top:topY});
+}
+function hit(x,z){
+  var fy=floorY(x,z), R=240;
+  for(var i=0;i<BLOCK.length;i++){ var b=BLOCK[i];
+    if(b.top<=fy+150) continue;                          // low enough to step past
+    if(x>b.x0-R&&x<b.x1+R&&z>b.z0-R&&z<b.z1+R) return true; }
+  return false;
+}
+function unstick(){
+  if(!hit(eye.x,eye.z)) return true;
+  for(var r=200;r<=8000;r+=200)
+    for(var a=0;a<16;a++){
+      var t=a*Math.PI/8, nx=eye.x+Math.cos(t)*r, nz=eye.z+Math.sin(t)*r;
+      if(!hit(nx,nz)){ eye.x=nx; eye.z=nz; return true; }
+    }
+  return false;
+}
+function setWalk(on){
+  WALK=on;
+  KEYS={};                                        /* never inherit a held key */
+  if(on){ try{ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); }catch(x){} }
+  if(on&&!unstick()){ eye.x=EYE0.x; eye.z=EYE0.z; unstick(); }
+  var h=document.getElementById('hint');
+  if(h) h.innerHTML = on
+    ? 'W A S D or arrows to walk &nbsp;&middot;&nbsp; shift to hurry &nbsp;&middot;&nbsp; drag to look &nbsp;&middot;&nbsp; R to return to the decks &nbsp;&middot;&nbsp; F or Esc to fly out'
+    : 'drag orbit &nbsp;&middot;&nbsp; scroll zoom &nbsp;&middot;&nbsp; shift-drag pan &nbsp;&middot;&nbsp; keys 1&ndash;7 &nbsp;&middot;&nbsp; D dimensions &nbsp;&middot;&nbsp; F walk';
+  var b=document.getElementById('walkbtn');
+  if(b) b.style.background = on?'#2f5f7a':'#1c3040';
+  applyCam();
+}
+function applyCam(){
+  if(WALK){
+    var ey=floorY(eye.x,eye.z)+P.EYE;
+    camera.position.set(eye.x,ey,eye.z);
+    var cp=Math.cos(eye.pitch);
+    camera.lookAt(eye.x+Math.sin(eye.yaw)*cp, ey+Math.sin(eye.pitch), eye.z+Math.cos(eye.yaw)*cp);
+    return;
+  }
+  var s=Math.sin(orb.phi);
+  camera.position.set(orb.tx+orb.rad*s*Math.sin(orb.theta),
+                      orb.ty+orb.rad*Math.cos(orb.phi),
+                      orb.tz+orb.rad*s*Math.cos(orb.theta));
+  camera.lookAt(orb.tx,orb.ty,orb.tz);
+}
+var drag=null;
+renderer.domElement.addEventListener('pointerdown',function(e){
+  drag={x:e.clientX,y:e.clientY,pan:e.shiftKey||e.button===2};
+  try{renderer.domElement.setPointerCapture(e.pointerId);}catch(x){}
+});
+renderer.domElement.addEventListener('pointermove',function(e){
+  if(!drag)return;
+  var dx=e.clientX-drag.x, dy=e.clientY-drag.y; drag.x=e.clientX; drag.y=e.clientY;
+  if(WALK){
+    eye.yaw-=dx*0.005;
+    eye.pitch=Math.max(-1.2,Math.min(1.2,eye.pitch-dy*0.004));
+    applyCam(); return;
+  }
+  if(drag.pan){ var k=orb.rad*0.0016;
+    orb.tx-=dx*k*Math.cos(orb.theta); orb.tz+=dx*k*Math.sin(orb.theta); orb.ty+=dy*k;
+  }else{ orb.theta-=dx*0.006;
+    orb.phi=Math.max(0.08,Math.min(Math.PI-0.08,orb.phi-dy*0.006)); }
+  applyCam();
+});
+addEventListener('keyup',function(e){ KEYS[(e.key||'').toLowerCase()]=false; });
+/* a key held while the window loses focus never fires keyup, which would leave
+   it stuck down and drift the camera. Clear everything whenever focus moves. */
+function clearKeys(){ KEYS={}; }
+addEventListener('blur',clearKeys);
+addEventListener('focus',clearKeys);
+if(typeof document!=='undefined'&&document.addEventListener)
+  document.addEventListener('visibilitychange',function(){ if(document.hidden) clearKeys(); });
+addEventListener('pointerup',function(){drag=null;});
+renderer.domElement.addEventListener('contextmenu',function(e){e.preventDefault();});
+renderer.domElement.addEventListener('wheel',function(e){ e.preventDefault(); if(WALK) return;
+  orb.rad=Math.max(400,Math.min(30000,orb.rad*(1+Math.sign(e.deltaY)*0.11))); applyCam();
+},{passive:false});
+
+/* dining room is -Z, so the "dining" view looks from -Z back toward +Z */
+var VIEWS={
+  axo:   {theta:2.35,phi:1.05,rad:7400},
+  dining:{theta:Math.PI,phi:1.32,rad:5000},
+  lounge:{theta:0,phi:1.30,rad:5400},
+  deck:  {theta:Math.PI-0.45,phi:0.70,rad:2500},
+  plan:  {theta:0.001,phi:0.07,rad:7200},
+  step:  {theta:2.05,phi:1.10,rad:4600},
+  kitchen:{theta:1.15,phi:1.05,rad:9500}
+};
+function setView(name){
+  var v=VIEWS[name]; if(!v)return;
+  orb.theta=v.theta; orb.phi=v.phi; orb.rad=v.rad;
+  orb.tx=-P.LB/2; orb.ty=P.TOP*0.35; orb.tz=(P.DA+P.DB)/2;
+  if(name==='deck'){ orb.tx=-(recX()+P.RECW/2); orb.ty=P.TOP; orb.tz=P.LIP+P.RECD/2; }
+  if(name==='step'){ orb.tx=400; orb.ty=0; orb.tz=700; }
+  if(name==='kitchen'){ orb.tx=-(P.LB+300); orb.ty=900; orb.tz=-3200; }
+  applyCam();
+}
+document.querySelectorAll('[data-view]').forEach(function(b){
+  b.addEventListener('click',function(){setView(b.dataset.view);});
+});
+var KEYMAP=['axo','dining','lounge','deck','plan','step','kitchen'];
+addEventListener('keydown',function(e){
+  var k=(e.key||'').toLowerCase();
+  var inField=/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||''));
+  if(k==='f'&&!inField){ setWalk(!WALK); return; }
+  if(k==='p'&&!inField&&!WALK){ P.panelOff=!P.panelOff; applyPanel(); return; }
+  if(k==='escape'&&WALK){ setWalk(false); return; }
+  if(k==='r'&&WALK){ eye.x=EYE0.x; eye.z=EYE0.z; eye.yaw=EYE0.yaw; eye.pitch=EYE0.pitch; unstick(); applyCam(); return; }
+  if(WALK){
+    var isMove=('wasd'.indexOf(k)>=0&&k.length===1)||k.indexOf('arrow')===0||k==='shift';
+    if(inField&&!isMove) return;                 /* let them type in the field */
+    if(inField) { try{ e.target.blur(); }catch(x){} }
+    KEYS[k]=true; return;
+  }
+  if(inField) return;
+  var i=parseInt(e.key,10); if(i>=1&&i<=7) setView(KEYMAP[i-1]);
+  if(e.key==='d'||e.key==='D'){ P.showDims=!P.showDims; chks.showDims.checked=P.showDims; build(); }
+});
+
+/* ----------------------------------------------------------- helpers */
+var MADE=[], TEX=[];
+function M2(m){MADE.push(m);return m;}
+var MATC={};
+function M(hex,rough,metal){                   /* cached: same spec reuses the material */
+  var ro=(rough===undefined?0.62:rough), me=metal||0, key=hex+'|'+ro+'|'+me;
+  var m=MATC[key];
+  if(!m){ m=new THREE.MeshStandardMaterial({color:new THREE.Color(hex),roughness:ro,metalness:me});
+          MATC[key]=m; }
+  return m;
+}
+function dropMatCache(){ Object.keys(MATC).forEach(function(k){ MATC[k].dispose(); }); MATC={};
+  Object.keys(MKC).forEach(function(k){ MKC[k].dispose(); }); MKC={}; }
+var MKC={};
+function MK(key,make){ if(!MKC[key]) MKC[key]=make(); return MKC[key]; }
+function spineTex(){
+  var c=document.createElement('canvas'); c.width=512; c.height=64; var x=c.getContext('2d');
+  x.fillStyle='#2a2320'; x.fillRect(0,0,512,64);
+  var pal=['#3a2f2a','#22262c','#4a2a28','#2f3a30','#514036','#1e1c1f','#5d4b3a','#33404a','#6b5236','#2b2b33'];
+  var p=0;
+  while(p<512){ var w=1+Math.random()*3.2;
+    x.fillStyle=pal[(Math.random()*pal.length)|0]; x.fillRect(p,0,w,64);
+    if(Math.random()<0.16){ x.fillStyle='rgba(255,255,255,.10)'; x.fillRect(p,0,0.7,64); }
+    p+=w+0.4; }
+  var t=new THREE.CanvasTexture(c); t.wrapS=THREE.RepeatWrapping; t.repeat.set(3,1); return t;
+}
+var RECMAT=new THREE.MeshStandardMaterial({map:spineTex(),roughness:.82});
+
+var root=new THREE.Group(); scene.add(root);
+var boxGeo=new THREE.BoxGeometry(1,1,1);
+function box(x0,y0,z0,w,h,d,mat,noSh){
+  if(!(w>0)||!(h>0)||!(d>0)) return null;
+  var m=new THREE.Mesh(boxGeo,mat); m.scale.set(w,h,d);
+  m.position.set(-(x0+w/2),y0+h/2,z0+d/2);      /* X negated: see note above */
+  if(!noSh){m.castShadow=true;m.receiveShadow=true;}
+  root.add(m); return m;
+}
+function cyl(r,h,x,y,z,mat){
+  var g=new THREE.CylinderGeometry(r,r,h,44);
+  var m=new THREE.Mesh(g,mat); m.position.set(-x,y+h/2,z);
+  m.castShadow=true; root.add(m); return m;
+}
+/* ---- dimension helpers. Model coords in, X negated on placement ---- */
+var DIMCOL=0xff8f7a;
+function V(x,y,z){ return new THREE.Vector3(-x,y,z); }
+function dimSeg(pts,col){
+  var g=new THREE.BufferGeometry().setFromPoints(pts);
+  var m=M2(new THREE.LineBasicMaterial({color:col||DIMCOL,transparent:true,opacity:.95,depthTest:false}));
+  var l=new THREE.Line(g,m); l.renderOrder=998; root.add(l); return l;
+}
+var TAGH=100;                      /* label band height in mm, uniform */
+var TAGC={};
+function dimTag(txt,pos,col){
+  txt=String(txt); col=col||'#ff9b88';
+  var key=col+'|'+txt;                        /* cache per colour, not per text alone */
+  if(TAGC[key]){ var sp0=new THREE.Sprite(TAGC[key].m); sp0.position.copy(pos);
+    sp0.scale.set(TAGC[key].w,TAGC[key].h,1); sp0.renderOrder=999; root.add(sp0); return sp0; }
+  var fs=48, pad=20;
+  var c=document.createElement('canvas'), g=c.getContext('2d');
+  g.font='600 '+fs+'px Helvetica,Arial,sans-serif';
+  var tw=(g.measureText?g.measureText(txt).width:txt.length*fs*0.56);
+  c.width=Math.max(80,Math.ceil(tw)+pad*2); c.height=fs+pad;
+  g=c.getContext('2d');                       /* resizing clears the context */
+  g.font='600 '+fs+'px Helvetica,Arial,sans-serif';
+  g.fillStyle='rgba(16,16,16,0.82)'; g.fillRect(0,0,c.width,c.height);
+  g.fillStyle=col; g.textAlign='center'; g.textBaseline='middle';
+  g.fillText(txt,c.width/2,c.height/2);
+  var t=new THREE.CanvasTexture(c);
+  if(THREE.sRGBEncoding) t.encoding=THREE.sRGBEncoding;
+  var m=new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false});
+  TAGC[key]={m:m,w:TAGH*c.width/c.height,h:TAGH};
+  var sp=new THREE.Sprite(m); sp.position.copy(pos);
+  sp.scale.set(TAGC[key].w,TAGC[key].h,1); sp.renderOrder=999;
+  root.add(sp); return sp;
+}
+/* a=[x,y,z] b=[x,y,z] in model coords. ext=[dx,dy,dz] optional witness offset */
+function dim(a,b,txt,ext,wide,col){
+  var A=V(a[0],a[1],a[2]), B=V(b[0],b[1],b[2]);
+  var lc=(typeof col==='string'&&col.charAt(0)==='#')?parseInt(col.slice(1),16):null;
+  dimSeg([A,B],lc);
+  var d=new THREE.Vector3().subVectors(B,A);
+  var len=d.length(); if(len<1) return;
+  d.normalize();
+  var up=Math.abs(d.y)>0.9 ? new THREE.Vector3(0,0,1) : new THREE.Vector3(0,1,0);
+  var t=new THREE.Vector3().crossVectors(d,up).normalize().multiplyScalar(45);
+  if(t.length()<1) t=new THREE.Vector3(0,45,0);
+  [A,B].forEach(function(pt){
+    dimSeg([pt.clone().sub(t),pt.clone().add(t)],lc);
+  });
+  if(ext){
+    var e=new THREE.Vector3(-ext[0],ext[1],ext[2]);
+    dimSeg([A.clone().add(e),A],0x8a6a60);
+    dimSeg([B.clone().add(e),B],0x8a6a60);
+  }
+  dimTag(txt||String(Math.round(len)),
+         new THREE.Vector3().addVectors(A,B).multiplyScalar(0.5)
+           .add(up.clone().multiplyScalar(Math.abs(d.y)>0.9?0:75)),col);
+}
+
+/* Small S-curved ply sweep easing the top of the sub enclosure down to the
+   bench seat. Profile drawn in (X,Y) with X already negated, extruded along Z. */
+function sweepX(x0,y0,x1,y1,z0,z1,th,mat){
+  try{
+    var u0=-x0, u1=-x1;
+    var sh=new THREE.Shape();
+    var k=Math.abs(u1-u0)*0.55, dir=(u1>u0)?1:-1;
+    sh.moveTo(u0,y0);
+    sh.bezierCurveTo(u0+dir*k,y0, u1-dir*k,y1, u1,y1);
+    sh.lineTo(u1,y1-th);
+    sh.bezierCurveTo(u1-dir*k,y1-th, u0+dir*k,y0-th, u0,y0-th);
+    sh.closePath();
+    var g=new THREE.ExtrudeGeometry(sh,{depth:Math.abs(z1-z0),bevelEnabled:false,curveSegments:28});
+    var m=new THREE.Mesh(g,mat);
+    m.position.set(0,0,Math.min(z0,z1));
+    m.castShadow=true; m.receiveShadow=true;
+    root.add(m); return m;
+  }catch(e){ return null; }
+}
+
+function labelPlane(txt,x,y,z,w,col,rot){
+  var fs2=92, c=document.createElement('canvas'), g=c.getContext('2d');
+  g.font='600 '+fs2+'px Helvetica,Arial,sans-serif';
+  var tw2=(g.measureText?g.measureText(txt).width:txt.length*fs2*0.56);
+  var CW=Math.max(256,Math.ceil(tw2)+80), CH=fs2+60;
+  c.width=CW; c.height=CH; g=c.getContext('2d');
+  g.fillStyle=col||'#d6d1c8'; g.font='600 '+fs2+'px Helvetica,Arial,sans-serif';
+  g.textAlign='center'; g.textBaseline='middle';
+  g.fillText(txt,CW/2,CH/2);
+  var t=new THREE.CanvasTexture(c); TEX.push(t);
+  var m=M2(new THREE.MeshBasicMaterial({map:t,transparent:true,opacity:.9,depthWrite:false}));
+  var geo=new THREE.PlaneGeometry(w,w*CH/CW);
+  var p=new THREE.Mesh(geo,m);
+  p.rotation.x=-Math.PI/2; p.rotation.z=rot||0;
+  p.position.set(-x,y,z); root.add(p); return p;
+}
+function clear(g){
+  while(g.children.length){ var c=g.children.pop();
+    if(c.geometry&&c.geometry!==boxGeo)c.geometry.dispose(); }
+  MADE.forEach(function(m){ if(m!==RECMAT) m.dispose(); }); MADE=[];
+  TEX.forEach(function(t){t.dispose();}); TEX=[];
+}
+function recX(){ return (P.LA-P.RECW)*P.RECPOS/100; }
+function shade(hex,f){
+  var c=new THREE.Color(hex), h={}; c.getHSL(h);
+  c.setHSL(h.h,h.s,Math.max(0,Math.min(1,h.l+f)));
+  return '#'+c.getHexString();
+}
+
+/* ----------------------------------------------------------- build */
+function build(){
+  clear(root);
+  var LA=P.LA, LB=P.LB, DA=P.DA, DB=P.DB, D=DA+DB, TOP=P.TOP, BT=P.BT, STEP=P.STEP, T=P.T;
+  var carcTop=TOP-BT, baseY=TOP-P.DROP;
+  var RX=recX(), RW=P.RECW, RD=P.RECD, LIP=P.LIP, rear=LIP+RD;
+  var cubY=-STEP+P.CUBSTART, seatY=-STEP+P.SEAT;
+  var tiers=Math.max(1,Math.round(P.TIERS)), bays=Math.max(1,Math.round(P.BAYS));
+  var openH=carcTop-cubY;
+  var tierH=(openH-(tiers-1)*T)/tiers;
+  var bayW=(LB-(bays+1)*T)/bays;
+  var zF=DA+DB;
+  /* NPX is measured from the SOUTH end of Carcase A: the bin sits on the DJ's
+     right, at the buffet end. Model X still runs 0 = north. */
+  var np=P.showNP&&P.NPW>0&&P.NPD>0, npW=P.NPW, npX=P.LA-P.NPX-npW, npZ=P.NPZ,
+      npD=Math.min(P.NPD,Math.max(0,DA+DB-npZ));
+  var intrude=Math.max(0,rear-DA);
+  var topTierDepth=Math.max(0,D-rear);
+
+  var walnut=M(P.walnut,0.5), walnutD=M(shade(P.walnut,-0.20),0.45),
+      ply=M(P.ply,0.66), plyEdge=M(shade(P.ply,-0.06),0.7), mel=M(P.mel,0.7),
+      dark=M('#161616',0.9), grey=M('#6d6a65',0.8),
+      cush=M('#8e8579',0.92), bolst=M('#9c9184',0.95),
+      floorHi=M('#6f665c',0.9), floorLo=M('#5d544b',0.9),
+      tread=M('#7d6d59',0.75),
+      ghost=MK('ghost',function(){return new THREE.MeshStandardMaterial({color:0x9a958c,roughness:.9,transparent:true,opacity:.20});}),
+      metal=M('#38383a',0.34,0.5), plat=M('#b6b6ba',0.3,0.65),
+      vinyl=M('#0e0e10',0.55), lab=M('#c8a15e',0.7),
+      screen=MK('screen',function(){return new THREE.MeshStandardMaterial({color:0x2b4a6b,roughness:.22,emissive:0x14283c});}),
+      skin=M('#9a9a9a',0.85);
+
+  /* ---------- context: floors, steps, buffet, labels ---------- */
+  if(P.showContext){
+    /* step opening is what is left of the room once Carcase A and the buffet
+       are taken out. Plan: 4860 - 2940 - 720 = 1200. */
+    var opening=Math.max(0,P.ROOMN-LA-P.BUFD);
+    var W=Math.max(0,P.LOUNGEW), zE=DA+W;      // lounge east wall face
+    var zW=DA-7375;                             // west end of the kitchen run
+    // dining side raised mass
+    box(-opening,-STEP-70,zW,opening+LB,STEP+70,DA-zW,floorHi,true);
+    // lounge slab
+    box(-opening,-STEP-70,DA,opening+LB,70,W,floorLo,true);
+    // steps at the north end, full width of the opening
+    var n=Math.max(1,Math.round(P.STEPN)), rise=STEP/n;
+    for(var i=0;i<n-1;i++){
+      box(-opening,-STEP,DA+i*P.STEPG,opening,STEP-(i+1)*rise,P.STEPG,tread);
+    }
+    // existing buffet: DINING side (-Z), south end
+    if(P.BUFD>0 && !P.showKitchen) box(LB-P.BUFD,0,-1100,P.BUFD,900,1100+DA,ghost,true);
+    // room walls, translucent so they read as extents without blocking the view
+    if(P.showWalls){
+      var wallM=MK('wall',function(){return new THREE.MeshStandardMaterial({color:0xb9b3a8,roughness:.95,transparent:true,opacity:.16});});
+      box(-opening-110,-STEP,DA,110,P.FCL+STEP,W,wallM,true);        // lounge north wall
+      box(-opening-110,-STEP,zE,opening+LB+220,P.FCL+STEP,110,wallM,true); // lounge east wall
+      box(LB,-STEP,zW,110,P.FCL+STEP,zE-zW+110,wallM,true);          // south wall
+    }
+  }
+
+  /* ---------- bench seat and back bolsters (by builder) ---------- */
+  if(P.showSeat && P.SEATL>0){
+    var sl=Math.min(P.SEATL,LB+900);
+    box(0,-STEP,zF,sl,P.SEAT-P.CUSH,P.SEATD,grey,true);   // platform runs through
+    /* cushion stops where the sub enclosure and its S sweep sit */
+    var e3=P.SUBENC?58:0;
+    var oc0=(P.showSub&&P.SUBZ>=DA)?P.SUBX-e3:1e9;
+    var oc1=(P.showSub&&P.SUBZ>=DA)?P.SUBX+SUBW+e3+(P.showSweep?P.SWEEPRUN:0):-1e9;
+    if(oc0>0)  box(0,-STEP+P.SEAT-P.CUSH,zF,Math.min(sl,oc0),P.CUSH,P.SEATD,cush,true);
+    if(oc1<sl) box(oc1,-STEP+P.SEAT-P.CUSH,zF,sl-oc1,P.CUSH,P.SEATD,cush,true);
+    // return along the south wall
+    box(sl,-STEP,zF+P.SEATD,Math.max(0,LB-sl+600),P.SEAT-P.CUSH,1800,grey,true);
+    box(sl,-STEP+P.SEAT-P.CUSH,zF+P.SEATD,Math.max(0,LB-sl+600),P.CUSH,1800,cush,true);
+    // 5 loose back bolsters against Carcase B, as drawn on the plan
+    if(P.BOLD>0&&P.BOLH>0){
+      var nb=5, gap=100, run=sl-50, seg=(run-(nb-1)*gap)/nb;
+      /* a gap over ~60 leaves the bolster nothing to lean on, so it needs a back rail
+         at the front of the gap. The gap then reads as a ledge at seat height. */
+      if(P.BOLGAP>60) box(0,-STEP+P.SEAT,zF+P.BOLGAP-18,sl,P.BOLH*0.55,18,M(shade(P.ply,-0.04),0.7));
+      /* skip any bolster the subwoofer sits in front of */
+      var enc=P.SUBENC?58:0;
+      var subX0=P.showSub?P.SUBX-enc:1e9;
+      var subX1=P.showSub?P.SUBX+SUBW+enc+(P.showSweep?P.SWEEPRUN:0):-1e9;
+      for(var b2=0;b2<nb;b2++){
+        var bx=50+b2*(seg+gap), bx1=bx+seg;
+        if(P.showSub && P.SUBZ>=DA && bx1>subX0 && bx<subX1) continue;
+        box(bx,-STEP+P.SEAT,zF+P.BOLGAP,Math.max(0,seg),P.BOLH,P.BOLD,bolst,true);
+      }
+    }
+  }
+
+  /* ---------- CARCASE A, dining side ---------- */
+  box(P.KICKSET,0,P.KICKSET,LA-P.KICKSET,P.KICK,DA-P.KICKSET,walnutD);
+  box(0,P.KICK,0,LA,carcTop-P.KICK,DA,mel);
+  var ampW=Math.min(920,RW), ampX=RX+(RW-ampW)/2;
+  window.__amp={x:ampX,w:ampW};
+  /* slim drawer band: sits directly under the recess box, runs clear of the bin */
+  var drwTop=baseY-18, drwBot=drwTop-P.DRWH;
+  var binUnder=np?(TOP-P.NPDROP-18):1e9;                 /* underside of the well */
+  var drwX0=0, drwX1=(np&&binUnder<drwTop)?Math.min(LA,Math.max(0,npX-20)):LA;
+  var drwOn=P.showDRW&&(drwX1-drwX0)>200&&drwBot>P.KICK+60;
+  box(ampX,P.KICK+20,-2,ampW,Math.max(50,(drwOn?drwBot:baseY-18)-P.KICK-40),DA*0.92,dark);
+  if(drwOn){
+    var dn=Math.max(1,Math.round(P.DRWN)), dw=(drwX1-drwX0)/dn;
+    for(var q=0;q<dn;q++){
+      box(drwX0+q*dw+3,drwBot+3,-18,dw-6,P.DRWH-6,18,walnut);
+      box(drwX0+q*dw+dw/2-60,drwBot+P.DRWH/2-6,-24,120,12,7,M('#5a5a5c',0.4,0.5)); // pull
+    }
+  }
+  if(P.showDoors){
+    var g2=4, dh=(drwOn?drwBot:carcTop)-P.KICK-2*g2;
+    var northTop=drwOn?drwBot:Math.min(carcTop, np?binUnder:carcTop);
+    if(RX>60)          box(g2,P.KICK+g2,-18,RX-2*g2,northTop-P.KICK-2*g2,18,walnut);
+    if(LA-(RX+RW)>60)  box(RX+RW+g2,P.KICK+g2,-18,LA-(RX+RW)-2*g2,dh,18,walnut);
+    if(ampX-RX>60)     box(RX+g2,P.KICK+g2,-18,ampX-RX-2*g2,dh,18,walnut);
+    var rr=RX+RW-(ampX+ampW);
+    if(rr>60)          box(ampX+ampW+g2,P.KICK+g2,-18,rr-2*g2,dh,18,walnut);
+  }
+
+  /* ---------- CARCASE B, lounge side, record storage ---------- */
+  box(0,-STEP,DA,LB,T,DB,ply);                      // bottom
+  box(0,-STEP,DA,LB,carcTop+STEP,T,ply);            // back
+  box(0,-STEP,DA,LB,P.CUBSTART,DB,ply);             // solid section below the cubbies
+  var topTierY=cubY+(tiers-1)*(tierH+T);
+  if(intrude>0 && rear<=D)
+    box(RX,topTierY,rear-T,Math.min(RW,LB-RX),carcTop-topTierY,T,ply);
+  for(var i2=0;i2<=bays;i2++){
+    var dx=Math.min(i2*(bayW+T),LB-T);
+    box(dx,cubY,DA+T,T,openH,DB-T,ply);
+    box(dx,cubY,zF-2,T,openH,3,plyEdge);      /* exposed ply edge, no lipping */
+  }
+  for(var k=1;k<tiers;k++){
+    var sy=cubY+k*tierH+(k-1)*T;
+    box(0,sy,DA+T,LB,T,DB-T,ply);
+    box(0,sy,zF-2,LB,T,3,plyEdge);
+  }
+  box(0,cubY-T,zF-2,LB,T,3,plyEdge);
+
+  /* ---------- records, and books where the tier is shallow ---------- */
+  if(P.showRecords&&P.FILL>0){
+    for(var t2=0;t2<tiers;t2++){
+      var yy=cubY+t2*(tierH+T), isTop=(t2===tiers-1);
+      for(var b3=0;b3<bays;b3++){
+        var bx2=T+b3*(bayW+T);
+        var over=isTop&&intrude>0&&(bx2+bayW>RX)&&(bx2<RX+RW);
+        var avail=over?topTierDepth:DB-T;
+        var w2=bayW*P.FILL/100;
+        if(w2<8) continue;
+        if(avail>=330){
+          var rd=Math.min(320,avail-10), h2=Math.min(315,tierH-12);
+          if(h2>40) box(bx2,yy+4,zF-rd-6,w2,h2,rd,RECMAT);
+        }else if(avail>=120){
+          var bd=avail-12, h3=Math.min(240,tierH-14);
+          if(h3>40) box(bx2,yy+4,zF-bd-6,w2,h3,bd,M('#7a6a58',0.85));
+        }
+      }
+    }
+  }
+
+  /* ---------- benchtop, built round the recess opening ---------- */
+  if(!P.cutaway){
+    var bt=[[0,0,LA,Math.min(LIP,D)],
+            [0,rear,LA,Math.max(0,D-rear)],
+            [RX+RW,LIP,Math.max(0,LA-(RX+RW)),Math.min(RD,Math.max(0,D-LIP))]];
+    var midD=Math.min(RD,Math.max(0,D-LIP));
+    /* the strip north of the recess and the strip south of it, each split round
+       the now playing well if the bin falls inside it */
+    bt.pop();                                            // rebuild the south strip below
+    [[0,RX],[RX+RW,LA]].forEach(function(st){
+      if(np&&npX>=st[0]-1&&npX+npW<=st[1]+1){
+        bt.push([st[0],LIP,Math.max(0,npX-st[0]),midD]);
+        bt.push([npX+npW,LIP,Math.max(0,st[1]-(npX+npW)),midD]);
+        bt.push([npX,LIP,Math.max(0,npW),Math.max(0,npZ-LIP)]);              // in front of the bin
+        bt.push([npX,npZ+npD,Math.max(0,npW),Math.max(0,LIP+midD-npZ-npD)]); // behind it
+      }else{
+        bt.push([st[0],LIP,Math.max(0,st[1]-st[0]),midD]);
+      }
+    });
+    bt.forEach(function(q){ box(q[0],carcTop,q[1],q[2],BT,q[3],walnut); });
+    if(LB>LA) box(LA,carcTop,DA,LB-LA,BT,DB,ply);   /* ply top from the buffet line south */
+    box(0,carcTop,-3,LA,BT,4,walnutD);                          // solid lipping, front
+    if(LIP>0) box(RX-4,carcTop,LIP-3,RW+8,BT,4,walnutD);         // lipping to recess
+    if(rear<=D) box(RX-4,carcTop,rear-1,RW+8,BT,4,walnutD);
+  }
+
+  /* ---------- now playing bin, on the DJ's right ---------- */
+  if(np){
+    var npBase=TOP-P.NPDROP;
+    box(npX,npBase-18,npZ,npW,18,npD,walnut);                       // well floor
+    box(npX-T,npBase-18,npZ,T,carcTop-npBase+18,npD,walnut);        // ends
+    box(npX+npW,npBase-18,npZ,T,carcTop-npBase+18,npD,walnut);
+    box(npX,npBase-18,npZ+npD,npW,carcTop-npBase+18,T,walnut);      // back
+    if(P.showRecords&&P.FILL>0){
+      var stack=Math.max(10,npD*P.FILL/100-16);
+      var rw=Math.min(315,npW-30);
+      box(npX+(npW-rw)/2,npBase,npZ+8,rw,315,stack,M('#1a1a1c',0.8));
+      box(npX+(npW-rw)/2,npBase,npZ+6,rw,315,3,M('#8f7a5e',0.7));   // front sleeve
+    }
+  }
+
+  /* ---------- recess box ---------- */
+  box(RX,baseY-18,LIP,RW,18,Math.min(RD,D-LIP),walnut);
+  box(RX-T,baseY-18,LIP,T,carcTop-baseY+18,Math.min(RD,D-LIP),walnut);
+  box(RX+RW,baseY-18,LIP,T,carcTop-baseY+18,Math.min(RD,D-LIP),walnut);
+
+  /* ---------- decks ---------- */
+  if(P.showDecks){
+    var need=2*TTW+RXW, mg=(RW-need)/4, cx=RX+mg, z0=LIP+12, y0=baseY+P.PAD;
+    [[TTW,TTD,P.TTH,'tt'],[RXW,RXD,RXH,'rx'],[TTW,TTD,P.TTH,'tt']].forEach(function(u){
+      var w=u[0], d=u[1], h=u[2];
+      if(P.PAD>0) box(cx+12,baseY,z0+12,w-24,P.PAD,Math.max(10,d-24),M('#202020',0.95));
+      box(cx,y0,z0,w,h,d,metal);
+      if(u[3]==='tt'){
+        var pcx=cx+0.393*w, pcz=z0+0.489*d;
+        cyl(166,7,pcx,y0+h-7,pcz,plat);                 // platter, top flush with plinth
+        cyl(151,2,pcx,y0+h,pcz,vinyl);                  // record on the platter
+        cyl(50,2.4,pcx,y0+h+2,pcz,lab);                 // label
+        cyl(17,26,cx+w-72,y0+h-4,z0+46,metal);          // tonearm pillar, back right
+        box(cx+w-86,y0+h+16,z0+56,12,9,150,metal);      // arm tube
+        box(cx+30,y0+h-3,z0+d-96,40,4,72,M('#c0c0c4',0.4,0.6)); // pitch fader slot
+      }else{
+        box(cx+(w-220)/2,y0+h,z0+d-178,220,3,135,screen);        // 10.1 inch screen
+        cyl(62,4,cx+0.17*w,y0+h,z0+0.70*d,plat);                 // jog wheels
+        cyl(62,4,cx+0.83*w,y0+h,z0+0.70*d,plat);
+      }
+      cx+=w+mg;
+    });
+  }
+
+  /* ---------- dining table, 6 seats: 2 each long side, 1 each end ---------- */
+  if(P.showTable){
+    var tw=M(shade(P.walnut,-0.02),0.5), ch=M(shade(P.walnut,-0.14),0.55);
+    var tL=P.TBLL, tW=P.TBLW, tH=P.TBLH;
+    var tx=P.TBLX-tL/2, tz=P.TBLZ-tW/2;
+    box(tx,tH-36,tz,tL,36,tW,tw);                                  // top
+    [[tx+60,tz+60],[tx+tL-120,tz+60],[tx+60,tz+tW-120],[tx+tL-120,tz+tW-120]]
+      .forEach(function(l){ box(l[0],0,l[1],60,tH-36,60,tw); });   // legs
+    function chair(cx,cz,rot){        /* rot 0 faces +Z, 2 faces -Z, 1/3 face along X */
+      var sw=450, sd=450, sh=450;
+      if(rot===0||rot===2){
+        box(cx-sw/2,sh-70,cz-sd/2,sw,70,sd,ch);
+        box(cx-sw/2,sh,cz+(rot===0?-sd/2:sd/2-60),sw,430,60,ch);
+        box(cx-sw/2+40,0,cz-sd/2+40,sw-80,sh-70,sd-80,ch);
+      }else{
+        box(cx-sd/2,sh-70,cz-sw/2,sd,70,sw,ch);
+        box(cx+(rot===1?-sd/2:sd/2-60),sh,cz-sw/2,60,430,sw,ch);
+        box(cx-sd/2+40,0,cz-sw/2+40,sd-80,sh-70,sw-80,ch);
+      }
+    }
+    var q1=tx+tL*0.28, q2=tx+tL*0.72;
+    chair(q1,tz-320,0); chair(q2,tz-320,0);                        // island side
+    chair(q1,tz+tW+320,2); chair(q2,tz+tW+320,2);                  // DJ side
+    chair(tx-320,tz+tW/2,1); chair(tx+tL+320,tz+tW/2,3);           // ends
+    window.__tbl={z0:tz,z1:tz+tW,x0:tx,x1:tx+tL};
+  }
+
+  /* ---------- kitchen ---------- */
+  if(P.showKitchen){
+    window.__ct=null;                                        // rebuilt below, never carried over
+    var stone=M(P.stone,0.35), kcarc=M(shade(P.walnut,0.02),0.5),
+        appl=M('#3d3f42',0.4,0.45), fridgeM=M('#c9ccd0',0.35,0.5);
+    var kd=P.KDEP, kx0=LB-kd, kb=P.KBENCH, WC=P.KWALL, TH=P.KTALL;  // run sits against the south wall
+    /* Mill page 4, east to west. Fixed appliance widths, the four door / drawer
+       cabinets in the bench run absorb the shortening. */
+    /* bench run is set by the appliances; the pantry bank takes up the slack
+       so the whole run still totals 7355 */
+    var binW=P.binInRun?P.KBIN:0;
+    var pantry=P.KPANTRY, nook=P.KNOOK;
+    /* The run is fixed between two fixed ends: the DJ return gap at the east and
+       the oven tower hard against the west wall. Everything else is set by the
+       sliders, so ONE element has to absorb the slack or the oven floats off the
+       wall. That element is the bench between the dishwasher and the cooktop. */
+    /* The cooktop zone, two ways to build it.
+       off  a slim cupboard each side of the cooktop. East one is the derived
+            element by default, west one is the KGAP2 landing.
+       on   no slim cupboards. One wide drawer bank with the cooktop centred on
+            it, plus a single slim drawer on the oven side, which is where the
+            wider of the two landings was. The zone total is identical either
+            way, so nothing else in the run moves when the toggle flips. */
+    var slimW=P.wideStove?Math.max(0,P.KSLIM):0;
+    var zoneT=P.KBENCH1+P.KSTOVE+P.KGAP2+50;                 // three cabinets plus their two panels
+    var wideW=zoneT-slimW-(slimW>0?25:0);                    // give a panel back if the slim drawer is there
+    var cookZone=P.wideStove
+      ? [['stove',wideW,2]].concat(slimW>0?[['slimd',slimW,1]]:[])
+      : [['land1',P.KBENCH1,2],['stove',P.KSTOVE,2],['land',P.KGAP2,2]];
+    var cab=[
+      ['gap' ,P.KGAP,0],
+      ['nook',nook,2],                                       // coffee / toaster nook, east end
+      ['door',450,0], ['draw',pantry,4],                     // tall pantry bank
+      ['fridge',P.KFRIDGE,0],
+      ['bin',binW,1],
+      ['sink',P.KSINK,0], ['dw',P.KDW,0]
+    ].concat(cookZone,[['oven',P.KOVEN,0]])
+     .filter(function(c){ return c[0]!=='bin' || c[1]>0; });
+    /* one element has to absorb the slack or the oven leaves the west wall */
+    var benchSlackKey=P.wideStove?'stove':'land1';
+    var slackKey={bench:benchSlackKey,pantry:'draw',nook:'nook'}[P.SLACK]||benchSlackKey;
+    var tot0=cab.reduce(function(a,c){return a+c[1];},0)+25*(cab.length+1);
+    var slack=P.KRUN-tot0, overflow=0;
+    cab.forEach(function(c){ if(c[0]===slackKey){
+      var v=c[1]+slack; if(v<0){ overflow=-v; v=0; } c[1]=v; } });
+    var land1=(cab.filter(function(c){return c[0]==='land1';})[0]||{1:0})[1];
+    var stoveF=(cab.filter(function(c){return c[0]==='stove';})[0]||{1:0})[1];
+    var slimF=(cab.filter(function(c){return c[0]==='slimd';})[0]||{1:0})[1];
+    var pantryF=(cab.filter(function(c){return c[0]==='draw';})[0]||{1:0})[1];
+    var nookF=(cab.filter(function(c){return c[0]==='nook';})[0]||{1:0})[1];
+    var BENCHK=['bin','sink','dw','land1','stove','land','slimd'];
+    var bRun=cab.reduce(function(a,c){return a+(BENCHK.indexOf(c[0])>=0?c[1]+25:0);},0)+25;
+    var z=P.KZ0, seg=[];
+    cab.forEach(function(c){
+      z-=25; seg.push({kind:c[0],z1:z,z0:z-c[1],w:c[1],n:c[2]}); z-=c[1];
+    });
+    var K_runEndZ=z-25;
+    var bz1=-1e9, bz0=1e9;                                   // extent of the stone run
+    seg.forEach(function(g){
+      if(BENCHK.indexOf(g.kind)>=0 && g.w>0){
+        bz1=Math.max(bz1,g.z1); bz0=Math.min(bz0,g.z0);
+      }
+    });
+    window.__kit={runEnd:z-25, segs:seg, bRun:bRun, used:P.KZ0-(z-25), bz0:bz1+25-bRun, bz1:bz1+25};
+    seg.forEach(function(g){
+      var tall=(g.kind==='fridge'||g.kind==='oven'||g.kind==='door'&&g.z1>P.KZ0-2400&&false);
+      if(g.kind==='gap'){
+        /* The corner where the run meets the DJ return. Below the DJ return
+           benchtop it is blind: Carcase A stands right in front of it, so no
+           door or drawer there could ever be opened. Above the benchtop it is
+           open to the dining room, so that part becomes display shelving you
+           reach over the top of the DJ return. */
+        if(!P.showCorner||g.w<150) return;
+        var cy0=P.TOP+20, cy1=TH;
+        box(kx0,0,g.z0,kd,cy0,g.w,kcarc);                    // blind box, service void
+        box(kx0+kd-18,cy0,g.z0,18,cy1-cy0,g.w,kcarc);        // back
+        box(kx0,cy0,g.z0,kd,18,g.w,kcarc);                   // bottom
+        box(kx0,cy1-18,g.z0,kd,18,g.w,kcarc);                // top
+        box(kx0,cy0,g.z0,kd,cy1-cy0,18,kcarc);               // ends
+        box(kx0,cy0,g.z1-18,kd,cy1-cy0,18,kcarc);
+        var nsh=Math.max(1,Math.round(P.CORNSH));
+        for(var sh=1;sh<nsh;sh++)
+          box(kx0,cy0+sh*(cy1-cy0)/nsh,g.z0+18,kd-18,18,g.w-36,kcarc);
+        return;
+      }
+      if(g.kind==='oven'){
+        box(kx0,0,g.z0,kd,TH,g.w,kcarc);
+        /* 2 x Westinghouse WVEP6716 pyrolytic, 597 high each, published */
+        var ob=P.OVENBASE, oh=P.OVENH, nOv=Math.max(1,Math.round(P.OVENN));
+        for(var o=0;o<nOv;o++){
+          box(kx0-16,ob+o*(oh+8),g.z0+22,18,oh,g.w-44,appl);
+          box(kx0-22,ob+o*(oh+8)+oh-92,g.z0+60,8,26,g.w-120,M('#8d9196',0.3,0.6)); // handle
+        }
+        var topOv=ob+nOv*oh+(nOv-1)*8;
+        var nD2=Math.max(1,Math.floor((ob-110)/210));
+        for(var q2=0;q2<nD2;q2++) box(kx0-18,110+q2*(ob-118)/nD2,g.z0+22,18,(ob-118)/nD2-10,g.w-44,M(shade(P.walnut,-0.05),0.5));
+        if(TH-topOv>120) box(kx0-18,topOv+10,g.z0+22,18,TH-topOv-20,g.w-44,kcarc);
+      }else if(g.kind==='nook'){
+        if(P.showNookGear&&g.w>200){
+          var items=[['esp',ESPW]];
+          if(P.NSINKW>0) items.push(['snk',P.NSINKW]);
+          var usedW=items.reduce(function(a,c){return a+c[1];},0);
+          var gp=(g.w-usedW)/(items.length+1);
+          var zc=g.z0+gp;
+          items.forEach(function(it){
+            if(it[0]==='esp'){
+              box(kx0+110,kb,zc,ESPD,ESPH,ESPW,M('#b1281f',0.42));       // Ascaso Dream PID, red
+              box(kx0+110,kb+ESPH,zc+40,ESPD-60,14,ESPW-80,M('#cfd2d5',0.3,0.6));
+              cyl(9,120,kx0+110+40,kb+90,zc+ESPW-42,M('#c9ccd0',0.25,0.8)); // steam wand
+            }else{
+              /* drip tray, not a sink: shallow well with a grate, for filling glasses */
+              var td=Math.min(Math.round(it[1]*1.2),kd-300), tdep=25;
+              box(kx0+180,kb-14,zc,td,16,it[1],M('#9aa0a4',0.28,0.7));            // rim
+              box(kx0+188,kb-14-tdep,zc+8,td-16,tdep,it[1]-16,M('#4e5256',0.35,0.6)); // well
+              box(kx0+192,kb-16,zc+12,td-24,4,it[1]-24,M('#8e9498',0.3,0.75));    // grate
+              cyl(14,300,kx0+180+td+70,kb,zc+it[1]/2,M('#b8bcc0',0.22,0.85));     // sparkling tap
+            }
+            zc+=it[1]+gp;
+          });
+          window.__nook={w:g.w,used:usedW,gap:gp,n:items.length};
+          /* Benchy carbonator and CO2 bottle in the base below */
+          box(kx0+BENCLR,110,g.z0+40,BEND,BENH,BENW,M('#1e2022',0.5));
+          cyl(70,520,kx0+BENCLR+BEND+180,110,g.z0+40+BENW+140,M('#4a4d52',0.4,0.5));
+        }
+        box(kx0,0,g.z0,kd,kb-20,g.w,kcarc);                       // base
+        box(kx0,kb-20,g.z0,kd,20,g.w,M(shade(P.walnut,0.04),0.45));// timber shelf, not off the slab
+        box(kx0-18,110,g.z0+22,18,(kb-150)/2-10,g.w-44,M(shade(P.walnut,-0.05),0.5));
+        box(kx0-18,110+(kb-150)/2,g.z0+22,18,(kb-150)/2-10,g.w-44,M(shade(P.walnut,-0.05),0.5));
+        box(kx0+kd-40,kb,g.z0,40,700,g.w,M(shade(P.walnut,-0.12),0.6)); // niche back
+        box(kx0,kb+700,g.z0,kd,TH-kb-700,g.w,kcarc);              // cupboard over
+      }else if(g.kind==='fridge'){
+        box(kx0,0,g.z0,kd,TH,g.w,kcarc);
+        box(kx0-26,80,g.z0+30,kd-60,1760,g.w-60,fridgeM);
+        box(kx0-26,1870,g.z0+30,kd-60,500,g.w-60,kcarc);     // cupboard over
+      }else if(g.kind==='door'||g.kind==='draw'){
+        /* the two tall pantry cabinets at the east end */
+        box(kx0,0,g.z0,kd,TH,g.w,kcarc);
+        if(g.n) for(var i=0;i<g.n;i++) box(kx0-18,110+i*180,g.z0+20,18,170,g.w-40,M(shade(P.walnut,-0.05),0.5));
+      }else{
+        box(kx0,0,g.z0,kd,kb-20,g.w,kcarc);                  // base
+        if(g.kind==='dw'){ box(kx0-20,110,g.z0+20,20,kb-150,g.w-40,appl); }
+        else if(g.kind==='sink'){
+          var bw=Math.min(800,g.w-100), bd=Math.min(460,kd-220), bdep=200;
+          var bx0=kx0+(kd-bd)/2-40, bz0s=g.z0+(g.w-bw)/2;
+          box(bx0-14,kb-24,bz0s-14,bd+28,26,bw+28,M('#8f9498',0.28,0.75));    // rim
+          box(bx0,kb-24-bdep,bz0s,bd,bdep,bw,M('#5c6165',0.3,0.6));           // bowl
+          cyl(18,250,kx0+kd-110,kb,g.z0+g.w/2,M('#b8bcc0',0.22,0.85));        // tap
+          box(kx0-18,110,g.z0+20,18,kb-150,g.w-40,M(shade(P.walnut,-0.05),0.5));
+        }
+        else if(g.kind==='stove'){
+          /* the cooktop is a fixed appliance and stays centred on its cabinet,
+             so widening the bank grows the drawer either side of it equally */
+          var ctW=Math.min(P.KSTOVE,g.w), ctZ=g.z0+(g.w-ctW)/2;
+          window.__ct={z0:ctZ,z1:ctZ+ctW,w:ctW,z0b:g.z0,z1b:g.z1,bank:g.w};
+          if(ctW>80){
+            box(kx0+60,kb,ctZ+40,kd-160,14,ctW-80,M('#151517',0.25));          // cooktop
+            for(var bn=0;bn<5;bn++){
+              var bx2=kx0+60+(kd-160)*(bn<2?0.28:(bn<4?0.72:0.5));
+              var bz2=ctZ+40+(ctW-80)*([0.18,0.18,0.5,0.82,0.82][bn]);
+              cyl(58,6,bx2,kb+14,bz2,M('#2b2b2e',0.4));
+            }
+          }
+          for(var j3=0;j3<g.n;j3++) box(kx0-18,110+j3*(kb-150)/g.n,g.z0+20,18,(kb-150)/g.n-14,g.w-40,M(shade(P.walnut,-0.05),0.5));
+        }
+        else if(g.kind==='land1'){                            // sauce pull-outs, side by side
+          var nS=Math.max(1,Math.round(g.w/175)), sw=g.w/nS;
+          for(var j4=0;j4<nS;j4++)
+            box(kx0-18,110,g.z0+j4*sw+3,18,kb-150,sw-6,M(shade(P.walnut,-0.05),0.5));
+        }
+        else if(g.n) for(var j=0;j<g.n;j++)
+          box(kx0-18,110+j*(kb-150)/g.n,g.z0+20,18,(kb-150)/g.n-14,g.w-40,M(shade(P.walnut,-0.05),0.5));
+      }
+    });
+    /* gyprock bulkhead instead of overhead cupboards */
+    if(P.showBulk){
+      var gyp=M('#e9e7e3',0.95);
+      if(bz1>bz0) box(kx0,P.BULKY,bz0-25,kd,P.FCL-P.BULKY,(bz1-bz0)+50,gyp);  // over the bench
+      box(kx0,TH,K_runEndZ,kd,Math.max(0,P.FCL-TH),P.KZ0-K_runEndZ,gyp);      // fill over the tall units
+      /* concealed range hood under the soffit, sized to the cooktop, not to the
+         cabinet, so it stays put when the drawer bank widens */
+      var ct2=window.__ct;
+      if(ct2&&ct2.w>0) box(kx0+60,P.BULKY-110,ct2.z0-20,kd-160,110,ct2.w+40,M('#2f3134',0.4,0.4));
+    }
+
+    /* one continuous stone benchtop over the whole bench run, off the single slab */
+    /* the last cabinet before the oven tower: the west landing, or the slim
+       drawer once the wide bank is on */
+    var lastLand=P.wideStove?slimF:P.KGAP2;
+    var stoneRun=P.stoneOverGap?bRun:Math.max(0,bRun-lastLand-(lastLand>0?25:0));
+    if(bz1>bz0) box(kx0,kb-20,bz1+25-stoneRun,kd,20,stoneRun,stone);   // one piece
+    window.__kit.stoneRun=stoneRun; window.__kit.pantry=pantry; window.__kit.nook=nook;
+    window.__kit.land1=land1; window.__kit.bRun=bRun;
+    window.__kit.wideW=stoveF; window.__kit.slimW=slimF;
+    window.__kit.pantryF=pantryF; window.__kit.nookF=nookF;
+    window.__kit.overflow=overflow; window.__kit.slackKey=slackKey;
+
+    /* Resinate pendant, 1800 x 35 x 100 resin shade, drops at 1400 centres */
+    if(P.showPend){
+      var pz0=(P.islCentre&&bz1>bz0?Math.round((bz0+bz1)/2-P.ISLW/2):P.ISLZ)+P.ISLW/2;
+      var px0=P.ISLX+P.ISLD/2, py0=kb+P.PENDH;
+      var resin=MK('resin',function(){return new THREE.MeshStandardMaterial({color:0xe6c46a,emissive:0x7a6018,roughness:0.45,transparent:true,opacity:0.93});});
+      var pcap=M('#2a2a2c',0.4,0.4);
+      box(px0-18,py0,pz0-900,35,100,1800,resin);              // shade
+      box(px0-30,P.FCL-40,pz0-85,60,40,170,pcap);             // canopy
+      cyl(3,P.FCL-40-(py0+100),px0,py0+100,pz0-700,pcap);     // drops at 1400 centres
+      cyl(3,P.FCL-40-(py0+100),px0,py0+100,pz0+700,pcap);
+    }
+
+    /* island: carcase plus a 20 stone top from the same slab */
+    var islZ=P.islCentre&&bz1>bz0 ? Math.round((bz0+bz1)/2-P.ISLW/2) : P.ISLZ;
+    window.__kit.islZ=islZ;
+    box(P.ISLX,0,islZ,P.ISLD,kb-20,P.ISLW,kcarc);
+    box(P.ISLX-P.ISLOH,kb-20,islZ-P.ISLOH,P.ISLD+2*P.ISLOH,20,P.ISLW+2*P.ISLOH,stone);
+  }
+
+  /* ---------- stone slab, laid out flat so the nesting reads ---------- */
+  if(P.showSlab){
+    var slz=-2600, slx=-3600;                            // clear of everything, on the dining floor
+    var bR2=Math.max(0,((window.__kit||{}).stoneRun)||0);
+    var isL2=P.ISLW+2*P.ISLOH, isD2=P.ISLD+2*P.ISLOH;
+    /* the slab itself, one piece */
+    box(slx,2,slz,P.SLABW,30,P.SLABL,M(P.stone,0.32),true);
+    /* the two pieces scored out of it, drawn as shallow inset recesses */
+    box(slx+6,32,slz+6,P.KDEP-12,3,Math.min(P.SLABL-12,bR2),M(shade(P.stone,-0.10),0.45),true);
+    box(slx+P.KDEP+12,32,slz+6,Math.max(0,Math.min(P.SLABW-P.KDEP-18,isD2)),3,
+        Math.min(P.SLABL-12,isL2),M(shade(P.stone,-0.16),0.45),true);
+    if(P.showLabels){
+      labelPlane('O N E   S L A B   '+P.SLABL+' x '+P.SLABW,slx+P.SLABW/2,42,slz-320,1900,'#8c8378');
+      labelPlane('B E N C H',slx+P.KDEP/2,40,slz+Math.min(P.SLABL,bR2)/2,620,'#5f5a52');
+      labelPlane('I S L A N D',slx+P.KDEP+12+isD2/2,40,slz+Math.min(P.SLABL,isL2)/2,760,'#5f5a52');
+    }
+    if(P.showDims && (P.DIMSCOPE==='all'||P.DIMSCOPE==='kit')){
+      dim([-(slx),20,slz],[-(slx),20,slz+P.SLABL],P.SLABL+'  SLAB',null,340);
+      dim([-(slx),20,slz-260],[-(slx+P.SLABW),20,slz-260],P.SLABW+'  SLAB',null,340);
+      dim([-(slx+6),46,slz+6],[-(slx+6),46,slz+6+Math.min(P.SLABL-12,bR2)],Math.round(bR2)+'  BENCH',null,340);
+      dim([-(slx+P.KDEP+12),46,slz+6],[-(slx+P.KDEP+12),46,slz+6+Math.min(P.SLABL-12,isL2)],Math.round(isL2)+'  ISLAND',null,340);
+    }
+  }
+
+  /* ---------- subwoofer ---------- */
+  if(P.showSub){
+    var sx=P.SUBX, sz=P.SUBZ;
+    var inAmp=(sz<DA)&&(sx>ampX-200)&&(sx<ampX+ampW+200);
+    var subY = (sz>=DA) ? -STEP : (inAmp ? P.KICK+20 : 0);
+    if(P.SUBENC && sz>=DA){
+      var cl=40;                                   // clearance all round inside the box
+      box(sx-cl-18,subY,sz-cl-18,SUBW+2*cl+36,SUBH+cl+18,SUBD+2*cl+36,M(shade(P.ply,-0.04),0.7));
+      box(sx-cl,subY,sz-cl,SUBW+2*cl,SUBH+cl,SUBD+2*cl,M('#141414',0.95));   // open void
+    }
+    box(sx,subY,sz,SUBW,SUBH,SUBD,M('#232326',0.85));
+    if(P.showSweep && sz>=DA){
+      var e2=P.SUBENC?58:0;
+      var topY=subY+SUBH+e2;                            // top of the enclosure, or of the bare sub
+      /* sits within the seat: from the front face of the bolster support rail
+         out to the front edge of the bench, and no further */
+      var swZ0=DA+DB+Math.max(0,P.BOLGAP), swZ1=DA+DB+P.SEATD;
+      sweepX(sx+SUBW+e2, topY,                        // start: south top corner of the box
+             sx+SUBW+e2+P.SWEEPRUN, -STEP+P.SEAT,     // finish: seat cushion top
+             swZ0, swZ1, P.SWEEPT, M(shade(P.ply,0.03),0.62));
+    }
+    var cone=new THREE.Mesh(new THREE.CylinderGeometry(190,190,8,40),M('#111113',0.9));
+    cone.position.set(-(sx+SUBW/2),subY+SUBH*0.42,sz-4);
+    cone.rotation.x=Math.PI/2; root.add(cone);
+  }
+
+  /* ---------- figure for scale, standing at the decks ---------- */
+  if(P.showFigure){
+    var fx=recX()+P.RECW/2, fz=-430;
+    box(fx-170,0,fz-100,340,840,200,skin,true);
+    box(fx-210,840,fz-120,420,560,240,skin,true);
+    box(fx-285,900,fz-100,75,480,150,skin,true);
+    box(fx+210,900,fz-100,75,480,150,skin,true);
+    var head=new THREE.Mesh(new THREE.SphereGeometry(105,20,14),skin);
+    head.position.set(-fx,1505,fz); root.add(head);
+  }
+
+  /* ---------- floor labels ---------- */
+  if(P.showLabels){
+    labelPlane('D I N I N G',LB/2,4,-1250,1500);
+    labelPlane('S U N K E N   L O U N G E',LB/2,-STEP+4,zF+P.SEATD+900,2100);
+    if(P.showContext){
+      labelPlane('S T E P S   D O W N   —   D J \u2019 S   L E F T',-560,-STEP+6,
+                 DA+P.STEPG*Math.max(1,P.STEPN-1)+540,1700,'#c9b08a');
+      labelPlane('N O R T H',-1050,4,-900,760,'#9c968c');
+      if(LB>LA) labelPlane('E X I S T I N G   B U F F E T   —   D J \u2019 S   R I G H T',
+                 LA+(LB-LA)/2,6,-1000,1900,'#b9b3a8',Math.PI/2);
+    }
+  }
+
+  /* ---------- dimensions ---------- */
+  if(P.showDims){
+    var D2=D, top=TOP, ov=TOP+430;
+    var DS=P.DIMSCOPE||'all';
+    var wantDJ=(DS==='all'||DS==='dj'), wantKIT=(DS==='all'||DS==='kit'),
+        wantROOM=(DS==='all'||DS==='room');
+    if(wantDJ){
+    /* along the unit */
+    dim([0,ov,-460],[LA,ov,-460],LA+'  CARCASE A',[0,-430,0]);
+    dim([0,ov,D2+460],[LB,ov,D2+460],LB+'  CARCASE B',[0,-430,0]);
+    dim([RX,top+190,LIP+RD/2],[RX+RW,top+190,LIP+RD/2],RW+'  RECESS');
+    dim([T,carcTop-tierH/2,D2+320],[T+bayW,carcTop-tierH/2,D2+320],Math.round(bayW)+'  BAY',null,300);
+    /* depth, off the north end which is the DJ's left */
+    dim([-340,top+190,0],[-340,top+190,DA],String(DA),null,280);
+    dim([-340,top+190,DA],[-340,top+190,D2],String(DB),null,280);
+    dim([-720,top+190,0],[-720,top+190,D2],D2+'  O/A');
+    dim([RX-300,top+70,0],[RX-300,top+70,LIP],String(LIP),null,250);
+    dim([RX-300,top+70,LIP],[RX-300,top+70,rear],String(RD),null,250);
+    if(rear<D2) dim([RX-300,top+70,rear],[RX-300,top+70,D2],String(Math.round(D2-rear)),null,250);
+    /* heights */
+    dim([LA+220,0,-260],[LA+220,top,-260],top+'  TO BENCH');
+    dim([LB+240,-STEP,D2+280],[LB+240,top,D2+280],(top+STEP)+'  ABOVE LOUNGE');
+    dim([LB+620,-STEP,D2+280],[LB+620,0,D2+280],STEP+'  STEP');
+    dim([RX-80,baseY,LIP+RD/2],[RX-80,top,LIP+RD/2],P.DROP+'  DROP',null,300);
+    dim([LB+200,cubY,D2+150],[LB+200,cubY+tierH,D2+150],Math.round(tierH)+'  TIER',null,300);
+    dim([LB+460,-STEP,D2+150],[LB+460,cubY,D2+150],P.CUBSTART+'  CUBBY START');
+    /* decks */
+    if(P.showDecks){
+      var mg2=(RW-(2*TTW+RXW))/4, gearRun=RW-2*mg2;
+      dim([RX+mg2,top+95,LIP+12],[RX+RW-mg2,top+95,LIP+12],Math.round(gearRun)+'  GEAR');
+      dim([RX+mg2,top+95,LIP+12+TTD+90],[RX+mg2+TTW,top+95,LIP+12+TTD+90],TTW+'  SL-1210',null,300);
+      dim([RX+mg2+TTW+mg2,top+95,LIP+12+RXD+90],[RX+mg2+TTW+mg2+RXW,top+95,LIP+12+RXD+90],RXW+'  XDJ-RX3',null,320);
+    }
+    /* now playing bin */
+    if(np){
+      dim([npX,top+190,LIP+npD/2],[npX+npW,top+190,LIP+npD/2],npW+'  NOW PLAYING',null,340);
+      dim([npX-120,TOP-P.NPDROP,LIP+npD/2],[npX-120,top,LIP+npD/2],P.NPDROP+'  WELL',null,300);
+    }
+    }
+    /* kitchen */
+    if(wantKIT && P.showKitchen && window.__kit){
+      var K=window.__kit, kmid=LB-P.KDEP/2, ky=P.KTALL+340;
+      dim([kmid,ky+260,P.KZ0],[kmid,ky+260,K.runEnd],Math.round(K.used)+'  KITCHEN RUN');
+      var COOKK={land1:1,land:1,slimd:1};        // the slim cabinets each side of the cooktop
+      var CLBL={land:'LANDING, WEST',land1:'SLIM CUPBOARD, EAST',slimd:'SLIM DRAWER, WEST'};
+      K.segs.forEach(function(g){
+        if(COOKK[g.kind]) return;                // these go on their own string, below
+        var lbl={gap:'GAP, DJ RETURN',fridge:'FRIDGE',oven:'OVENS',dw:'DISHWASHER',bin:'BIN',
+                 sink:'SINK',stove:(P.wideStove?'DRAWER BANK':'STOVE'),draw:'PANTRY'}[g.kind]||'';
+        if(g.kind===K.slackKey) lbl=lbl?lbl+', DERIVED':'DERIVED';
+        if(g.w>=300) dim([kmid,ky,g.z0],[kmid,ky,g.z1],Math.round(g.w)+(lbl?'  '+lbl:''),null,g.w>700?380:300);
+      });
+      /* Cooktop string, on its own line so the slim cabinets read however narrow
+         they get. Derived value is called out. */
+      var ct=window.__ct, ky2=ky-190;
+      K.segs.forEach(function(g){
+        if(!COOKK[g.kind]||!(g.w>0)) return;
+        var lbl=CLBL[g.kind]+(g.kind===K.slackKey?', DERIVED':'');
+        dim([kmid,ky2,g.z0],[kmid,ky2,g.z1],Math.round(g.w)+'  '+lbl,null,340);
+      });
+      /* only worth drawing once the bank is wider than the cooktop, otherwise
+         the cabinet dim above already says it */
+      if(ct&&ct.w>0&&ct.bank-ct.w>2){
+        dim([kmid,ky2,ct.z0],[kmid,ky2,ct.z1],Math.round(ct.w)+'  COOKTOP',null,320);
+        var ohE=Math.round(ct.z1b-ct.z1), ohW=Math.round(ct.z0-ct.z0b);
+        if(ohE>1) dim([kmid,ky2,ct.z1],[kmid,ky2,ct.z1b],ohE+'  BANK',null,300);
+        if(ohW>1) dim([kmid,ky2,ct.z0b],[kmid,ky2,ct.z0],ohW+'  BANK',null,300);
+      }
+      /* Stone, dimensioned over the piece that is actually modelled, and warned
+         on the tag itself when it will not come off the one slab. */
+      if(K.bz1>K.bz0&&K.stoneRun>0){
+        var sr=Math.round(K.stoneRun), over=sr-P.SLABL;
+        var scol=over>0?'#ff6b5c':(over>-30?'#f2c463':null);
+        var stag=sr+'  STONE, ONE PIECE'+(over>0?'   OVER SLAB BY '+over
+                 :(over>-30?'   TIGHT, '+(-over)+' SPARE ON '+P.SLABL:''));
+        dim([kmid,ky+130,K.bz1+25-K.stoneRun],[kmid,ky+130,K.bz1+25],stag,null,520,scol);
+      }
+      dim([LB-P.KDEP,P.KTALL+120,K.runEnd-320],[LB,P.KTALL+120,K.runEnd-320],P.KDEP+'  DEEP',null,300);
+      dim([LB+320,0,K.runEnd+120],[LB+320,P.KBENCH,K.runEnd+120],P.KBENCH+'  BENCH',null,300);
+      dim([LB+620,0,K.runEnd+120],[LB+620,P.KTALL,K.runEnd+120],P.KTALL+'  O/A',null,300);
+      var iz=K.islZ!==undefined?K.islZ:P.ISLZ;
+      dim([P.ISLX,P.KBENCH+230,iz],[P.ISLX,P.KBENCH+230,iz+P.ISLW],P.ISLW+'  ISLAND');
+      dim([P.ISLX,P.KBENCH+230,iz+P.ISLW+260],[P.ISLX+P.ISLD,P.KBENCH+230,iz+P.ISLW+260],P.ISLD+'  ISLAND');
+    }
+    /* room */
+    if(wantROOM && P.showContext){
+      var opW=Math.max(0,P.ROOMN-LA-P.BUFD);
+      dim([-opW,ov+560,-900],[LB,ov+560,-900],P.ROOMN+'  ROOM N-S');
+      dim([-opW,ov+330,-900],[0,ov+330,-900],Math.round(opW)+'  OPENING');
+      dim([LB-P.BUFD,ov+330,-900],[LB,ov+330,-900],P.BUFD+'  BUFFET');
+      dim([LB+900,-STEP,DA],[LB+900,-STEP,DA+P.LOUNGEW],P.LOUNGEW+'  LOUNGE E-W');
+    }
+    /* steps */
+    if(wantROOM && P.showContext&&P.STEPN>1){
+      var r2=STEP/Math.max(1,Math.round(P.STEPN));
+      dim([-640,-r2,DA],[-640,-r2,DA+P.STEPG],P.STEPG+'  GOING',null,300);
+      dim([-640,-2*r2,DA+P.STEPG],[-640,-r2,DA+P.STEPG],Math.round(r2)+'  RISER',null,300);
+    }
+  }
+
+  /* ---------- collision footprints for walk mode ---------- */
+  BLOCK.length=0;
+  blk(0,0,LA,DA,TOP);                                   // Carcase A
+  if(P.showTable) blk(P.TBLX-P.TBLL/2-450,P.TBLZ-P.TBLW/2-450,P.TBLL+900,P.TBLW+900,P.TBLH);
+  blk(0,DA,LB,DB,carcTop);                              // Carcase B
+  if(P.showSeat&&P.SEATL>0){
+    blk(0,zF,Math.min(P.SEATL,LB+900),P.SEATD,-STEP+P.SEAT);
+    blk(P.SEATL,zF+P.SEATD,Math.max(0,LB-P.SEATL+600),1800,-STEP+P.SEAT);
+  }
+  if(P.showSub&&P.SUBZ>=DA){
+    var se=P.SUBENC?58:0;
+    blk(P.SUBX-se,P.SUBZ-se,SUBW+2*se,SUBD+2*se,-STEP+SUBH+se);
+  }
+  if(P.showKitchen&&window.__kit){
+    blk(LB-P.KDEP,window.__kit.runEnd,P.KDEP,P.KZ0-window.__kit.runEnd,P.KTALL);
+    var iz2=window.__kit.islZ!==undefined?window.__kit.islZ:P.ISLZ;
+    blk(P.ISLX,iz2,P.ISLD,P.ISLW,P.KBENCH);
+  }
+  if(P.showContext){
+    var op2=Math.max(0,P.ROOMN-LA-P.BUFD), W2=Math.max(0,P.LOUNGEW);
+    if(P.showWalls){
+      blk(-op2-110,DA,110,W2,P.FCL);                    // lounge north wall
+      blk(-op2-110,DA+W2,op2+LB+220,110,P.FCL);         // lounge east wall
+      blk(LB,DA-7375,110,DA-(DA-7375)+W2+110,P.FCL);    // south wall
+    }
+  }
+
+  readout(tierH,bayW,tiers,bays,topTierDepth,intrude,rear);
+  applyCam();
+}
+
+/* ----------------------------------------------------------- readout */
+function readout(tierH,bayW,tiers,bays,ttd,intrude,rear){
+  var D=P.DA+P.DB, carcTop=P.TOP-P.BT, cubY=-P.STEP+P.CUBSTART;
+  var RX=recX(), RW=P.RECW;
+  var bolTop=P.SEAT+(P.BOLD>0?P.BOLH:0);
+  var npOn=P.showNP&&P.NPW>0&&P.NPD>0, npDd=Math.min(P.NPD,Math.max(0,P.DA+P.DB-P.NPZ));
+
+  var lin=0, shallow=0, blocked=0;
+  for(var t=0;t<tiers;t++){
+    var isTop=(t===tiers-1);
+    var tierBottom=P.CUBSTART+t*(tierH+P.T);          // above lounge FFL
+    for(var b=0;b<bays;b++){
+      var bx=P.T+b*(bayW+P.T);
+      var over=isTop&&intrude>0&&(bx+bayW>RX)&&(bx<RX+RW);
+      var avail=over?ttd:P.DB-P.T;
+      if(tierH<330) continue;
+      if(avail>=330){ lin+=bayW; if(tierBottom<bolTop-20) blocked+=bayW; }
+      else shallow+=bayW;
+    }
+  }
+  var clearLin=Math.max(0,lin-blocked);
+
+  var faceM2=(P.LA*carcTop + P.LB*(carcTop+P.STEP) + D*(carcTop+P.STEP))/1e6;
+  var topM2=(P.LA*D + Math.max(0,P.LB-P.LA)*P.DB)/1e6;
+
+  var plinth=P.DROP-(P.TTH+P.PAD);
+  var deckNeed=2*TTW+RXW;
+  var rise=P.STEP/Math.max(1,Math.round(P.STEPN));
+
+  function k(a,b){return '<div class="k"><span>'+a+'</span><span>'+b+'</span></div>';}
+  function kc(a,b,c){return '<div class="k"><span>'+a+'</span><span style="color:'+c+';font-weight:600">'+b+'</span></div>';}
+  document.getElementById('out').innerHTML=
+    k('Tier clear height',Math.round(tierH)+' mm')+
+    k('Bay clear width',Math.round(bayW)+' mm')+
+    k('Recess intrusion into Carcase B',Math.round(intrude)+' mm')+
+    k('Top tier depth behind recess',Math.round(ttd)+' mm')+
+    k('Plinth below benchtop',(plinth>=0?'':'+')+Math.round(plinth)+' mm')+
+    k('Bolster top above lounge FFL',Math.round(bolTop)+' mm')+
+    k('Gap, bolster to Carcase B',Math.round(P.BOLGAP)+' mm')+
+    k('Usable seat depth',Math.round(P.SEATD-P.BOLD-P.BOLGAP)+' mm')+
+    k('LP storage, reachable',(clearLin/1000).toFixed(1)+' m &asymp; '+Math.round(clearLin/5).toLocaleString()+' records')+
+    k('LP storage behind bolsters',(blocked/1000).toFixed(1)+' m')+
+    k('Shallow shelving',(shallow/1000).toFixed(1)+' m')+
+    (function(){ if(!P.showTable) return '';
+      var t=window.__tbl||{z0:0,z1:0};
+      var islE=P.ISLZ, gapI=0, gapD=0;
+      var iz=(window.__kit&&window.__kit.islZ!==undefined)?window.__kit.islZ:P.ISLZ;
+      gapI=Math.round(t.z0-(P.ISLX+0)*0-(-3604));
+      gapD=Math.round(0-t.z1);
+      gapI=Math.round(t.z0-(-3604));
+      var lo=Math.min(gapI,gapD);
+      var col=lo<813?'#f0857a':(lo<1118?'#e8b96a':'#8fbf8f');
+      return k('Dining table',P.TBLL+' x '+P.TBLW+', 6 seats')+
+             kc('Table clearance','island '+gapI+' / DJ '+gapD+' mm',col);})()+
+    k('Kitchen run used',Math.round((window.__kit||{}).used||0)+' of 7355 mm')+
+    k('DJ return gap',P.KGAP+' mm  (Carcase A is '+P.DA+' deep)')+
+    k('Pantry bank',Math.round(450+25+((window.__kit||{}).pantryF||0))+' mm  (450 door + '+Math.round((window.__kit||{}).pantryF||0)+')'+(P.SLACK==='pantry'?' (takes the slack)':''))+
+    k('Coffee nook',Math.round((window.__kit||{}).nookF||0)+' mm'+(P.SLACK==='nook'?' (takes the slack)':''))+
+    (function(){var n=window.__nook; if(!n) return '';
+      var col=n.gap<50?'#f0857a':(n.gap<80?'#e8b96a':'#8fbf8f');
+      return kc('Nook fit',Math.round(n.used)+' of '+Math.round(n.w)+', gaps '+Math.round(n.gap),col);})()+
+    k('Bench run',Math.round((window.__kit||{}).bRun||0)+' mm')+
+    k('Oven stack',Math.round(P.OVENN)+' x '+P.OVENH+' from '+P.OVENBASE+' to '+Math.round(P.OVENBASE+P.OVENN*P.OVENH+(P.OVENN-1)*8))+
+    (function(){var K2=window.__kit||{};
+      if(P.wideStove){
+        var W=Math.round(K2.wideW||0), oh=Math.round((W-P.KSTOVE)/2);
+        var col=oh<305?'#f0857a':(oh<381?'#e8b96a':'#8fbf8f');
+        return k('Drawer bank under the cooktop',W+' mm'+(P.SLACK==='bench'?' (takes the slack)':''))+
+               kc('Bank each side of the cooktop',oh+' mm each',col)+
+               k('Slim drawer, oven side',(K2.slimW>0?Math.round(K2.slimW)+' mm':'none'));
+      }
+      var L=Math.round(K2.land1||0), n=Math.max(1,Math.round(L/175));
+      return k('Bench, dishwasher to stove',L+' mm'+(P.SLACK==='bench'?' (takes the slack)':''))+
+             k('Sauce pull-outs',n+' at '+Math.round(L/n-6)+' wide');})()+
+    k('Corner shelving',(P.showCorner?Math.round(P.CORNSH)+' shelves over the DJ return':'off'))+
+    k('Pendant',(P.showPend?'1800 resin, '+P.PENDH+' over the bench':'off'))+
+    (function(){var K2=window.__kit||{}, e2, w2;
+      if(P.wideStove){ var oh2=Math.round(((K2.wideW||0)-P.KSTOVE)/2);
+        e2=oh2; w2=oh2+(K2.slimW>0?Math.round(K2.slimW)+25:0); }
+      else { e2=Math.round(K2.land1||0); w2=P.KGAP2; }
+      return k('Cooktop landings',e2+' / '+w2+' mm  (NKBA 305 / 381)');})()+
+    k('Aisle, run to island',Math.round((P.LB-P.KDEP)-(P.ISLX+P.ISLD))+' mm')+
+    (function(){var sr=Math.round((window.__kit||{}).stoneRun||0);
+       var col=sr>P.SLABL?'#f0857a':(sr>P.SLABL-30?'#e8b96a':'#8fbf8f');
+       var tag=sr>P.SLABL?'  OVER':(sr>P.SLABL-30?'  TIGHT':'  OK');
+       return kc('Stone run, one piece',sr+' / '+P.SLABL+tag,col);})()+
+
+    k('Slab width used',Math.round(P.KDEP+P.ISLD+2*P.ISLOH)+' / '+P.SLABW+' mm')+
+    k('Island stone',(P.ISLW+2*P.ISLOH)+' x '+(P.ISLD+2*P.ISLOH)+'  (incl '+P.ISLOH+' overhang)')+
+    k('Subwoofer',(P.showSub?'450 x 600 x 600, 40 kg':'off'))+
+    k('Slim drawers',(P.showDRW?Math.round(P.DRWN)+' at '+Math.round(P.DRWH)+' high':'off'))+
+    k('Now playing bin',(npOn?Math.round((npDd-16)*P.FILL/100/5)+' records, '+Math.round(315-P.NPDROP)+' showing, set back '+P.NPZ:'off'))+
+    k('Step opening width',Math.round(Math.max(0,P.ROOMN-P.LA-P.BUFD))+' mm')+
+    k('Step risers',Math.round(P.STEPN)+' at '+Math.round(rise)+' mm')+
+    k('Steps / buffet','on the DJ&rsquo;s left / right')+
+    k('Finished face',faceM2.toFixed(2)+' m&sup2;')+
+    k('Benchtop',topM2.toFixed(2)+' m&sup2;');
+
+  var openW=P.ROOMN-P.LA-P.BUFD;
+  var f=[];
+  if(P.showKitchen){
+    var bR=((window.__kit||{}).stoneRun)||0;
+    var isL=P.ISLW+2*P.ISLOH, isD=P.ISLD+2*P.ISLOH;   // stone piece, overhang included
+    var wUsed=P.KDEP+isD, lUsed=Math.max(bR,isL);
+    var ovTop=P.OVENBASE+P.OVENN*P.OVENH+(P.OVENN-1)*8;
+    if(ovTop>P.KTALL-60) f.push(['w','Oven stack tops out at '+Math.round(ovTop)+', which does not leave room inside the '+P.KTALL+' tower. Drop the base height.']);
+    if(P.OVENBASE+P.OVENH>1600) f.push(['n','Top oven shelf is around '+Math.round(P.OVENBASE+P.OVENH*1.5)+' above the floor. Comfortable reach for a hot tray is usually below about 1500.']);
+    if(P.showPend){
+      if(P.PENDH<600) f.push(['n','Pendant sits '+P.PENDH+' over the bench. Under about 600 you will see the LED strip and knock your head at the island end.']);
+      if(P.PENDH>900) f.push(['n','Pendant sits '+P.PENDH+' over the bench, which is high for a 100 deep shade over a 2800 island.']);
+      if(1800>P.ISLW) f.push(['n','The 1800 pendant is longer than the '+P.ISLW+' island.']);
+    }
+    var ovf=Math.round((window.__kit||{}).overflow||0);
+    if(ovf>0) f.push(['w','The run is over by '+ovf+'. '+({bench:(P.wideStove?'The drawer bank under the cooktop':'The bench between the dishwasher and the cooktop'),pantry:'The pantry drawer bank',nook:'The coffee nook'}[P.SLACK])+' has gone to nothing and the oven tower is being pushed off the west wall.']);
+    if(P.showNookGear&&window.__nook){
+      var nk=window.__nook;
+      if(nk.gap<0) f.push(['w','The nook is '+Math.round(nk.w)+' and the machine, kettle and sink need '+Math.round(nk.used)+'. They do not fit.']);
+      else if(nk.gap<50) f.push(['w','Only '+Math.round(nk.gap)+' between items in the nook. Under about 50 you cannot get a hand in. Widen the nook to about '+Math.round(nk.used+4*60)+'.']);
+      else if(nk.gap<80) f.push(['n','Gaps of '+Math.round(nk.gap)+' in the nook. Workable but tight. About '+Math.round(nk.used+4*80)+' would be comfortable.']);
+      f.push(['n','The Ascaso tank comes out the side, so leave a clear side or plan to slide the machine forward each refill.']);
+      if(P.NSINKW>0) f.push(['n','The drip tray is '+P.NSINKW+' x '+Math.round(P.NSINKW*1.2)+', 25 deep. Plumb it to waste, or make it a lift-out tray you empty, which saves running a waste 3 m to the main sink. The tap still needs a mains feed.']);
+    }
+    if(P.showTable&&window.__tbl){
+      var t2=window.__tbl, gI=Math.round(t2.z0-(-3604)), gD=Math.round(0-t2.z1);
+      [['island',gI],['DJ return',gD]].forEach(function(pr){
+        if(pr[1]<813) f.push(['w','Only '+pr[1]+' between the table and the '+pr[0]+'. NKBA wants 813 minimum behind a seated diner.']);
+        else if(pr[1]<1118) f.push(['n',pr[1]+' between the table and the '+pr[0]+'. Enough to edge past a seated diner, not to walk past. 1118 for that.']);
+      });
+      if(P.TBLL<1600) f.push(['n','Table is '+P.TBLL+' long. Two chairs a side wants about 1600 minimum.']);
+      if(t2.x1>P.LA-P.KDEP+200) f.push(['n','The table runs past the south end of the DJ return toward the kitchen.']);
+    }
+    var LMIN=305, LMAX=381;                                  // NKBA G17, 12in and 15in
+    var K3=window.__kit||{}, L1, LW1;
+    if(P.wideStove){
+      var bankW=Math.round(K3.wideW||0), oh3=Math.round((bankW-P.KSTOVE)/2);
+      L1=oh3; LW1=oh3+(K3.slimW>0?Math.round(K3.slimW)+25:0);
+      if(oh3<0) f.push(['w','The drawer bank is '+bankW+', narrower than the '+P.KSTOVE+' cooktop. Give the run back '+(-oh3*2)+' or shrink the cooktop.']);
+      else f.push(['o','No slim cupboards. One '+bankW+' drawer bank with the cooktop centred on it, '+oh3+' of drawer showing each side.']);
+      if(K3.slimW>0&&K3.slimW<150) f.push(['n','The slim drawer is only '+Math.round(K3.slimW)+' wide. Under about 150 a drawer box is barely worth making. Take it to 0 and let the bank run the whole way, or widen it.']);
+    } else {
+      L1=Math.round(K3.land1||0); LW1=P.KGAP2;
+      if(L1<0) f.push(['w','The run is over by '+(-L1)+'. The bench between the dishwasher and the cooktop has gone to nothing and the oven tower would be pushed off the west wall. Take '+(-L1)+' off the nook, the pantry or an appliance.']);
+    }
+    var lo2=Math.min(L1,LW1), hi2=Math.max(L1,LW1);
+    if(L1>=0&&(lo2<LMIN||hi2<LMAX)) f.push(['n','Cooktop landings are '+L1+' and '+LW1+'. NKBA G17 wants at least 305 one side and 381 the other.']);
+    var aisle=Math.round((P.LB-P.KDEP)-(P.ISLX+P.ISLD));
+    if(aisle>0&&aisle<1219) f.push(['o','Island is '+aisle+' across from the oven, inside the 1219 that NKBA G23 allows, so the island can serve as the oven landing area.']);
+    if(aisle>0&&aisle<1067) f.push(['n','Work aisle is '+aisle+'. NKBA G6 wants 1067 minimum for one cook, 1219 for two.']);
+    if(P.binInRun) f.push(['n','Bin is in the bench run, which adds '+(P.KBIN+25)+' to the stone. Moving it to the island or a sink pull-out is what makes the one-slab top work.']);
+    if(bR>P.SLABL) f.push(['w','Stone run is '+Math.round(bR)+' but the slab is only '+P.SLABL+' long. Over by '+Math.round(bR-P.SLABL)+'. Either the top gets a join, or something in the bench run shrinks.']);
+    if(isL>P.SLABL) f.push(['w','Island stone is '+Math.round(isL)+' long with the '+P.ISLOH+' overhang, longer than the '+P.SLABL+' slab.']);
+    if(wUsed>P.SLABW) f.push(['w','Run depth '+P.KDEP+' plus island stone depth '+Math.round(isD)+' is '+Math.round(wUsed)+', wider than the '+P.SLABW+' slab. They cannot both come off it.']);
+    if(bR<=P.SLABL&&isL<=P.SLABL&&wUsed<=P.SLABW){
+      f.push(['o','Both pieces nest in the one '+P.SLABL+' x '+P.SLABW+' slab. '+Math.round(P.SLABW-wUsed)+' spare across the width, '+Math.round(P.SLABL-lUsed)+' along the length.']);
+      if(P.SLABL-lUsed<30) f.push(['n','Only '+Math.round(P.SLABL-lUsed)+' spare along the slab. Stone needs a few mm for saw kerf and edge dressing, so pull the bench run back to about '+(P.SLABL-30)+' before you order.']);
+      if(P.SLABW-wUsed<30) f.push(['n','Only '+Math.round(P.SLABW-wUsed)+' spare across the slab width. Same cutting allowance problem.']);
+    }
+  }
+  var useD=P.SEATD-P.BOLD-P.BOLGAP;
+  if(P.showSeat){
+    if(useD<450) f.push(['w','Usable seat depth is only '+Math.round(useD)+'. Under 450 you perch on the edge. Deepen the platform or reduce the gap.']);
+    else if(useD<520) f.push(['n','Usable seat depth '+Math.round(useD)+'. Upright, dining posture. Fine to eat at, not to sprawl on.']);
+    else if(useD<=630) f.push(['o','Usable seat depth '+Math.round(useD)+'. Good lounge depth.']);
+    else f.push(['n','Usable seat depth '+Math.round(useD)+'. Deeper than a normal sofa, you will need extra scatter cushions to sit upright.']);
+    if(P.BOLGAP>60) f.push(['n','Gap is '+P.BOLGAP+', so the bolsters have nothing to lean on. A back rail is drawn at the front of the gap and the gap becomes a ledge at seat height.']);
+    if(P.BOLD<150) f.push(['n','Back bolster is '+P.BOLD+' thick. Under about 150 is thin for a back cushion.']);
+  }
+  if(P.showSub){
+    var A=window.__amp||{x:1010,w:920};
+    var inAmp=(P.SUBZ<P.DA)&&(P.SUBX>A.x-200)&&(P.SUBX<A.x+A.w+200);
+    if(inAmp) f.push(['w','The sub is 600 deep. Carcase A is only '+P.DA+' deep, so it cannot go in the amp bay. It would project '+(600-P.DA)+' into the record storage.']);
+    else if(P.SUBZ<P.DA) f.push(['w','The sub is on the dining side. That floor is suspended timber and a 1600 W sub there will make the decks skip. Put it on the lounge slab.']);
+    else f.push(['o','Sub is on the lounge slab. Best place for it: no suspended floor to excite, and slab coupling gives more output.']);
+    var encBack=P.SUBZ-(P.SUBENC?58:0), faceB=P.DA+P.DB;
+    if(P.SUBZ>=P.DA && encBack<faceB)
+      f.push(['w','The sub '+(P.SUBENC?'enclosure':'')+' runs '+Math.round(faceB-encBack)+' into Carcase B. Move it east.']);
+    else if(P.SUBZ>=P.DA && encBack<faceB+150)
+      f.push(['n','Sub sits '+Math.round(encBack-faceB)+' off Carcase B. It is bass reflex and I do not know which face the port is on, so check the manual before boxing it in tight.']);
+  }
+  if(P.showNP){
+    if(P.NPW<340) f.push(['w','Now playing bin is '+P.NPW+' wide. An LP sleeve is 315, so it needs 340 minimum.']);
+    if(P.LA-P.NPX-P.NPW<recX()+P.RECW+40) f.push(['w','Now playing bin runs into the deck recess. Reduce its width or offset.']);
+    if(P.NPDROP>=315) f.push(['n','Well is '+P.NPDROP+' deep, so the records sit below the benchtop and you cannot see the tops.']);
+    var bu=P.TOP-P.NPDROP-18, dt=P.TOP-P.DROP-18;
+    if(bu>=dt) f.push(['o','The well clears the slim drawer band, so the drawers run the full length of Carcase A and there is one under the bin.']);
+    else f.push(['n','The well drops '+Math.round(dt-bu)+' below the drawer band, so the band breaks around it. A well depth of '+Math.round(P.TOP-dt-18)+' or less keeps a drawer under the bin.']);
+    if(P.LIP+P.NPD>P.DA+P.DB) f.push(['w','Now playing bin is deeper than the unit.']);
+  }
+  if(Math.abs(P.LB-(P.LA+P.BUFD))>5) f.push(['w','Carcase B is '+P.LB+' but should equal Carcase A plus the buffet depth, '+(P.LA+P.BUFD)+'. Both run from the step opening to the south wall.']);
+  if(openW<900) f.push(['w','Step opening is only '+Math.round(openW)+' wide. Carcase A plus the buffet leaves too little of the '+P.ROOMN+' room.']);
+  if(P.LIP+P.RECD>D) f.push(['w','Lip plus recess depth is '+(P.LIP+P.RECD)+', past the back of the '+D+' deep unit. Reduce one of them.']);
+  if(P.RECD<RXD+15) f.push(['w','Recess is '+P.RECD+' deep. The XDJ-RX3 is '+RXD+' deep. Needs 490 minimum.']);
+  if(P.RECW<deckNeed+40) f.push(['w','Recess is '+P.RECW+' wide. Two turntables plus the RX3 need '+(deckNeed+40)+' minimum.']);
+  if(tierH<330) f.push(['w','Tier clear height is '+Math.round(tierH)+'. LP sleeves are 315 square and need 330. No records fit.']);
+  if(blocked>0) f.push(['w',(blocked/1000).toFixed(1)+' m of LP storage sits behind the back bolsters. Either the bolsters are loose and you move them, or start the cubbies above '+Math.round(bolTop)+'.']);
+  if(bayW>520) f.push(['n','Bay clear is '+Math.round(bayW)+'. Over 520 records lean and shelves sag. Add a bay.']);
+  if(ttd>0&&ttd<178&&intrude>0) f.push(['n','Top tier behind the recess is '+Math.round(ttd)+' deep. Under 178, so CDs or paperbacks, not 7 inch singles.']);
+  if(ttd>=178&&ttd<330&&intrude>0) f.push(['n','Top tier behind the recess is '+Math.round(ttd)+' deep. Fits 7 inch singles and books, not LPs.']);
+  if(Math.abs(plinth-5)>12) f.push(['n','Plinth top sits '+Math.abs(Math.round(plinth))+' mm '+(plinth>0?'below':'above')+' the benchtop. Target about 5 below.']);
+  if(Number(P.TTH)===TTH_PUB) f.push(['n','Turntable height is set to the published 162, which includes the dust cover. Measure the bare plinth and change it.']);
+  if(P.LIP>0&&P.LIP<40) f.push(['n','Front lip is '+P.LIP+'. Under about 40 it is too thin to lip in solid walnut.']);
+  if(rise>190) f.push(['n','Step riser is '+Math.round(rise)+' mm, which is steep for a domestic stair.']);
+  if(!f.length) f.push(['o','No conflicts. Every clearance checks out.']);
+  var nW=f.filter(function(x){return x[0]==='w';}).length,
+      nN=f.filter(function(x){return x[0]==='n';}).length;
+  document.getElementById('out').insertAdjacentHTML('afterbegin',
+    kc('Checks', nW? (nW+' to fix'+(nN?', '+nN+' to note':'')) : (nN? nN+' to note' : 'all clear'),
+       nW?'#f0857a':(nN?'#e8b96a':'#8fbf8f')));
+  document.getElementById('flags').innerHTML=f.map(function(x){return '<div class="flag '+x[0]+'">'+x[1]+'</div>';}).join('');
+
+  window.__spec=spec(tierH,bayW,tiers,bays,ttd,intrude,clearLin,blocked,shallow,faceM2,topM2,bolTop,rise);
+}
+
+function spec(tierH,bayW,tiers,bays,ttd,intr,clearLin,blocked,shallow,faceM2,topM2,bolTop,rise){
+  function L(a,b){return (a+':').padEnd(40)+b+'\n';}
+  return 'DJ RETURN - CURRENT MODEL SETOUT (mm)\n234 Duffy Street, Ainslie\n\n'+
+  '-- CARCASES\n'+
+  L('Carcase A length, dining side',P.LA)+L('Carcase B length, lounge side',P.LB)+
+  L('Carcase A depth',P.DA)+L('Carcase B depth',P.DB)+L('Overall depth',P.DA+P.DB)+
+  L('Benchtop height above dining FFL',P.TOP)+L('Benchtop thickness',P.BT)+
+  L('Step down to lounge',P.STEP)+L('Kick height',P.KICK)+
+  '\n-- DECK RECESS\n'+
+  L('Recess width',P.RECW)+L('Recess depth',P.RECD)+L('Front lip',P.LIP)+
+  L('Drop below benchtop surface',P.DROP)+
+  L('Recess position from north end',Math.round(recX()))+
+  L('Intrusion into Carcase B',Math.round(intr))+
+  L('Top tier depth behind recess',Math.round(ttd))+
+  '\n-- EQUIPMENT\n'+
+  L('Turntable plinth height',P.TTH)+L('Isolation pad thickness',P.PAD)+
+  L('Plinth below benchtop surface',Math.round(P.DROP-(P.TTH+P.PAD)))+
+  L('Deck run required',(2*453+728)+' plus clearances')+
+  '\n-- KITCHEN, from Mill 26.03.2026, east to west\n'+
+  L('Gap for the DJ return',P.KGAP)+
+  L('Pantry bank, 450 door + drawers',Math.round(450+25+((window.__kit||{}).pantryF||0)))+
+  L('Coffee / toaster nook',Math.round((window.__kit||{}).nookF||0))+
+  L('Ascaso Dream PID','245 W x 345 H x 280 D, 10 kg, red, side-removable tank')+
+  L('Drip tray',P.NSINKW?(P.NSINKW+' x '+Math.round(P.NSINKW*1.2)+', 25 deep, sparkling tap over'):'none')+
+  L('Benchy Sparkling Zero','290 W x 380 H x 420 D under the nook, plus 100 front clearance')+
+  L('Nook fit',(window.__nook?Math.round(window.__nook.used)+' of '+Math.round(window.__nook.w)+', gaps '+Math.round(window.__nook.gap):'n/a'))+
+  L('Fridge opening',P.KFRIDGE)+
+  L('Bench run',Math.round((window.__kit||{}).bRun||0)+'  = '+(P.binInRun?'bin '+P.KBIN+' + ':'')+'sink '+P.KSINK+' + dw '+P.KDW+' + '+
+     (P.wideStove?('drawer bank '+Math.round((window.__kit||{}).wideW||0)+((window.__kit||{}).slimW>0?' + slim drawer '+Math.round((window.__kit||{}).slimW):''))
+                 :('bench '+Math.round((window.__kit||{}).land1||0)+' + stove '+P.KSTOVE+' + landing '+P.KGAP2))+' + panels')+
+  L('Bin',P.binInRun?('in the run, '+P.KBIN):'not in the run, to island or sink pull-out')+
+  L('Cooktop zone',P.wideStove
+      ?('one '+Math.round((window.__kit||{}).wideW||0)+' drawer bank, '+P.KSTOVE+' cooktop centred on it, '+Math.round((((window.__kit||{}).wideW||0)-P.KSTOVE)/2)+' of drawer each side'
+        +((window.__kit||{}).slimW>0?', plus a '+Math.round((window.__kit||{}).slimW)+' slim drawer on the oven side':', no slim drawer'))
+      :('slim cupboard '+Math.round((window.__kit||{}).land1||0)+' east, '+P.KSTOVE+' cooktop, landing '+P.KGAP2+' west'))+
+  (function(){var K4=window.__kit||{}, e4, w4;
+     if(P.wideStove){ var o4=Math.round(((K4.wideW||0)-P.KSTOVE)/2); e4=o4; w4=o4+(K4.slimW>0?Math.round(K4.slimW)+25:0); }
+     else { e4=Math.round(K4.land1||0); w4=P.KGAP2; }
+     return L('Cooktop landings',e4+' and '+w4+'  (NKBA G17: 305 and 381)');})()+
+  L('Slack absorbed by',{bench:(P.wideStove?'drawer bank under the cooktop':'bench between dishwasher and cooktop'),pantry:'pantry drawer bank',nook:'coffee nook'}[P.SLACK])+
+  (P.wideStove?'':L('Sauce pull-outs',Math.max(1,Math.round(((window.__kit||{}).land1||0)/175))+' at about '+Math.round(((window.__kit||{}).land1||0)/Math.max(1,Math.round(((window.__kit||{}).land1||0)/175)))+' wide'))+
+  L('Corner shelving',P.showCorner?(Math.round(P.CORNSH)+' open shelves above '+(P.TOP+20)+', blind service void below'):'none')+
+  L('Pendant','Resinate 1800 x 35 x 100 resin, '+P.PENDH+' over the bench, drops at 1400 centres')+
+  L('Stone, one piece',Math.round((window.__kit||{}).stoneRun||0))+
+  L('Oven tower',P.KOVEN)+
+  L('Ovens','2 x Westinghouse WVEP6716 pyrolytic, 597 h each')+
+  L('Oven stack',P.OVENBASE+' to '+Math.round(P.OVENBASE+P.OVENN*P.OVENH+(P.OVENN-1)*8))+L('Run depth',P.KDEP)+L('Benchtop height',P.KBENCH)+
+  L('Island carcase',P.ISLW+' x '+P.ISLD+(P.islCentre?', centred on the bench run':''))+
+  L('Island stone',(P.ISLW+2*P.ISLOH)+' x '+(P.ISLD+2*P.ISLOH)+' incl '+P.ISLOH+' overhang')+
+  L('Stone slab',P.SLABL+' x '+P.SLABW+', one slab')+
+  L('Slab width used',Math.round(P.KDEP+P.ISLD+2*P.ISLOH)+' of '+P.SLABW)+
+  '\n-- DINING TABLE\n'+
+  L('Size',P.TBLL+' x '+P.TBLW+' x '+P.TBLH+' high, 6 seats')+
+  L('Layout','2 each long side, 1 each end, long side to the DJ')+
+  L('Clearance to the island',(window.__tbl?Math.round(window.__tbl.z0-(-3604)):'?'))+
+  L('Clearance to the DJ return',(window.__tbl?Math.round(0-window.__tbl.z1):'?'))+
+  '\n-- SUBWOOFER, Yamaha DXS15XLF\n'+
+  L('Size, published','450 W x 600 H x 600 D, 40 kg')+
+  L('Position along the unit',P.SUBX)+L('Position, depth',P.SUBZ)+
+  L('Ply enclosure',P.SUBENC?'yes':'no')+
+  L('S sweep, box top to seat',P.showSweep?(P.SWEEPRUN+' run, '+P.SWEEPT+' ply, drops '+Math.round(SUBH+(P.SUBENC?58:0)-P.SEAT)+', '+Math.max(0,P.SEATD-P.BOLGAP)+' deep between the back rail and the bench front'):'no')+
+  L('Slim drawer band',P.showDRW?(Math.round(P.DRWN)+' drawers at '+Math.round(P.DRWH)+' high'):'none')+
+  '\n-- NOW PLAYING BIN, DJ RIGHT\n'+
+  L('Bin width',P.NPW)+L('Bin depth',P.NPD)+L('Well depth below benchtop',P.NPDROP)+
+  L('Offset from the south end',P.NPX)+
+  L('Records showing above benchtop',Math.round(315-P.NPDROP))+
+  L('Set back from the front edge',P.NPZ)+
+  '\n-- RECORD STORAGE\n'+
+  L('Cubbies start above lounge FFL',P.CUBSTART)+
+  L('Tiers',tiers)+L('Bays',bays)+L('Shelf / divider thickness',P.T)+
+  L('Tier clear height',Math.round(tierH))+L('Bay clear width',Math.round(bayW))+
+  L('LP storage reachable',(clearLin/1000).toFixed(1)+' m, approx '+Math.round(clearLin/5)+' records')+
+  L('LP storage behind bolsters',(blocked/1000).toFixed(1)+' m')+
+  L('Shallow shelving',(shallow/1000).toFixed(1)+' m')+
+  '\n-- BENCH SEAT, BY BUILDER\n'+
+  L('Seat height above lounge FFL',P.SEAT)+L('Seat depth',P.SEATD)+
+  L('Seat run length',P.SEATL)+
+  L('Seat cushion thickness',P.CUSH)+
+  L('Back bolster depth',P.BOLD)+L('Back bolster height above seat',P.BOLH)+
+  L('Usable seat depth',Math.round(P.SEATD-P.BOLD-P.BOLGAP))+
+  L('Gap, bolster to Carcase B',P.BOLGAP)+
+  L('Bolster top above lounge FFL',Math.round(bolTop))+
+  '\n-- STEPS\n'+
+  L('Risers',Math.round(P.STEPN)+' at '+Math.round(rise))+L('Going',P.STEPG)+
+  '\n-- AREAS\n'+
+  L('Finished face area',faceM2.toFixed(2)+' m2')+L('Benchtop area',topM2.toFixed(2)+' m2')+
+  '';
+}
+
+/* ----------------------------------------------------------- buttons */
+function pushAll(){
+  Object.keys(rows).forEach(function(k){rows[k]._set(P[k]);});
+  Object.keys(chks).forEach(function(k){chks[k].checked=P[k];});
+  Object.keys(cols).forEach(function(k){cols[k].value=P[k];});
+  Object.keys(sels).forEach(function(k){sels[k].value=P[k];});
+  applySecs();
+  build();
+}
+function setStat(msg,col){
+  var st=document.getElementById('savestat');
+  if(st){ st.textContent=msg||''; st.style.color=col||'var(--dim)'; }
+}
+document.getElementById('reset').addEventListener('click',function(){
+  P=Object.assign({},BRIEF);
+  try{ localStorage.removeItem(SKEY); }catch(e){}
+  setStat('Back to the brief defaults. Any saved settings cleared.');
+  pushAll();
+});
+document.getElementById('save').addEventListener('click',function(){
+  var txt=JSON.stringify(P,null,2);
+  try{
+    localStorage.setItem(SKEY,txt);
+    setStat('Saved. Reopen this file and your settings come back. Reset clears it.','#8fbf8f');
+  }catch(e){
+    try{
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));
+      a.download='dj-return-settings.json'; a.click();
+      setStat('This browser blocks local storage, so the settings downloaded as a file.','#ddd3b8');
+    }catch(e2){ setStat('Could not save in this browser.','#f0b3b0'); }
+  }
+});
+document.getElementById('tweak').addEventListener('click',function(){P.LIP=40;P.RECD=490;pushAll();});
+document.getElementById('above').addEventListener('click',function(){
+  P.CUBSTART=P.SEAT+P.BOLH; P.TIERS=2; pushAll();
+});
+document.getElementById('comfy').addEventListener('click',function(){
+  P.SEAT=420; P.SEATD=960; P.BOLD=180; P.BOLGAP=200; P.CUSH=110; pushAll();});
+document.getElementById('subBench').addEventListener('click',function(){P.SUBX=40;P.SUBZ=830;P.showSub=true;pushAll();});
+document.getElementById('subStep').addEventListener('click',function(){P.SUBX=-1140;P.SUBZ=1420;P.showSub=true;pushAll();});
+document.getElementById('subAmp').addEventListener('click',function(){P.SUBX=1245;P.SUBZ=20;P.showSub=true;pushAll();});
+document.getElementById('copy').addEventListener('click',function(){
+  var t=document.getElementById('spec');
+  t.style.display='block'; t.value=window.__spec||''; t.select();
+  try{document.execCommand('copy');}catch(e){}
+});
+
+/* ----------------------------------------------------------- loop */
+function resize(){
+  var w=view.clientWidth,h=view.clientHeight;
+  renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();
+}
+addEventListener('resize',resize);
+wireSecs(); applyPanel();
+resize(); build();
+if(RESTORED) setStat('Restored '+RESTORED+' saved settings. Reset to brief to start over.','#c98a4b');
+function step(){
+  if(!WALK) return;
+  var sp=P.SPEED*(KEYS['shift']?2.2:1);
+  var f=((KEYS['w']||KEYS['arrowup'])?1:0)-((KEYS['s']||KEYS['arrowdown'])?1:0);
+  var r=((KEYS['d']||KEYS['arrowright'])?1:0)-((KEYS['a']||KEYS['arrowleft'])?1:0);
+  if(!f&&!r) return;
+  /* forward is (sin yaw, cos yaw), so right is (-cos yaw, sin yaw) */
+  var sy=Math.sin(eye.yaw), cy=Math.cos(eye.yaw);
+  var nx=eye.x+(f*sy-r*cy)*sp, nz=eye.z+(f*cy+r*sy)*sp;
+  nx=Math.max(-9000,Math.min(4000,nx));           /* stay in the building */
+  nz=Math.max(-9000,Math.min(6500,nz));
+  if(!hit(nx,eye.z)) eye.x=nx;                          // slide along obstacles
+  if(!hit(eye.x,nz)) eye.z=nz;
+  applyCam();
+}
+document.getElementById('walkbtn').addEventListener('click',function(){ setWalk(!WALK); });
+(function loop(){step();renderer.render(scene,camera);requestAnimationFrame(loop);})();
+})();
+</script>
