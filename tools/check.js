@@ -100,6 +100,83 @@ console.log('levels');
   }
 }
 
+/* ---------- the house, from the architect's model ---------- */
+
+console.log('house');
+{
+  const HH = window.DUFFY_HOUSE;
+  ok('house-data.js loaded', !!HH);
+  const FL = JSON.parse(R('source/project-data.json')).floor_levels_m_AHD;
+  const st = n => (HH.STOREY.find(s => s[0] === n) || [, null])[1];
+  eq('the FFL storey is the architect\'s FFL', st('FFL'), FL.house_and_addition_FFL);
+  eq('the sunken lounge storey', st('SUNKEN LOUNGE'), FL.sunken_lounge_FFL);
+  eq('the FCL storey', st('FCL'), FL.finished_ceiling_FCL);
+  eq('walls', HH.WALL.length, 67);
+  eq('floors', HH.SLAB.length, 28);
+  eq('roofs', HH.ROOF.length, 8);
+  eq('doors and windows', HH.OPEN.length, 28);
+
+  /* The fit is the one thing here that could be silently wrong: the model would
+     still draw, just in the wrong place. Everything has to land on the block. */
+  const pts = [];
+  HH.WALL.forEach(w => { pts.push([w[0], w[1]], [w[2], w[3]]); });
+  HH.SLAB.forEach(s => s[4].forEach(p => pts.push(p)));
+  HH.ROOF.forEach(r => r[5].forEach(p => pts.push(p)));
+  ok('every point of the house is on the block',
+     pts.every(p => p[0] >= 0 && p[0] <= 40 && p[1] >= 0 && p[1] <= 21.34),
+     'the fit in tools/house-extract.js has moved');
+  ok('no NaN anywhere in the house', !/NaN|null,null/.test(JSON.stringify(HH)));
+
+  /* Both directions of the massing have to agree, or the plan draws one house
+     and the sun map shades another. */
+  const site = D.BOXH.map(b => b.join(',')).sort().join('|');
+  const house = HH.BOXH.map(b => b.join(',')).sort().join('|');
+  ok('BOXH in site-data.js is what the model derives', site === house,
+     'run node tools/house-extract.js and patch BOXH');
+
+  /* project-data.json recorded these two as the only place the app's massing
+     disagreed with the architect. The model had to settle it. */
+  ['kitchen addition', 'link'].forEach(n => {
+    const b = D.BOXH.find(x => x[0] === n);
+    ok(n + ' has its ridge above the finished ceiling', b && b[5] > FL.finished_ceiling_FCL,
+       'BOXH used to guess one ridge per building and put this one under the ceiling');
+  });
+
+  /* The footprint drives what ground is under the house, so it must be a
+     believable area and it must be smaller than the boxes it replaces. A
+     silent regression here reads as the house growing or vanishing. */
+  const boxArea = HH.BOXH.reduce((a, b) => a + (b[3] - b[1]) * (b[4] - b[2]), 0);
+  ok('the footprint is a house-sized area', HH.FOOTPRINT > 200 && HH.FOOTPRINT < 320,
+     HH.FOOTPRINT + ' m2');
+  ok('the footprint is smaller than the six boxes', HH.FOOTPRINT < boxArea,
+     'boxes ' + boxArea.toFixed(1) + ', footprint ' + HH.FOOTPRINT);
+  ok('the outline has an outer ring and at least one hole', HH.OUTLINE.length >= 2);
+  ok('every outline ring is closed and rectilinear', HH.OUTLINE.every(r => r.length >= 4
+     && r.every((p, i) => { const q = r[(i + 1) % r.length];
+       return Math.abs(p[0] - q[0]) < 1e-9 || Math.abs(p[1] - q[1]) < 1e-9; })),
+     'the trace runs on a grid, so every edge is axis-aligned');
+
+  /* The plan draws BLDS from the model now. Both halves have to be there, or
+     the addition or the old house silently stops being drawn. */
+  ok('the plan outline is split into existing and new work',
+     HH.BLDS.length === 2 && HH.BLDS.every(b => b.d && b.d.length > 40));
+  ok('the new work half is the smaller of the two',
+     HH.BLDS.find(b => b.k === 'proposed').d.length < HH.BLDS.find(b => b.k === 'existing').d.length);
+
+  /* A door has to be in the wall it says it is in, or the section cuts a hole
+     in thin air. Checked as a distance from the host wall's axis. */
+  const stray = HH.OPEN.filter(o => {
+    if (o[6] < 0) return false;
+    const w = HH.WALL[o[6]];
+    const dx = w[2] - w[0], dy = w[3] - w[1], L = Math.hypot(dx, dy);
+    if (L < 1e-6) return true;
+    const t = Math.max(0, Math.min(1, ((o[1] - w[0]) * dx + (o[2] - w[1]) * dy) / (L * L)));
+    return Math.hypot(o[1] - (w[0] + dx * t), o[2] - (w[1] + dy * t)) > 0.6;
+  });
+  ok('every hosted door and window sits on its wall', stray.length === 0,
+     stray.map(o => o[8]).join(', '));
+}
+
 /* ---------- the element library ---------- */
 
 console.log('library');
@@ -134,6 +211,23 @@ for (const id of ['base'].concat(D.SCHEMES.map(s => s.id))) {
     cost: Math.round(q.cost), held: +w.held.toFixed(2) };
 }
 for (const s of D.SCHEMES) ok('scheme ' + s.id + ' has notes', (s.notes || '').length > 50);
+
+/* The sun map reads BOXH, so the massing coming off the architect's roofs moved
+   it: 2.0 percent less sun over this grid than the guessed ridges gave, most
+   ridges having gone up. Nothing else here would have caught that, because the
+   baseline counts issues and cost and neither of those reads the sun. The
+   figure does not depend on the layout, only on the massing, the trees and the
+   neighbours, so it is one number rather than one per scheme. */
+{
+  const a = make();
+  a.state = { items: [] };
+  const pts = [];
+  for (let x = 4; x <= 36; x += 4) for (let y = 3; y <= 19; y += 4) pts.push([x, y]);
+  let tot = 0;
+  for (const p of pts) for (const d of [355, 172, 264]) tot += a.sunHours(p[0], p[1], d, 0.9);
+  ok('the sun map is finite', isFinite(tot), String(tot));
+  seen._sun = { gridHours: +tot.toFixed(1) };
+}
 
 /* ---------- prose ---------- */
 

@@ -135,10 +135,16 @@ Plant ids are neither unique nor always filled in, so prefer the exact name.
 
 ## Writing
 
-`STYLE.md` is how the words here should read, and it applies to scheme notes,
-the handbook, Checks messages, this file and commit messages. Shorter than your
-first draft, no em dashes, no line built to land, and every number saying where
-it came from.
+**Read `STYLE.md` before you write any prose, and read it in full.** Not after
+drafting, and not from the summary below. It carries a worked rewrite that is
+the calibration, and no summary of it has ever been enough: prose written from
+the gist of it comes out twice too long and has to be done again. This has now
+happened, so it is a step and not a reference.
+
+It applies to scheme notes, the handbook, Checks messages, the printed sheets,
+`README.md`, this file and commit messages. Shorter than your first draft, no em
+dashes, no line built to land, bullets wherever the content is a list, and every
+number saying where it came from.
 
 ## Notes on a scheme
 

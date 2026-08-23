@@ -5,12 +5,13 @@
    network-first so a published change is picked up as soon as there is signal;
    everything else is cache-first so the app opens instantly and offline. */
 
-const CACHE = '234-duffy-v44';
+const CACHE = '234-duffy-v45';
 
 const ASSETS = [
   '.',
   'index.html',
   'site-data.js',
+  'house-data.js',
   'handbook.js',
   'bloom.js',
   'printsheet.js',

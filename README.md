@@ -26,8 +26,9 @@ the last note in this file.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The app: plan editor, checks, stages, the reference sections, ask |
+| `index.html` | The app: plan editor, checks, stages, the interior, the reference sections, ask |
 | `site-data.js` | The site: boundaries, contours, the surveyor's 126 ground levels and their triangulation, the seven kerb and gutter levels, buildings, the five protected trees and their zones, fences, drainage, the element library, the 82-plant list |
+| `house-data.js` | The house from the architect's IFC: four storeys, 67 walls, 28 floors, 8 roofs, 28 doors and windows, the footprint and the plan outline. Generated. Edit `tools/house-extract.js` and run it |
 | `handbook.js` | The reference half: the Site, Works and Risks sections, as blocks the app renders |
 | `bloom.js` | Flowering month and flower colour per plant. Horticultural, not survey |
 | `printsheet.js` | The printable set: plan, schedules and bloom calendar, drawn in mm at a true scale |
@@ -37,13 +38,15 @@ the last note in this file.
 | `sw.js` | Service worker: caches the app so it opens with no signal |
 | `manifest.webmanifest`, `apple-touch-icon.png`, `icon-512.png` | Home-screen name and icon |
 | `offline/234-duffy-offline.html` | The whole app in one file. AirDrop it and it works with no network. Built by `tools/build-offline.js`, so rebuild it whenever a served file changes |
-| `source/` | The original handbook and project data the site file was extracted from |
+| `source/` | The handbook and project data the site file came from. Also `house.json`, the IFC extract, and `dj-return.html`, the interior joinery study |
 | `CLAUDE.md` | How to add a scheme, publish, and check it. The parts that are easy to get wrong |
 | `STYLE.md` | How the words here should read |
 | `tools/build-offline.js` | Rebuilds the offline single-file copy from the current sources |
+| `tools/house-extract.js` | Puts the IFC extract on the block and writes `house-data.js`. `--check` says whether the app still agrees with it |
+| `tools/ifc/` | The python half: reads the 54.7 MB IFC and writes `source/house.json`. Needs ifcopenshell and the IFC, so it runs where the file is |
 
 Sun hours, ground levels, cut and fill, protection-zone rules and costs are computed
-in the app from `site-data.js` using the same maths as the handbook. Change a number
+in the app from `site-data.js` and `house-data.js` using the same maths as the handbook. Change a number
 there and every screen follows.
 
 ## Notes

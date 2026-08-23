@@ -108,13 +108,18 @@ const GARAGE_IFC = '2327953';                /* Floor:Conc 100, the garage slab 
 const garage = H.slabs.find(s => s.name && s.name.indexOf(GARAGE_IFC) >= 0 && s.boundary);
 if (!garage) throw new Error('the garage floor slab ' + GARAGE_IFC + ' is not in house.json');
 
+/* Footprint and the new work flag stay as they are. The footprints are the
+   architect's own site plan traced at 1:200 and the model agrees with them to
+   20 mm, so re-deriving them would move the whole layout for no gain. Column 7
+   is 1 for new build, which is how the Shape view knows to leave a building out
+   of the surveyed half. Only the ridge and the eave come from the model. */
 const BOXH = [
-  ['existing house', 20.38, 1.77, 29.01, 17.79],
-  ['east wing', 25.94, 1.77, 33.33, 8.06],
-  ['rear addition', 9.66, 11.96, 16.32, 17.96],
-  ['link', 16.32, 12.51, 21.25, 13.88],
-  ['garage', 16.32, 17.34, 27.91, 21.21],
-  ['kitchen addition', 19.95, 2.3, 21.52, 7.48]
+  ['existing house', 20.38, 1.77, 29.01, 17.79, 0],
+  ['east wing', 25.94, 1.77, 33.33, 8.06, 0],
+  ['rear addition', 9.66, 11.96, 16.32, 17.96, 1],
+  ['link', 16.32, 12.51, 21.25, 13.88, 1],
+  ['garage', 16.32, 17.34, 27.91, 21.21, 0],
+  ['kitchen addition', 19.95, 2.3, 21.52, 7.48, 1]
 ];
 const boxOf = n => BOXH.find(b => b[0] === n);
 
@@ -216,14 +221,46 @@ const openings = H.openings.map(o => {
           sIdx(o.storey), o.name];
 });
 
+/* Glazing came across as a bounding box and nothing else, and the box is
+   axis-aligned to the IFC world rather than to the building. A panel 2.75 m
+   long and 50 mm thick, sitting 14 degrees off those axes, has a box 2.747 by
+   0.829: the box is most of a metre thick where the glass is a finger wide.
+   Transforming the box and re-boxing it keeps that error and draws a room-sized
+   rectangle where there is a window.
+
+   The panel can be recovered exactly, because the angle is known. For a
+   rectangle L by t turned by theta inside an axis-aligned box Wx by Wy,
+
+     Wx = L cos + t sin        L = (Wx cos - Wy sin) / cos 2theta
+     Wy = L sin + t cos        t = (Wy cos - Wx sin) / cos 2theta
+
+   which is solvable while cos 2theta stays away from zero, and at 14.37 degrees
+   it is 0.877. Which way round the panel runs is not decided by algebra, so
+   both are tried and the one that rebuilds the given box is kept. */
+const th0 = gridDeg * Math.PI / 180;
+const c0 = Math.abs(Math.cos(th0)), s0 = Math.abs(Math.sin(th0)), c2 = c0 * c0 - s0 * s0;
+let cwFallback = 0;
 const cwalls = H.curtain_walls.map(c => {
-  /* only a bounding box came across, so both plan corners are transformed and
-     the result re-boxed. Good enough for a glazing line on a plan. */
-  const p = [T([c.bbox[0][0], c.bbox[0][1]]), T([c.bbox[1][0], c.bbox[1][1]]),
-             T([c.bbox[0][0], c.bbox[1][1]]), T([c.bbox[1][0], c.bbox[0][1]])];
-  const b = bbox(p);
-  return [r3(b[0]), r3(b[1]), r3(b[2]), r3(b[3]), r3(c.base_z), r3(c.top_z), sIdx(c.storey), c.name];
+  const Wx = c.bbox[1][0] - c.bbox[0][0], Wy = c.bbox[1][1] - c.bbox[0][1];
+  const mid = T([(c.bbox[0][0] + c.bbox[1][0]) / 2, (c.bbox[0][1] + c.bbox[1][1]) / 2]);
+  let best = null;
+  if (Math.abs(c2) > 0.2) [[Wx, Wy], [Wy, Wx]].forEach(([A, B], swap) => {
+    const L = (A * c0 - B * s0) / c2, t = (B * c0 - A * s0) / c2;
+    if (L <= 0 || t <= 0) return;
+    /* rebuild the box this pair would have made, and keep it only if it is the
+       box the export actually carried */
+    const gx = L * c0 + t * s0, gy = L * s0 + t * c0;
+    const err = swap ? Math.abs(gx - Wy) + Math.abs(gy - Wx) : Math.abs(gx - Wx) + Math.abs(gy - Wy);
+    if (err < 0.002 && (!best || err < best.err)) best = { L: L, t: t, swap: swap, err: err };
+  });
+  let hx, hy;
+  if (best) { const lx = best.swap ? best.t : best.L, ly = best.swap ? best.L : best.t;
+              hx = lx / 2; hy = ly / 2; }
+  else { cwFallback++; hx = Math.max(Wx, Wy) / 2; hy = Math.min(Wx, Wy) / 2; }
+  return [r3(mid[0] - hx), r3(mid[1] - hy), r3(mid[0] + hx), r3(mid[1] + hy),
+          r3(c.base_z), r3(c.top_z), sIdx(c.storey), c.name];
 });
+if (cwFallback) say(cwFallback + ' of ' + cwalls.length + ' glazing panels could not be un-boxed and keep their bounding box');
 
 /* ---- 5. the massing, rebuilt from the roofs ---- */
 
@@ -276,8 +313,161 @@ const boxh = BOXH.map(b => {
   if (!over.length) return null;
   const ridge = Math.max(...over.map(r => r.ridge != null ? r.ridge : r.z1));
   const eave = Math.min(...over.map(r => r.eave != null ? r.eave : r.z0));
-  return [b[0], b[1], b[2], b[3], b[4], r2(ridge), r2(eave), over.length];
+  const row = [b[0], b[1], b[2], b[3], b[4], r2(ridge), r2(eave)];
+  if (b[5]) row.push(1);
+  return row;
 });
+
+/* ---- 5b. the outline the plan should draw ---- */
+
+/* The plan has been drawing BLDS, nine paths traced off the site plan PDF, and
+   the massing has been drawing six rectangles. Neither is the building. The
+   building is the region the external walls enclose, and that is what this
+   works out.
+
+   It is done on a grid rather than by unioning polygons, because a polygon
+   union of 19 overlapping wall rectangles is a great deal of code to get one
+   outline and every corner case in it is a hairline. On a 50 mm grid the
+   building is rectilinear and axis-aligned in this frame, so the traced
+   boundary is exact once collinear runs are dropped, and the cell count gives
+   the footprint area for free. That area is the thing the earthworks want: it
+   is the ground that is under the house and cannot be regraded or stripped. */
+
+const CELL = 0.05;
+const ext = walls.map(intQuad).filter(Boolean);
+function intQuad(w) {
+  const dx = w.b[0] - w.a[0], dy = w.b[1] - w.a[1], L = Math.hypot(dx, dy);
+  if (L < 1e-6) return null;
+  /* half a cell of reach on each side, so two walls meeting at a corner touch
+     on the grid instead of leaving a hairline for the fill to leak through */
+  const t = w.t / 2 + CELL, ux = dx / L, uy = dy / L, nx = -uy * t, ny = ux * t;
+  const ex = ux * CELL, ey = uy * CELL;
+  return [[w.a[0] + nx - ex, w.a[1] + ny - ey], [w.b[0] + nx + ex, w.b[1] + ny + ey],
+          [w.b[0] - nx + ex, w.b[1] - ny + ey], [w.a[0] - nx - ex, w.a[1] - ny - ey]];
+}
+const roofed = poly => {
+  const c = poly.reduce(function (a, p) { return [a[0] + p[0], a[1] + p[1]]; }, [0, 0]);
+  const n = poly.length, mid = [c[0] / n, c[1] / n];
+  return roofs.some(r => inPoly(mid, r.poly));
+};
+const houseFloors = floors.filter(f => roofed(f.poly));
+const openFloors = floors.length - houseFloors.length;
+
+/* The grid has to cover the floors as well as the walls. Sizing it off the
+   walls alone lost the garage: it has no modelled wall past y 18.02, being
+   open along its long side, and its slab reaches y 21.34. Those cells fell
+   outside the array and the footprint came out 40 m2 short. */
+const gb = bbox([].concat(...ext, ...houseFloors.map(f => f.poly)));
+const GX0 = gb[0] - 0.5, GY0 = gb[1] - 0.5;
+const NXc = Math.ceil((gb[2] - GX0 + 0.5) / CELL), NYc = Math.ceil((gb[3] - GY0 + 0.5) / CELL);
+const cellAt = (i, j) => [GX0 + (i + 0.5) * CELL, GY0 + (j + 0.5) * CELL];
+
+const WALLC = new Uint8Array(NXc * NYc);
+ext.forEach(q => {
+  const b = bbox(q);
+  const i0 = Math.max(0, Math.floor((b[0] - GX0) / CELL)), i1 = Math.min(NXc - 1, Math.ceil((b[2] - GX0) / CELL));
+  const j0 = Math.max(0, Math.floor((b[1] - GY0) / CELL)), j1 = Math.min(NYc - 1, Math.ceil((b[3] - GY0) / CELL));
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++)
+    if (!WALLC[j * NXc + i] && inPoly(cellAt(i, j), q)) WALLC[j * NXc + i] = 1;
+});
+
+/* Floors fill what the walls surround. Flooding the outside and keeping what
+   it cannot reach was tried first and gave 20 m2, because the 19 external walls
+   do not close: glazing and breeze block make up part of the enclosure and
+   those are not walls. Marking walls and floors directly needs no watertight
+   ring and cannot leak.
+
+   A floor counts as house if it is under a roof. That is what separates the
+   rooms from the driveway apron and the brick paving, which are floor slabs in
+   the model too and are not building. */
+houseFloors.forEach(f => {
+  const b = bbox(f.poly);
+  const i0 = Math.max(0, Math.floor((b[0] - GX0) / CELL)), i1 = Math.min(NXc - 1, Math.ceil((b[2] - GX0) / CELL));
+  const j0 = Math.max(0, Math.floor((b[1] - GY0) / CELL)), j1 = Math.min(NYc - 1, Math.ceil((b[3] - GY0) / CELL));
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++)
+    if (!WALLC[j * NXc + i] && inPoly(cellAt(i, j), f.poly)) WALLC[j * NXc + i] = 1;
+});
+const IN = WALLC;
+let cells = 0;
+for (let k = 0; k < IN.length; k++) if (IN[k]) cells++;
+const footprint_m2 = r2(cells * CELL * CELL);
+say(houseFloors.length + ' floor slabs are under a roof, ' + openFloors + ' are open paving');
+
+/* Trace the boundary. Every cell edge with house on one side and not on the
+   other is a segment; the segments are then chained into rings and collinear
+   runs collapsed, which on a rectilinear building leaves the corners and
+   nothing else. */
+const key = p => p[0] + ',' + p[1];
+function trace(mask) {
+const has = (i, j) => i >= 0 && j >= 0 && i < NXc && j < NYc && mask[j * NXc + i] === 1;
+const segs = new Map();
+const addSeg = (a, b) => { const k = key(a); if (!segs.has(k)) segs.set(k, []); segs.get(k).push(b); };
+for (let i = 0; i < NXc; i++) for (let j = 0; j < NYc; j++) {
+  if (!has(i, j)) continue;
+  /* wound so the house is on the left, which keeps outer rings one way round */
+  if (!has(i, j - 1)) addSeg([i, j], [i + 1, j]);
+  if (!has(i + 1, j)) addSeg([i + 1, j], [i + 1, j + 1]);
+  if (!has(i, j + 1)) addSeg([i + 1, j + 1], [i, j + 1]);
+  if (!has(i - 1, j)) addSeg([i, j + 1], [i, j]);
+}
+const rings = [];
+while (segs.size) {
+  const start = segs.keys().next().value;
+  let cur = start.split(',').map(Number), ring = [cur];
+  for (;;) {
+    const list = segs.get(key(cur));
+    if (!list || !list.length) break;
+    const nxt = list.pop();
+    if (!list.length) segs.delete(key(cur));
+    ring.push(nxt); cur = nxt;
+    if (key(cur) === key(ring[0])) break;
+  }
+  if (ring.length > 8) rings.push(ring);
+}
+const simplify = ring => {
+  const out = [];
+  for (let i = 0; i < ring.length - 1; i++) {
+    const p = ring[(i - 1 + ring.length - 1) % (ring.length - 1)], c = ring[i], n = ring[i + 1];
+    if ((c[0] - p[0]) * (n[1] - c[1]) !== (c[1] - p[1]) * (n[0] - c[0])) out.push(c);
+  }
+  return out;
+};
+return rings.map(simplify).filter(r => r.length >= 4).map(r =>
+  r.map(p => [r3(GX0 + p[0] * CELL), r3(GY0 + p[1] * CELL)]));
+}
+
+const OUTLINE = trace(IN);
+OUTLINE.sort((a, b) => Math.abs(shoelace(b)) - Math.abs(shoelace(a)));
+
+/* The plan tints new build differently from what is already standing, so the
+   outline is traced twice more against the same grid: once masked to the boxes
+   flagged as new work, once to everything else. Tracing a mask rather than
+   splitting a finished ring keeps the two halves sharing an exact edge where
+   an addition meets the old house. */
+/* Wall cells reach half a cell past the box they belong to, and a strict
+   containment test left a 50 mm skin of the old house wrapped round every
+   addition. So an old box wins where it contains the cell outright, and a new
+   box is allowed 150 mm of reach to pick up its own walls. At plan scale
+   150 mm at a junction cannot be seen; the slivers could. */
+const inBox = (b, x, y, g) => x >= b[1] - g && x <= b[3] + g && y >= b[2] - g && y <= b[4] + g;
+const inNew = (x, y) => !BOXH.some(b => !b[5] && inBox(b, x, y, 0))
+  && BOXH.some(b => b[5] && inBox(b, x, y, 0.15));
+const NEWC = new Uint8Array(NXc * NYc), OLDC = new Uint8Array(NXc * NYc);
+for (let i = 0; i < NXc; i++) for (let j = 0; j < NYc; j++) {
+  const k = j * NXc + i; if (!IN[k]) continue;
+  const c = cellAt(i, j);
+  if (inNew(c[0], c[1])) NEWC[k] = 1; else OLDC[k] = 1;
+}
+let newCells = 0;
+for (let k = 0; k < NEWC.length; k++) if (NEWC[k]) newCells++;
+const footprint_new_m2 = r2(newCells * CELL * CELL);
+const asPath = rs => rs.map(r => 'M' + r.map(q => n2(q[0]) + ' ' + n2(YTOP - q[1])).join('L') + 'Z').join('');
+const n2 = v => (Math.round(v * 100) / 100).toFixed(2);
+const YTOP = 23.5;                     /* the plan draws y flipped, as fy() does */
+const BLDS = [{k: 'existing', d: asPath(trace(OLDC))}, {k: 'proposed', d: asPath(trace(NEWC))}]
+  .filter(b => b.d);
+say('footprint ' + footprint_m2 + ' m2 in ' + OUTLINE.length + ' ring'
+  + (OUTLINE.length === 1 ? '' : 's') + ', ' + OUTLINE.reduce((n, r) => n + r.length, 0) + ' corners');
 
 /* ---- 6. checks ---- */
 
@@ -360,7 +550,11 @@ const out = {
                         s.bz ? s.bz.map(r3) : null]),
   OPEN: openings,
   CWALL: cwalls,
-  BOXH: boxh.filter(Boolean).map(b => b.slice(0, 7))
+  BOXH: boxh.filter(Boolean),
+  OUTLINE: OUTLINE,
+  BLDS: BLDS,
+  FOOTPRINT: footprint_m2,
+  FOOTPRINT_NEW: footprint_new_m2
 };
 
 if (fail.length) {

@@ -57,8 +57,23 @@ disappears if it left no trace worth keeping. Git history is the log.
 - Checks severity: a plant on a building footprint is a care saying it can only
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
+- The house is the architect's IFC model, not six boxes traced off the PDF.
+  `source/house.json` is the extract, `tools/house-extract.js` puts it on the
+  block, `house-data.js` is what the app reads. The IFC is 54.7 MB and stays out
+  of the repo, as the survey DWG does. The fit is the building's own grid angle
+  and lands inside the app's building envelope to 20 mm.
+- Interior is a screen: the plan of what is built, and a section cut through it,
+  sharing one scale. The cut steps in half metres.
+- The massing comes off the roofs. Five of the six boxes moved more than 100 mm,
+  and the sun map fell 2.0 per cent. That grid total is in `tools/baseline.json`
+  under `_sun`, because nothing else was watching it.
+- Floor levels confirmed throughout. FFL 611.650 and the sunken lounge 611.070
+  match the architect exactly. The garage floor at 611.535 and its apron at
+  611.575 are new to the app.
+- The site plan draws the model's outline, split into existing and new work.
+  The footprint is 265.5 m² against the 284.4 m² the boxes claimed.
 
-Live build at the time of writing: **v44**.
+Live build at the time of writing: **v45**.
 
 ## Todo
 
@@ -82,10 +97,23 @@ Roughly in order. Nothing here is urgent and each is a spare-tokens job.
    fitted surface. Clamping the fallback to the nearest triangle edge would
    remove the step; it would also change levels, so it is a decision rather
    than a fix.
-5. **The kitchen addition and link roof heights.** `BOXH` gives them a ridge of
-   614.00 and 613.90, both below the finished ceiling at 614.165. Every other
-   building agrees with the architect's set. It changes the sun map and nothing
-   else. Recorded under `floor_levels_m_AHD._unresolved`.
+5. **The second pitch of the main roof.** The extract took one planar face per
+   roof, so the tile roof over the existing house came across as one pitch of
+   its two. The ridge and the eave are right, so the massing and the sun map are
+   right. The section draws half a roof. Re-export with every top face and run
+   `tools/house-extract.js` again.
+6. **Checks still tests footprints as six boxes.** `BLDR` is built from `BOXH`,
+   and the model's outline is 19.0 m² smaller. Moving Checks onto it would free
+   ground along the walls and move every scheme's issue count, so it wants its
+   own pass and a baseline update.
+7. **The sun ray-casts against box mid-heights.** `blockTop` is eave plus half
+   the rise. The roof planes are in `house-data.js` now, so a ray could be cast
+   against the roof itself. It would change the sun map again.
+8. **The DJ return.** `source/dj-return.html` is the interior joinery study:
+   deck recess, record storage, the Mill kitchen, the dining table, parametric
+   with presets. It is not in the app yet. It draws in three.js from a CDN, and
+   the app has to work with no signal, so r128 wants vendoring into `vendor/`
+   first: 603 kB, 149 kB gzipped, and about 600 kB onto the offline copy.
 
 - The block is the 1000 x 400 x 400 the Canberra yards stock, so `BLOCKH` is
   0.40 and everything behind the wall finishes 400 mm above the paving. About

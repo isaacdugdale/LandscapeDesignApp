@@ -78,6 +78,8 @@ const swaps = [
    '<link rel="stylesheet" href="' + dataCss(fontCss) + '">'],
   ['<script src="site-data.js"></script>',
    '<script src="' + dataJs(read('site-data.js')) + '"></script>'],
+  ['<script src="house-data.js"></script>',
+   '<script src="' + dataJs(read('house-data.js')) + '"></script>'],
   ['<script src="handbook.js"></script>',
    '<script src="' + dataJs(read('handbook.js')) + '"></script>'],
   ['<script src="bloom.js"></script>',

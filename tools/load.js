@@ -23,6 +23,7 @@ function loadApp() {
   global.DCLogic = class { constructor() { this.state = {}; } setState(o) { Object.assign(this.state, o); } };
 
   require(path.join(ROOT, 'site-data.js'));
+  require(path.join(ROOT, 'house-data.js'));
   require(path.join(ROOT, 'handbook.js'));
 
   const src = R('index.html');
@@ -41,7 +42,7 @@ function loadApp() {
     const a = Object.create(Component.prototype);
     a.state = {}; a.setState = o => Object.assign(a.state, o);
     const D = window.DUFFY;
-    a.D = D; a.C = D.TREND; a.YTOP = D.YTOP;
+    a.D = D; a.C = D.TREND; a.YTOP = D.YTOP; a.H = window.DUFFY_HOUSE;
     a.LIBM = {}; D.LIB.forEach(l => a.LIBM[l[0]] = l);
     a.PL = {}; D.PLANTS.forEach(p => { if (!a.PL[p.n]) a.PL[p.n] = p; });
     a.BLDR = D.BOXH.map(b => [b[0], b[1], b[2], b[3], b[4]])

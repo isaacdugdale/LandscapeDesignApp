@@ -18,6 +18,9 @@ window.PRINTSHEET = (function () {
   var SCALES = [50, 75, 100, 125, 150, 200, 250, 300];
   var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var INK = '#2e2b25', MUT = '#6f6959', FAINT = '#b9b1a1', RULE = '#d8d0c0', PAPER = '#ffffff';
+  /* the interior drawings, which need a few inks the site sheets never wanted */
+  var COLI = {glass: '#33646b', cut: '#8c491a', roof: '#645c50',
+              floor: '#a19786', ground: '#6f6959', fin: '#8c491a'};
 
   var esc = function (s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -929,7 +932,7 @@ window.PRINTSHEET = (function () {
       + '.ps-earth .ps-tbl td{padding:1mm 1.6mm}'
       + '.ps-no-dig td{background:#fbecea}.ps-no-dig td:nth-child(8) b{color:#a8332a}'
       + '.ps-hand td{background:#fbf1e7}.ps-hand td:nth-child(8) b{color:#8c491a}'
-      + '.ps-fine{font-size:2.4mm;color:' + FAINT + ';margin:1.4mm 0 0;line-height:1.45}'
+      + '.ps-fine{font-size:2.4mm;color:' + FAINT + ';margin:1.4mm 0 0;line-height:1.45}\n    ul.ps-fine{padding-left:4mm}\n    ul.ps-fine li{margin:0.6mm 0}'
       + '.ps-src{margin-top:auto;font-size:2.3mm;color:' + FAINT + ';border-top:0.15mm solid ' + RULE + ';padding-top:1.6mm}'
       + '.ps-empty{flex:1;display:flex;align-items:center;justify-content:center;color:' + MUT + ';font-size:5mm}'
       /* on paper: only the sheets, no chrome, no shadows, one sheet per page */
@@ -1646,5 +1649,359 @@ window.PRINTSHEET = (function () {
       + '</div>';
   }
 
-  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, levelsView: levelsView, waterView: waterView, isoView: isoView, gridView: gridView};
+  /* ------------------------------------------------------- interior --- */
+
+  /* The house itself, which until now was six boxes with a guessed ridge. This
+     draws the architect's model: the plan of what is actually built, and a
+     section cut straight through it.
+
+     The plan and the section share one horizontal scale and one origin, so the
+     section sits under the plan and every wall in it is directly below the wall
+     it cuts. That is the whole point of drawing them together: the owner can
+     put a finger on a wall in the plan and read its height off the section.
+
+     The cut runs in x, which is the fall line, 1 in 19 to the street. So the
+     section also shows the ground falling under the floor, and the floor
+     staying level across it, which is the thing that decides where a step
+     appears at a door. */
+
+  var INTPAD = 1.2;                    /* metres of paper round the house */
+
+  function intBounds(H) {
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    var put = function (x, y) {
+      if (x < x0) x0 = x; if (x > x1) x1 = x;
+      if (y < y0) y0 = y; if (y > y1) y1 = y;
+    };
+    H.WALL.forEach(function (w) { put(w[0], w[1]); put(w[2], w[3]); });
+    H.SLAB.forEach(function (s) { s[4].forEach(function (p) { put(p[0], p[1]); }); });
+    H.ROOF.forEach(function (r) { r[5].forEach(function (p) { put(p[0], p[1]); }); });
+    return [x0 - INTPAD, y0 - INTPAD, x1 + INTPAD, y1 + INTPAD];
+  }
+
+  /* A wall drawn as what it is, a rectangle t wide about its axis. */
+  function intWallQuad(w) {
+    var dx = w[2] - w[0], dy = w[3] - w[1], L = Math.hypot(dx, dy);
+    if (L < 1e-6) return null;
+    var nx = -dy / L * (w[4] / 2), ny = dx / L * (w[4] / 2);
+    return [[w[0] + nx, w[1] + ny], [w[2] + nx, w[3] + ny],
+            [w[2] - nx, w[3] - ny], [w[0] - nx, w[1] - ny]];
+  }
+
+  /* Where a segment of the house crosses the cut, and at what height. Roofs
+     carry a z per boundary point, so the roof line in the section is read off
+     the model rather than rebuilt from a pitch. */
+  function intCross(poly, zs, cy) {
+    var hits = [], i, j, a, b, t;
+    for (i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      a = poly[j]; b = poly[i];
+      if ((a[1] > cy) === (b[1] > cy)) continue;
+      t = (cy - a[1]) / (b[1] - a[1]);
+      hits.push([a[0] + (b[0] - a[0]) * t,
+                 zs ? zs[j] + (zs[i] - zs[j]) * t : null]);
+    }
+    return hits.sort(function (p, q) { return p[0] - q[0]; });
+  }
+
+  function interiorView(app) {
+    var H = window.DUFFY_HOUSE;
+    if (!H) return '<div class="ps-screen"><p class="ps-fine">The house model is not loaded.</p></div>';
+
+    var bbox = function (pts) {
+      var xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; });
+      return [Math.min.apply(null, xs), Math.min.apply(null, ys),
+              Math.max.apply(null, xs), Math.max.apply(null, ys)];
+    };
+    var B = intBounds(H), X0 = B[0], X1 = B[2], Y0 = B[1], Y1 = B[3];
+    var W = 250, k = W / (X1 - X0);
+    var sx = function (x) { return (x - X0) * k; };
+    var sy = function (y) { return (Y1 - y) * k; };
+    var PH = (Y1 - Y0) * k;
+
+    /* the cut, stepped by the buttons under the drawing */
+    var cy = app.state && app.state.intCut != null ? app.state.intCut : 13.2;
+    cy = Math.max(Y0 + 0.3, Math.min(Y1 - 0.3, cy));
+
+    var FFL = H.STOREY.reduce(function (m, s) { return s[0] === 'FFL' ? s[1] : m; }, 611.65);
+    var lvlFill = function (z) {
+      return Math.abs(z - FFL) < 0.02 ? '#efe9dd' : (z < FFL ? '#e2dac9' : '#f5f1e8');
+    };
+
+    /* ---- the plan ---- */
+    var plan = '<svg viewBox="0 0 ' + n1(W) + ' ' + n1(PH) + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'
+      + '<rect width="' + n1(W) + '" height="' + n1(PH) + '" fill="' + PAPER + '"/>';
+
+    H.SLAB.forEach(function (s) {
+      plan += '<path d="' + s[4].map(function (p, i) {
+        return (i ? 'L' : 'M') + n1(sx(p[0])) + ' ' + n1(sy(p[1]));
+      }).join('') + 'Z" fill="' + lvlFill(s[0]) + '" stroke="' + FAINT + '" stroke-width="0.25"/>';
+    });
+
+    H.WALL.forEach(function (w) {
+      var q = intWallQuad(w);
+      if (!q) return;
+      plan += '<path d="' + q.map(function (p, i) {
+        return (i ? 'L' : 'M') + n1(sx(p[0])) + ' ' + n1(sy(p[1]));
+      }).join('') + 'Z" fill="' + (w[8] ? INK : '#8d8471') + '"/>';
+    });
+
+    /* Openings are painted over the wall rather than cut out of it: a white
+       rectangle the width of the unit, then glass for a window and a swing for
+       a door. Boolean geometry would buy nothing a reader can see. */
+    H.OPEN.forEach(function (o) {
+      var w = o[6] >= 0 ? H.WALL[o[6]] : null;
+      if (!w) return;
+      var dx = w[2] - w[0], dy = w[3] - w[1], L = Math.hypot(dx, dy);
+      if (L < 1e-6) return;
+      var ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+      var hw = Math.min(o[3], 2.2) / 2, ht = w[4] / 2 + 0.03;
+      var q = [[o[1] - ux * hw + nx * ht, o[2] - uy * hw + ny * ht],
+               [o[1] + ux * hw + nx * ht, o[2] + uy * hw + ny * ht],
+               [o[1] + ux * hw - nx * ht, o[2] + uy * hw - ny * ht],
+               [o[1] - ux * hw - nx * ht, o[2] - uy * hw - ny * ht]];
+      plan += '<path d="' + q.map(function (p, i) {
+        return (i ? 'L' : 'M') + n1(sx(p[0])) + ' ' + n1(sy(p[1]));
+      }).join('') + 'Z" fill="' + PAPER + '"/>';
+      if (o[0] === 'window') {
+        plan += '<line x1="' + n1(sx(o[1] - ux * hw)) + '" y1="' + n1(sy(o[2] - uy * hw))
+          + '" x2="' + n1(sx(o[1] + ux * hw)) + '" y2="' + n1(sy(o[2] + uy * hw))
+          + '" stroke="' + COLI.glass + '" stroke-width="0.7"/>';
+      } else {
+        plan += '<path d="M' + n1(sx(o[1] - ux * hw)) + ' ' + n1(sy(o[2] - uy * hw))
+          + 'A' + n1(hw * 2 * k) + ' ' + n1(hw * 2 * k) + ' 0 0 1 '
+          + n1(sx(o[1] - ux * hw + nx * hw * 2)) + ' ' + n1(sy(o[2] - uy * hw + ny * hw * 2))
+          + '" fill="none" stroke="' + MUT + '" stroke-width="0.3"/>';
+      }
+    });
+
+    H.CWALL.forEach(function (c) {
+      plan += '<rect x="' + n1(sx(c[0])) + '" y="' + n1(sy(c[3])) + '" width="' + n1((c[2] - c[0]) * k)
+        + '" height="' + n1((c[3] - c[1]) * k) + '" fill="none" stroke="' + COLI.glass + '" stroke-width="0.8"/>';
+    });
+
+    /* the cut line, and which way you are looking */
+    plan += '<line x1="0" y1="' + n1(sy(cy)) + '" x2="' + n1(W) + '" y2="' + n1(sy(cy))
+      + '" stroke="' + COLI.cut + '" stroke-width="0.6" stroke-dasharray="4 2"/>'
+      + '<text x="2" y="' + n1(sy(cy) - 1.6) + '" font-size="3.4" fill="' + COLI.cut + '">Section A, y ' + cy.toFixed(1) + ' m</text>';
+
+    plan += '</svg>';
+
+    /* ---- the section ---- */
+    var zLo = 1e9, zHi = -1e9, xi;
+    for (xi = X0; xi <= X1; xi += 0.5) {
+      var g = app.RL(xi, cy), f = app.finRL(xi, cy);
+      if (g < zLo) zLo = g; if (f < zLo) zLo = f;
+      if (g > zHi) zHi = g; if (f > zHi) zHi = f;
+    }
+    H.WALL.forEach(function (w) { if (w[6] > zHi) zHi = w[6]; });
+    H.ROOF.forEach(function (r) { if (r[1] > zHi) zHi = r[1]; });
+    zLo -= 0.6; zHi += 0.5;
+    var SH = (zHi - zLo) * k;
+    var sz = function (z) { return (zHi - z) * k; };
+
+    var sec = '<svg viewBox="0 0 ' + n1(W) + ' ' + n1(SH) + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'
+      + '<rect width="' + n1(W) + '" height="' + n1(SH) + '" fill="' + PAPER + '"/>';
+
+    /* the ground, surveyed and finished, along the cut */
+    var line = function (f) {
+      var d = '', x;
+      for (x = X0; x <= X1 + 0.001; x += 0.25)
+        d += (d ? 'L' : 'M') + n1(sx(x)) + ' ' + n1(sz(f(x)));
+      return d;
+    };
+    var gd = line(function (x) { return app.RL(x, cy); });
+    sec += '<path d="' + gd + 'L' + n1(W) + ' ' + n1(SH) + 'L0 ' + n1(SH) + 'Z" fill="#e6dfd0"/>'
+      + '<path d="' + gd + '" fill="none" stroke="' + COLI.ground + '" stroke-width="0.5"/>'
+      + '<path d="' + line(function (x) { return app.finRL(x, cy); })
+      + '" fill="none" stroke="' + COLI.fin + '" stroke-width="0.6" stroke-dasharray="3 1.6"/>';
+
+    /* roofs first, so a wall drawn after reads in front of the roof behind it */
+    H.ROOF.forEach(function (r) {
+      var hits = intCross(r[5], r[6], cy);
+      if (hits.length < 2) return;
+      var i;
+      for (i = 0; i + 1 < hits.length; i += 2)
+        sec += '<line x1="' + n1(sx(hits[i][0])) + '" y1="' + n1(sz(hits[i][1]))
+          + '" x2="' + n1(sx(hits[i + 1][0])) + '" y2="' + n1(sz(hits[i + 1][1]))
+          + '" stroke="' + COLI.roof + '" stroke-width="1.1" stroke-linecap="round"/>';
+    });
+
+    /* floors */
+    H.SLAB.forEach(function (s) {
+      var hits = intCross(s[4], null, cy);
+      var i;
+      for (i = 0; i + 1 < hits.length; i += 2)
+        sec += '<rect x="' + n1(sx(hits[i][0])) + '" y="' + n1(sz(s[0]))
+          + '" width="' + n1((hits[i + 1][0] - hits[i][0]) * k) + '" height="' + n1(Math.max(0.35, s[1] * k))
+          + '" fill="' + COLI.floor + '"/>';
+    });
+
+    /* walls that the cut passes through, drawn cut: base to top, t wide */
+    var cutWalls = [];
+    H.WALL.forEach(function (w, i) {
+      var q = intWallQuad(w);
+      if (!q) return;
+      var hits = intCross(q, null, cy);
+      if (hits.length < 2) return;
+      var x0 = hits[0][0], x1 = hits[hits.length - 1][0];
+      cutWalls.push(i);
+      sec += '<rect x="' + n1(sx(x0)) + '" y="' + n1(sz(w[6])) + '" width="' + n1(Math.max(0.5, (x1 - x0) * k))
+        + '" height="' + n1(Math.max(0.5, (w[6] - w[5]) * k)) + '" fill="' + (w[8] ? INK : '#8d8471') + '"/>';
+    });
+
+    /* an opening in a cut wall is a hole in it, so it is painted back out */
+    H.OPEN.forEach(function (o) {
+      if (o[6] < 0 || cutWalls.indexOf(o[6]) < 0) return;
+      var w = H.WALL[o[6]], q = intWallQuad(w), hits = intCross(q, null, cy);
+      if (hits.length < 2) return;
+      var x0 = hits[0][0], x1 = hits[hits.length - 1][0];
+      sec += '<rect x="' + n1(sx(x0)) + '" y="' + n1(sz(o[5] + o[4])) + '" width="' + n1(Math.max(0.5, (x1 - x0) * k))
+        + '" height="' + n1(Math.max(0.5, o[4] * k)) + '" fill="' + PAPER + '"/>'
+        + '<line x1="' + n1(sx(x0)) + '" y1="' + n1(sz(o[5] + o[4])) + '" x2="' + n1(sx(x1)) + '" y2="' + n1(sz(o[5] + o[4]))
+        + '" stroke="' + MUT + '" stroke-width="0.3"/>';
+    });
+
+    /* the levels worth naming, as a line each with its RL */
+    [['FFL', FFL], ['FCL', H.STOREY.reduce(function (m, s) { return s[0] === 'FCL' ? s[1] : m; }, 614.165)]]
+      .forEach(function (L) {
+        sec += '<line x1="0" y1="' + n1(sz(L[1])) + '" x2="' + n1(W) + '" y2="' + n1(sz(L[1]))
+          + '" stroke="' + RULE + '" stroke-width="0.25" stroke-dasharray="2 2"/>'
+          + '<text x="' + n1(W - 1) + '" y="' + n1(sz(L[1]) - 1) + '" text-anchor="end" font-size="3.2" fill="' + MUT + '">'
+          + L[0] + ' ' + L[1].toFixed(2) + '</text>';
+      });
+    sec += '</svg>';
+
+    /* ---- what the section is standing on ---- */
+    var gLo = app.RL(X0 + INTPAD, cy), gHi = app.RL(X1 - INTPAD, cy);
+    var nCut = cutWalls.length;
+    var rows = ''
+      + '<tr><td>Cut at</td><td class="ps-num">y ' + cy.toFixed(1) + ' m</td></tr>'
+      + '<tr><td>Walls cut</td><td class="ps-num">' + nCut + '</td></tr>'
+      + '<tr><td>Finished floor</td><td class="ps-num">' + FFL.toFixed(2) + ' m</td></tr>'
+      + '<tr><td>Ground under the cut, reserve end to street end</td><td class="ps-num">'
+      + gLo.toFixed(2) + ' to ' + gHi.toFixed(2) + ' m</td></tr>'
+      + '<tr class="ps-tot"><td>Floor above ground at the street end</td><td class="ps-num">'
+      + Math.round((FFL - gHi) * 1000) + ' mm</td></tr>';
+
+    /* ---- the levels, throughout rather than at the three dimensioned points ---- */
+
+    /* The architect dimensions three levels on the elevations and the sections.
+       The model carries a level on every slab, so the question of whether the
+       floor levels are right everywhere can be answered rather than assumed. */
+    var polyArea = function (p) {
+      var a = 0, i, j;
+      for (i = 0, j = p.length - 1; i < p.length; j = i++) a += p[j][0] * p[i][1] - p[i][0] * p[j][1];
+      return Math.abs(a) / 2;
+    };
+    var byLevel = {};
+    H.SLAB.forEach(function (s) {
+      var k = s[0].toFixed(3);
+      if (!byLevel[k]) byLevel[k] = {a: 0, n: 0, names: {}};
+      byLevel[k].a += polyArea(s[4]); byLevel[k].n++;
+      byLevel[k].names[s[3].replace('Floor:', '').split(':')[0].replace(/ - \d+$/, '')] = 1;
+    });
+    var DIM = {'611.650': 'FFL, dimensioned 611.65', '611.652': 'FFL, dimensioned 611.65',
+               '611.070': 'sunken lounge, dimensioned 611.07', '611.072': 'sunken lounge, dimensioned 611.07'};
+    var lvlRows = Object.keys(byLevel).sort().map(function (k) {
+      var v = byLevel[k], off = Math.round((parseFloat(k) - FFL) * 1000);
+      return '<tr><td>' + k + '</td><td class="ps-num">' + (off === 0 ? '0' : (off > 0 ? '+' : '') + off)
+        + '</td><td class="ps-num">' + v.a.toFixed(1) + '</td><td>'
+        + esc(DIM[k] || Object.keys(v.names).join(', ')) + '</td></tr>';
+    }).join('');
+
+    /* ---- the sunken lounge ---- */
+    var SUNK = H.STOREY.reduce(function (m, s) { return s[0] === 'SUNKEN LOUNGE' ? s[1] : m; }, 611.07);
+    var sunkSlabs = H.SLAB.filter(function (s) { return Math.abs(s[0] - SUNK) < 0.01; });
+    var sunkTxt = '';
+    if (sunkSlabs.length) {
+      var sb = bbox([].concat.apply([], sunkSlabs.map(function (s) { return s[4]; })));
+      var sMid = [(sb[0] + sb[2]) / 2, (sb[1] + sb[3]) / 2];
+      var sGround = app.RL(sMid[0], sMid[1]);
+      sunkTxt = '<h3 class="ps-h3">The sunken lounge</h3><ul class="ps-fine">'
+        + '<li>It is at ' + SUNK.toFixed(2) + ', ' + Math.round((FFL - SUNK) * 1000)
+        + ' mm below the rest of the floor. That matches the architect\u2019s dimension.</li>'
+        + '<li>It sits at x ' + sb[0].toFixed(1) + ' to ' + sb[2].toFixed(1) + ', y ' + sb[1].toFixed(1)
+        + ' to ' + sb[3].toFixed(1) + ', in the east wing, over ' + polyArea(sunkSlabs[0][4]).toFixed(1) + ' m\u00b2 of slab.</li>'
+        + '<li>The surveyed ground under it is ' + sGround.toFixed(2) + '. The floor sits '
+        + Math.abs(Math.round((SUNK - sGround) * 1000)) + ' mm ' + (SUNK > sGround ? 'above' : 'below') + ' it.</li>'
+        + '</ul>';
+    }
+
+    /* ---- what is under the house, and what can come off it ---- */
+
+    /* The app has been treating the house as six rectangles, which is 284.4 m²
+       of ground. The model's own footprint is smaller, and the difference is
+       ground that can be stripped and regraded after all. */
+    var STRIP = 0.1;                    /* the topsoil strip this assumes, in metres */
+    var rings = H.OUTLINE;
+    var inHouse = function (x, y) {
+      var c = false, r, i, j, p;
+      for (r = 0; r < rings.length; r++) {
+        p = rings[r];
+        for (i = 0, j = p.length - 1; i < p.length; j = i++)
+          if ((p[i][1] > y) !== (p[j][1] > y) &&
+              x < (p[j][0] - p[i][0]) * (y - p[i][1]) / (p[j][1] - p[i][1]) + p[i][0]) c = !c;
+      }
+      return c;
+    };
+    var CG = 0.25, cut = 0, fill = 0, nIn = 0, xg, yg;
+    for (xg = B[0]; xg <= B[2]; xg += CG) for (yg = B[1]; yg <= B[3]; yg += CG) {
+      if (!inHouse(xg, yg)) continue;
+      nIn++;
+      var d = app.RL(xg, yg) - FFL;
+      if (d > 0) cut += d * CG * CG; else fill -= d * CG * CG;
+    }
+    var boxArea = 0;
+    H.BOXH.forEach(function (b) { boxArea += (b[3] - b[1]) * (b[4] - b[2]); });
+    var freed = boxArea - H.FOOTPRINT;
+
+    var qtyRows = ''
+      + '<tr><td>Ground actually under the house</td><td class="ps-num">' + H.FOOTPRINT.toFixed(1) + ' m²</td></tr>'
+      + '<tr><td>What the six boxes were claiming</td><td class="ps-num">' + boxArea.toFixed(1) + ' m²</td></tr>'
+      + '<tr><td>Ground the boxes were holding that is open</td><td class="ps-num">' + freed.toFixed(1) + ' m²</td></tr>'
+      + '<tr><td>Cut to bring the ground under the house down to floor</td><td class="ps-num">' + cut.toFixed(1) + ' m³</td></tr>'
+      + '<tr><td>Ground below floor level, spanned rather than filled</td><td class="ps-num">' + fill.toFixed(1) + ' m³</td></tr>'
+      + '<tr><td>Of that, under the new build</td><td class="ps-num">' + H.FOOTPRINT_NEW.toFixed(1) + ' m²</td></tr>'
+      + '<tr class="ps-tot"><td>Topsoil off the new build at ' + Math.round(STRIP * 1000) + ' mm</td><td class="ps-num">'
+      + (H.FOOTPRINT_NEW * STRIP).toFixed(1) + ' m³</td></tr>';
+
+    return '<div class="ps-screen">'
+      + '<div class="ps-screen-plan">' + plan + '</div>'
+      + '<div class="ps-btnrow">'
+      + '<button data-int-cut="-0.5" class="ps-print-btn">Move the cut back</button>'
+      + '<button data-int-cut="0.5" class="ps-print-btn">Move the cut forward</button>'
+      + '</div>'
+      + '<div class="ps-screen-plan">' + sec + '</div>'
+      + '<table class="ps-tbl"><tbody>' + rows + '</tbody></table>'
+      + '<ul class="ps-fine">'
+      + '<li>The plan and the section share one scale. A wall in the section sits under the wall it cuts.</li>'
+      + '<li>Walls in ink are external. The model flags all 67 as external, so the floor decides it instead.</li>'
+      + '<li>Roof lines are the heights the model carries. The ' + H.ROOF.length + ' roofs set the ridges and eaves the sun map uses.</li>'
+      + '<li>The ground is the surveyor\u2019s surface, dashed where the design finishes it.</li>'
+      + '<li>From ' + esc(H.SRC) + ', placed by tools/house-extract.js.</li>'
+      + '</ul>'
+      + '<h3 class="ps-h3">Every level the model carries</h3>'
+      + '<table class="ps-tbl"><thead><tr><th>RL</th><th class="ps-num">Off FFL mm</th>'
+      + '<th class="ps-num">Area m\u00b2</th><th>What is on it</th></tr></thead><tbody>' + lvlRows + '</tbody></table>'
+      + '<ul class="ps-fine">'
+      + '<li>The architect dimensions three levels. The model carries one on every slab. They agree.</li>'
+      + '<li>Two levels are new to the app. The garage floor is 611.535, 115 mm below the house. The apron is 611.575.</li>'
+      + '<li>The app held one finished floor for the whole building.</li>'
+      + '<li>Areas sum every slab at a level. A finish laid over an underlay counts twice.</li>'
+      + '</ul>'
+      + sunkTxt
+      + '<h3 class="ps-h3">What is under the house</h3>'
+      + '<table class="ps-tbl"><tbody>' + qtyRows + '</tbody></table>'
+      + '<ul class="ps-fine">'
+      + '<li>The footprint is traced on a 50 mm grid: every wall, and every floor slab under a roof. That leaves out the driveway apron and the brick paving.</li>'
+      + '<li>Cut and fill are sampled on a 250 mm grid against the surveyed surface. They cover the footprint only. The block figure is on the Works page.</li>'
+      + '<li>The house stands above the ground almost everywhere. The second line is the void a floor spans, not fill to import.</li>'
+      + '<li>Topsoil comes off the new build at the ' + Math.round(STRIP * 1000) + ' mm the borehole logs record for the silty sand. The six boxes made that 55 m\u00b2 and 5.5 m\u00b3.</li>'
+      + '<li>Stripping the whole footprint would give ' + (H.FOOTPRINT * STRIP).toFixed(1) + ' m\u00b3. The existing house is not coming up.</li>'
+      + '</ul>'
+
+      + '</div>';
+  }
+
+  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, levelsView: levelsView, waterView: waterView, isoView: isoView, gridView: gridView, interiorView: interiorView};
 })();
