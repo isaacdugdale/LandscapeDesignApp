@@ -672,7 +672,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v42';
+const BUILD='v43';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -688,7 +688,7 @@ const HARDCOL={
   'Sunken firepit':['#f6a06b','#8c491a'],'Firepit terrace':['#e4dccb','#a19786'],'Seat / retaining wall':['#c0b6a5','#645c50'],
   'Sandstone block edge':['#ebddc5','#645c50'],
   'Raised veg bed':['#ccdbb2','#56633f'],'Shed':['#dcd3c4','#645c50'],'Water tank':['#cfd9d3','#33646b'],
-  'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Planting mound':['#dcc9a8','#8c491a'],
+  'Clothesline':['#dcd3c4','#645c50'],'Mulched bed':['#d8c9ae','#8c491a'],'Terrace fill':['#d9cba8','#8d7a52'],'Planting mound':['#dcc9a8','#8c491a'],
   'Dichondra lawn':['#ccdbb2','#728157'],'Gym mat':['#eee7db','#82796a'],'Soak pit':['#cfd9d3','#33646b'],'Bench / seat':['#dcd3c4','#645c50'],
   'Channel drain':['#b9ccd1','#33646b'],'Yard sump':['#b9ccd1','#33646b'],
   'Swale, on contour':['#cfd9d3','#33646b'],'Mound, built up':['#dcc9a8','#8c491a'],
@@ -804,6 +804,11 @@ const ABUT=0.05;
    and raised the same Check twice. */
 const GRADE={
   'Dichondra lawn':     {want:40, max:20,  kind:'lawn',  datum:'floor', rise:BLOCKH},
+  /* The ground the block edge holds up. Same level as the lawn, so the wall
+     retains one platform along its whole length rather than for the two metres
+     the lawn happens to cover. Planted and mulched on top, which is why it is a
+     soft surface and not paving. */
+  'Terrace fill':       {want:40, max:20,  kind:'lawn',  datum:'floor', rise:BLOCKH},
   'Paving / terrace':   {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
   'Firepit terrace':    {want:80, max:40,  flat:150, kind:'paved', datum:'floor', near:2.0, away:'low'},
   'Path, firm surface': {want:20, max:14,  kind:'walk'},

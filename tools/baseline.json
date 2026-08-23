@@ -1,11 +1,19 @@
 {
  "base": {
-  "items": 60,
-  "issues": 61,
-  "stop": 6,
-  "care": 21,
-  "cost": 16545,
+  "items": 61,
+  "issues": 64,
+  "stop": 8,
+  "care": 22,
+  "cost": 18582,
   "held": 4.57
+ },
+ "s-terrace-raised": {
+  "items": 79,
+  "issues": 87,
+  "stop": 15,
+  "care": 48,
+  "cost": 21285,
+  "held": 3.16
  },
  "s-terrace-fitted": {
   "items": 79,

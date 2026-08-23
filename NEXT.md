@@ -18,6 +18,9 @@ disappears if it left no trace worth keeping. Git history is the log.
   top right, which is the plan's own framing. The surveyed half leaves the new
   work out, so the additions appear between the two panels. `finRL` in `index.html` is the finished surface and `isoView` in
   `printsheet.js` draws it. The house stands at its finished floor in it.
+- `Terrace fill` is an element: a soft surface that grades level to one block
+  course above the finished floor, so the block edge retains one platform along
+  its whole length instead of only where the lawn reaches. In `START` too.
 - Works, Earthworks carries a setting-out grid: 2 m squares over the whole
   block, the level each square is now and the level it finishes at, on two
   sheets. Sheet one is the levels alone, sheet two marks where a protection zone
@@ -55,7 +58,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v42**.
+Live build at the time of writing: **v43**.
 
 ## Todo
 
@@ -84,9 +87,10 @@ Roughly in order. Nothing here is urgent and each is a spare-tokens job.
    building agrees with the architect's set. It changes the sun map and nothing
    else. Recorded under `floor_levels_m_AHD._unresolved`.
 
-6. **The sandstone wall retains for 2.8 m of its 10.45 m.** Past y 3.1 the
-   ground is the same level both sides, so 7.4 m of it holds nothing back.
-   Either raise the ground behind it or shorten the run.
+- The fill does not balance. The scheme imports 56.7 m³ and takes 1.9 m³ off.
+  Levelling under the new build yields 1.8 m³, because the link and the kitchen
+  addition already sit below slab level, and topsoil off all three footprints is
+  5.5 m³ at the 100 mm the borehole logs record. About 49 m³ has to be bought.
 
 ## Open decisions, not work
 
