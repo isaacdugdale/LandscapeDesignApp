@@ -1,11 +1,28 @@
-import sys, json, math, collections
+"""Reads the architect's IFC and writes source/house.json.
+
+   This is the first half of the derivation. It runs where the IFC is, which is
+   not this repo: the file is 54.7 MB and only its extract is worth keeping.
+   The second half, tools/house-extract.js, turns that extract into the app's
+   own frame and needs neither python nor the IFC.
+
+     pip install ifcopenshell
+     python3 tools/ifc/extract.py '<file>.ifc' source/house.json
+
+   Coordinates come out as raw IFC world metres. The fit onto the block is done
+   in house-extract.js, against the surveyed boundary this script cannot see.
+"""
+
+import sys, os, json, math, collections
 import numpy as np
-sys.path.insert(0,"/private/tmp/claude-501/-Users-petrabismire-Desktop-Landscape-design-House-plans/8e253756-3f39-4a35-a087-b4e204b1ee45/scratchpad/ifc")
 import ifcopenshell
 from ifcopenshell.util.placement import get_local_placement
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from geom import a2p, cto, xf, prof_pts, crv_pts, collect, newell
 
-F="/Users/petrabismire/Desktop/Landscape design/House plans/234 Duffy Street, Ainslie - POST REVIEW FINAL7.ifc"
+if len(sys.argv) < 2:
+    sys.exit("usage: python3 tools/ifc/extract.py <file.ifc> [out.json]")
+F = sys.argv[1]
+OUT = sys.argv[2] if len(sys.argv) > 2 else "source/house.json"
 f=ifcopenshell.open(F)
 NOTES=[]
 
@@ -420,9 +437,7 @@ out={
  "sanity":out_sanity,
  "notes":NOTES,
 }
-OUT="/Users/petrabismire/Desktop/Landscape design/House plans/house.json"
 json.dump(out,open(OUT,"w"),indent=1)
-import os
 print("wrote",OUT,os.path.getsize(OUT),"bytes")
 print("storeys:",[(s['name'],s['world_z_m']) for s in storeys])
 print("walls",len(walls),"axis-fallback",len(nofallback))
