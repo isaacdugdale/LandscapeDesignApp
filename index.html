@@ -2535,7 +2535,7 @@ class Component extends DCLogic {
              turn, so moving it is not an edit and nothing is saved. */
           el.querySelectorAll('[data-int-cut]').forEach(b=>{ b.onclick=()=>{
             const step=parseFloat(b.getAttribute('data-int-cut'))||0;
-            const now=this.state.intCut==null?13.2:this.state.intCut;
+            const now=this.state.intCut==null?12.5:this.state.intCut;
             this.setState({intCut:Math.round((now+step)*2)/2}); }; });
         }catch(e){ el.textContent=''; } },
       earthRef:el=>{ if(!el||!window.PRINTSHEET) return;

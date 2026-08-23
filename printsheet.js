@@ -1719,7 +1719,7 @@ window.PRINTSHEET = (function () {
     var PH = (Y1 - Y0) * k;
 
     /* the cut, stepped by the buttons under the drawing */
-    var cy = app.state && app.state.intCut != null ? app.state.intCut : 13.2;
+    var cy = app.state && app.state.intCut != null ? app.state.intCut : 12.5;
     cy = Math.max(Y0 + 0.3, Math.min(Y1 - 0.3, cy));
 
     var FFL = H.STOREY.reduce(function (m, s) { return s[0] === 'FFL' ? s[1] : m; }, 611.65);
