@@ -7,11 +7,19 @@
   "cost": 18582,
   "held": 4.57
  },
+ "s-terrace-400": {
+  "items": 79,
+  "issues": 87,
+  "stop": 16,
+  "care": 47,
+  "cost": 21281,
+  "held": 3.16
+ },
  "s-terrace-raised": {
   "items": 79,
   "issues": 87,
-  "stop": 15,
-  "care": 48,
+  "stop": 16,
+  "care": 47,
   "cost": 21285,
   "held": 3.16
  },
@@ -42,32 +50,32 @@
  "s-gravel-fruit": {
   "items": 80,
   "issues": 88,
-  "stop": 15,
-  "care": 45,
+  "stop": 16,
+  "care": 44,
   "cost": 20653,
   "held": 3.75
  },
  "s-sumps": {
   "items": 58,
   "issues": 67,
-  "stop": 7,
-  "care": 21,
+  "stop": 8,
+  "care": 20,
   "cost": 18945,
   "held": 3.43
  },
  "s-sand-bike2": {
   "items": 44,
   "issues": 45,
-  "stop": 8,
-  "care": 19,
+  "stop": 9,
+  "care": 18,
   "cost": 17126,
   "held": 2.8
  },
  "s-contour-swales": {
   "items": 50,
   "issues": 53,
-  "stop": 7,
-  "care": 21,
+  "stop": 8,
+  "care": 20,
   "cost": 17505,
   "held": 3.43
  },

@@ -58,7 +58,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v43**.
+Live build at the time of writing: **v44**.
 
 ## Todo
 
@@ -87,12 +87,14 @@ Roughly in order. Nothing here is urgent and each is a spare-tokens job.
    building agrees with the architect's set. It changes the sun map and nothing
    else. Recorded under `floor_levels_m_AHD._unresolved`.
 
-- 500 mm courses are a real product. Canberra yards stock 1000 x 500 x 500,
-  about 575 kg a block, so the design's one course is buildable as drawn. Sizes
-  and suppliers are in `source/project-data.json`.
+- The block is the 1000 x 400 x 400 the Canberra yards stock, so `BLOCKH` is
+  0.40 and everything behind the wall finishes 400 mm above the paving. About
+  368 kg a block. Sizes, the yards checked and the caveat are in
+  `source/project-data.json`. The $250 a metre rate was set for the 500 course
+  and wants re-quoting.
 - Leaving the front yard out saves almost nothing: 3.8 m³ of 61.6. The fill is
   the terrace, the lawn and the terrace fill, all between x 8 and x 20.
-- The fill does not balance. The scheme imports 56.7 m³ and takes 1.9 m³ off.
+- The fill does not balance. The scheme imports 50.1 m³ and takes 2.2 m³ off.
   Levelling under the new build yields 1.8 m³, because the link and the kitchen
   addition already sit below slab level, and topsoil off all three footprints is
   5.5 m³ at the 100 mm the borehole logs record. About 49 m³ has to be bought.

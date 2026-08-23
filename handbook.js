@@ -77,7 +77,7 @@ window.HANDBOOK = [
     'The right half is the same ground shaped, with the rear addition, the link and the kitchen addition built. Those three are new work on the demolition plan.',
     'Both stand at the finished floor, 611.65 m. The survey measured that on the existing floor and the architect keeps it.',
     'Muted ground is where the survey does not reach, mostly along the reserve boundary. The older fitted surface answers there.',
-    'A surface with a datum finishes level. Paving takes the finished floor, 611.65 m, so a sliding door opens onto it with no step. The lawn takes one 500 mm course above that.',
+    'A surface with a datum finishes level. Paving takes the finished floor, 611.65 m, so a sliding door opens onto it with no step. The lawn takes one block course above that, 400 mm.',
     'Everything else finishes on its own string line, and ground under nothing stays as the surveyor found it.',
     'Each surface is drawn at its own level rather than sampled off the grid, so paving set level with the floor meets it instead of missing it by the width of a cell.'
   ]],
