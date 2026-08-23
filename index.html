@@ -721,7 +721,14 @@ const SOAK={
    for five minutes is 10.2 mm, which is 8.2 m³ on 807 m². It is what the shaping
    is measured against on the Drainage page. */
 const BLOCKM2=807, RAIN5=10.2;
-/* A single course of rough-sawn block, and sandstone runs about 2.3 tonnes the
+/* 500 mm is not a round number picked for the drawing. Sandstone block is quad
+   saw cut, so height is the dimension that comes out consistent and depth is the
+   one that varies, and 500 mm is what the Canberra yards stock: 1000 x 500 x 500
+   in A grade, 1000 x 500 x 350 to 500 in B grade. One block is about 575 kg.
+   Sizes and suppliers are in source/project-data.json under
+   sandstone_block_supply, so nobody has to go looking again.
+
+   A single course of rough-sawn block, and sandstone runs about 2.3 tonnes the
    cubic metre. The two numbers live here once so the Checks screen and the
    inspector cannot quote different weights. */
 const BLOCK='Sandstone block edge', BLOCKH=0.50, STONET=2.3;

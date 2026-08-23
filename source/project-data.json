@@ -483,5 +483,32 @@
   ],
   "_source": "Enfold Architecture demolition plan A2.01 (POST REVIEW FINAL7). It labels the garage and driveway as existing, and calls up removing a section of external wall to accommodate the extension link. The rear and kitchen additions are new build.",
   "_in_the_app": "BOXH rows carry 1 in column 7 for new work. The Shape view leaves them out of the surveyed half, so the additions appear between the two panels."
+ },
+ "sandstone_block_supply": {
+  "course_height_mm": 500,
+  "standard_sizes_mm": [
+   "1000 x 400 x 400 (A grade)",
+   "1000 x 500 x 500 (A grade)",
+   "1000 x 500 x 350 to 500 (B grade, depth tapers)",
+   "up to 1000 x 600 x 600"
+  ],
+  "weight_per_block_kg": 575,
+  "_note": "500 mm is the standard course height because the blocks are quad saw cut, so height is the consistent dimension and depth is the one that varies. BLOCKH in index.html is 0.50 and matches what can actually be bought. B grade tapers 350 to 500 mm in depth, so a wall drawn 450 mm deep is within the range.",
+  "_suppliers_checked": [
+   "Canberra Sandstone, delivers across the ACT",
+   "Sandstone Hub Canberra",
+   "Stonehenge Beltana, 8 Beltana Road Pialligo ACT 2609",
+   "Wholesale Sleeper Co, Canberra and Queanbeyan"
+  ],
+  "_searched": "August 2026, Canberra and Queanbeyan only. Supplier sites are blocked by this image's egress proxy, so the sizes come from search result summaries and should be confirmed with a quote before ordering."
+ },
+ "earthworks_by_area": {
+  "scheme": "s-terrace-raised",
+  "whole_block_fill_m3": 61.6,
+  "whole_block_cut_m3": 0.9,
+  "front_yard_fill_m3": 3.8,
+  "front_yard_line": "x 33.33, the street side of the east wing",
+  "back_only_net_import_m3": 56.9,
+  "_note": "Deferring the front yard saves 3.8 m3 of 61.6. Almost all the fill is the terrace, the lawn and the terrace fill behind the block edge, between x 8 and x 20."
  }
 }
