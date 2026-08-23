@@ -204,7 +204,10 @@ window.HANDBOOK = [
 /* ---------------------------------------------------------- earthworks --- */
 {id:'earthworks', group:'works', nav:'Earthworks', title:'Earthworks and levels', sub:'What can be dug, what cannot, and to what depth', blocks:[
   ['p','This is the first thing the garden needs from anyone with a machine. It is built from whatever is on the plan right now. The same two sheets print from the button at the bottom. Hand those over and keep the rest of the set.'],
-  ['earth','']
+  ['earth',''],
+  ['h','Setting out the levels'],
+  ['p','A grid over the whole block, two metres a square, with the level each square is now and the level it finishes at. Two sheets: the levels on their own, then the same numbers marked where a tree plan or the site classification has something to say. Set out from the survey plan, not from this.'],
+  ['levelgrid','']
 ]},
 
 /* --------------------------------------------------------------- levels --- */

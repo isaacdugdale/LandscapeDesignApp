@@ -482,6 +482,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
                 <div ref="{{ isoRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
 
+              <sc-if value="{{ b.isGrid }}" hint-placeholder-val="{{ false }}">
+                <div ref="{{ gridRef }}" style="margin:4px 0 10px"></div>
+              </sc-if>
+
               <sc-if value="{{ b.isWater }}" hint-placeholder-val="{{ false }}">
                 <div ref="{{ waterRef }}" style="margin:4px 0 10px"></div>
               </sc-if>
@@ -668,7 +672,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v41';
+const BUILD='v42';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -721,6 +725,10 @@ const BLOCKM2=807, RAIN5=10.2;
    cubic metre. The two numbers live here once so the Checks screen and the
    inspector cannot quote different weights. */
 const BLOCK='Sandstone block edge', BLOCKH=0.50, STONET=2.3;
+/* An unretained platform edge battens down at 1 in RAMPN until it meets the
+   ground. One in ten is walkable and mowable, and RAMPREACH is how far that
+   reaches for the deepest fill on this block. */
+const SEATWALL='Seat / retaining wall', RAMPN=10, RAMPREACH=7, WALLGAP=1.0;
 /* A swale is only a swale while it is level along its own length. The block falls
    1 in 19 one way and 1 in 132 the other, so this is really a test of whether the
    thing has been turned the right way round: it fails when it drops more than
@@ -1316,8 +1324,39 @@ class Component extends DCLogic {
       parts.push({n:it.n, poly:poly, bu:bu?bu.mm/1000:0,
         line:graded?this.levelLine(it):null, from:graded?lp.from:0, to:graded?lp.to:0, len:graded?lp.len:0});
     }
+    /* A platform standing above the ground has to get down to it somewhere. Where
+       a block edge runs along it, the wall does that. Everywhere else it battens
+       down at RAMPN, because the alternative the model was drawing is a vertical
+       face of earth with nothing holding it up. */
+    const walls=items.filter(i=>i.n===BLOCK||i.n===SEATWALL).map(i=>this.itemPoly(i)).filter(w=>w&&w.length>2);
+    for(const p of parts){
+      p.segs=[]; let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+      for(let k=0;k<p.poly.length;k++){
+        const A=p.poly[k], B=p.poly[(k+1)%p.poly.length];
+        const m=[(A[0]+B[0])/2,(A[1]+B[1])/2];
+        /* retained when a wall sits on the edge or just outside it */
+        let held=false;
+        for(const w of walls){ if(this.inPoly(m,w)||this.polyGap(m,w)<WALLGAP){ held=true; break; } }
+        /* the finished level at each end, worked out once: asking partZ inside
+           the batter loop walked the string line on every sample and made finRL
+           a thousand times slower than the drawing could stand */
+        p.segs.push({a:A,b:B,held:held,za:this.partZ(p,A[0],A[1]),zb:this.partZ(p,B[0],B[1])});
+        x0=Math.min(x0,A[0]);x1=Math.max(x1,A[0]);y0=Math.min(y0,A[1]);y1=Math.max(y1,A[1]);
+      }
+      p.bb=[x0,y0,x1,y1];
+    }
     this._finKey=key; this._finParts=parts;
     return parts; }
+  /* Shortest distance from a point to a ring, zero inside it. */
+  polyGap(p,poly){
+    let best=Infinity;
+    for(let i=0;i<poly.length;i++) best=Math.min(best,this.segGap(p,poly[i],poly[(i+1)%poly.length]));
+    return best; }
+  segGap(p,a,b){
+    const vx=b[0]-a[0], vy=b[1]-a[1], L=vx*vx+vy*vy;
+    let t=L?((p[0]-a[0])*vx+(p[1]-a[1])*vy)/L:0; t=Math.max(0,Math.min(1,t));
+    this._segT=t;
+    return Math.hypot(p[0]-(a[0]+vx*t), p[1]-(a[1]+vy*t)); }
   /* Later items sit on top, the way they are drawn, so the last one covering a
      point is the one that decides its level. */
   /* What one part finishes at, asked of the part rather than of the position, so
@@ -1329,7 +1368,28 @@ class Component extends DCLogic {
   finRL(x,y){
     const parts=this.finParts();
     for(let i=parts.length-1;i>=0;i--) if(this.inPoly([x,y],parts[i].poly)) return this.partZ(parts[i],x,y);
-    return this.RL(x,y); }
+    /* Outside every platform the ground is what the surveyor found, unless a
+       platform beside it is standing proud with nothing retaining that edge. Then
+       the batter off it is the ground here, until it runs back into grade. */
+    let z=this.RL(x,y);
+    for(const p of parts){
+      if(!p.segs) continue;
+      const bb=p.bb;
+      if(x<bb[0]-RAMPREACH||x>bb[2]+RAMPREACH||y<bb[1]-RAMPREACH||y>bb[3]+RAMPREACH) continue;
+      for(const s of p.segs){
+        if(s.held) continue;
+        if(s.za<=z&&s.zb<=z) continue;
+        const d=this.segGap([x,y],s.a,s.b);
+        if(d>RAMPREACH) continue;
+        /* Only where the edge itself faces the point. Without this the batter
+           wraps round the corners of a platform and runs on past the wall that
+           retains the next edge along, filling ground the wall is holding. */
+        const t=this._segT; if(t<=0.001||t>=0.999) continue;
+        const top=s.za+(s.zb-s.za)*t-d/RAMPN;
+        if(top>z) z=top;
+      }
+    }
+    return z; }
   levelPlan(it){
     const g=GRADE[it&&it.n]; if(!g||it.t==='plant'||it.shape==='circ') return null;
     const line=this.levelLine(it); if(!line||line.length<2) return null;
@@ -2248,7 +2308,7 @@ class Component extends DCLogic {
       const k=b[0], plain=k==='p'||k==='h'||k==='note';
       const w=b[2]||[];
       return {
-        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isLevels:k==='levels', isIso:k==='iso', isWater:k==='water',
+        isP:k==='p', isH:k==='h', isNote:k==='note', isUl:k==='ul', isKv:k==='kv', isTbl:k==='tbl', isBloom:k==='bloom', isEarth:k==='earth', isLevels:k==='levels', isIso:k==='iso', isGrid:k==='levelgrid', isWater:k==='water',
         x:plain?b[1]:'',
         items:k==='ul'?b[1].map(t=>({x:t})):[],
         head:k==='tbl'?b[1][0].map((c,i)=>({x:c,style:cell(w[i]||1,true)})):[],
@@ -2444,6 +2504,8 @@ class Component extends DCLogic {
           const btn=el.querySelector('[data-levels-print]');
           if(btn) btn.onclick=()=>{ this.persist(); window.PRINTSHEET.open(this,this._paper||'A3','levels'); };
         }catch(e){ el.textContent=''; } },
+      gridRef:el=>{ if(!el||!window.PRINTSHEET) return;
+        try{ el.innerHTML=window.PRINTSHEET.gridView(this); }catch(e){ el.textContent=''; } },
       isoRef:el=>{ if(!el||!window.PRINTSHEET) return;
         try{ el.innerHTML=window.PRINTSHEET.isoView(this);
           /* The view turns in quarter steps. Held on the component rather than

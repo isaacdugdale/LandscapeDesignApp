@@ -18,6 +18,13 @@ disappears if it left no trace worth keeping. Git history is the log.
   top right, which is the plan's own framing. The surveyed half leaves the new
   work out, so the additions appear between the two panels. `finRL` in `index.html` is the finished surface and `isoView` in
   `printsheet.js` draws it. The house stands at its finished floor in it.
+- Works, Earthworks carries a setting-out grid: 2 m squares over the whole
+  block, the level each square is now and the level it finishes at, on two
+  sheets. Sheet one is the levels alone, sheet two marks where a protection zone
+  or the 400 mm fill and 500 mm cut limits bite. `gridView` in `printsheet.js`.
+- A platform edge with no wall behind it battens down at 1 in 10 instead of
+  standing as a vertical face of earth. `RAMPN` and the `held` test per edge in
+  `finParts`. The lawn's two open ends ramp; its walled edge does not.
 - A surface has to reach 50 mm inside a building footprint before Checks calls
   it an overlap. Paving is meant to run up to the house, and drawn to the wall
   its edge samples land exactly on the footprint line.
@@ -48,7 +55,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   be a pot, the driveway is no longer tested as a building, and every stop and
   care carries its reason in the title.
 
-Live build at the time of writing: **v41**.
+Live build at the time of writing: **v42**.
 
 ## Todo
 
@@ -76,6 +83,10 @@ Roughly in order. Nothing here is urgent and each is a spare-tokens job.
    614.00 and 613.90, both below the finished ceiling at 614.165. Every other
    building agrees with the architect's set. It changes the sun map and nothing
    else. Recorded under `floor_levels_m_AHD._unresolved`.
+
+6. **The sandstone wall retains for 2.8 m of its 10.45 m.** Past y 3.1 the
+   ground is the same level both sides, so 7.4 m of it holds nothing back.
+   Either raise the ground behind it or shorten the run.
 
 ## Open decisions, not work
 

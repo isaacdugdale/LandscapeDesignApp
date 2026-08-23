@@ -40,6 +40,8 @@ ok('every block has a type', H.every(s => s.blocks.every(b => typeof b[0] === 's
 ok('every section has an id, group and nav', H.every(s => s.id && s.group && s.nav));
 ok('the earthworks section exists', !!H.find(s => s.id === 'earthworks'),
    'it renders the setout drawing and the volumes schedule');
+ok('the earthworks section carries the levels grid',
+   !!H.find(s => s.id === 'earthworks' && s.blocks.some(b => b[0] === 'levelgrid')));
 ok('the shape section exists', !!H.find(s => s.id === 'shape'),
    'it renders the block as a solid, before and after');
 
@@ -77,6 +79,17 @@ console.log('levels');
     try { html = window.PRINTSHEET.isoView(a); } catch (e) { html = 'threw: ' + e.message; }
     ok('the shape view renders', html.indexOf('<polygon') > 0, html.slice(0, 120));
     ok('the shape view has no NaN in it', !/NaN|undefined/.test(html));
+    let grid = '';
+    try { grid = window.PRINTSHEET.gridView(a); } catch (e) { grid = 'threw: ' + e.message; }
+    ok('the levels grid renders', grid.indexOf('<rect') > 0, grid.slice(0, 120));
+    ok('the levels grid has no NaN in it', !/NaN|undefined/.test(grid));
+    ok('the levels grid has two sheets', (grid.match(/<svg/g) || []).length === 2);
+    /* the batter is the only thing keeping a raised platform off a vertical face
+       of earth, so a lost edge test shows up as a cliff beside the lawn */
+    ok('an unretained platform edge battens down', (() => {
+      const on = a.finRL(10.2, 0.5), off = a.finRL(10.2, -1.5);
+      return on > off && off > a.RL(10.2, -1.5) - 0.001;
+    })(), 'the lawn east end should ramp, not drop');
     /* The surveyed half leaves the new work out, so the two halves cannot draw
        the same house. If the flag in BOXH is lost, they will. */
     ok('some buildings are flagged as new work', D.BOXH.some(b => b[7]));

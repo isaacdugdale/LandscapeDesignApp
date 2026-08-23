@@ -1460,6 +1460,156 @@ window.PRINTSHEET = (function () {
       + '</div>';
   }
 
+  /* ----------------------------------------------------------- levels grid --- */
+
+  /* Every square metre of the block, with the level it is now and the level it
+     finishes at. A setting-out grid rather than a drawing: the builder stands on
+     a square, reads the two numbers, and knows what to take off or put on.
+
+     Two sheets, because the ground does not care about the tree plan and the
+     tree plan does not care about the ground.
+
+       As designed   what the levels are, with nothing in the way
+       What is in the way   the same grid, marked where a restriction bites
+
+     Two metres a square. A metre a square is 440 squares on this block and the
+     numbers stop being readable at any size the sheet can carry. */
+
+  var GRIDM = 2;
+  /* the block itself, so squares off it are not printed */
+  var BOUND = [[0, 0], [ISOX, 0], [ISOX, ISOY], [4.34, ISOY]];
+
+  function gridCells(app) {
+    var out = [], x, y;
+    var nx = Math.ceil(ISOX / GRIDM), ny = Math.ceil(ISOY / GRIDM);
+    for (y = 0; y < ny; y++) for (x = 0; x < nx; x++) {  /* eslint-disable-line */
+      var x0 = x * GRIDM, y0 = y * GRIDM;
+      var x1 = Math.min(x0 + GRIDM, ISOX), y1 = Math.min(y0 + GRIDM, ISOY);
+      var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+      var now = app.RL(cx, cy), goal = app.finRL(cx, cy);
+      var d = goal - now;
+      /* inside a building there is nothing to set out, and the block is a
+         trapezoid, so the squares past its west side are not the site */
+      var built = (app.D.BOXH || []).some(function (b) {
+        return cx > b[1] && cx < b[3] && cy > b[2] && cy < b[4]; });
+      if (!app.inPoly([cx, cy], BOUND)) continue;
+      /* what a restriction would say about this square */
+      var zone = null, over = null;
+      (app.D.TREES || []).forEach(function (t) {
+        if (!t.ctrl) return;
+        var r2 = (cx - t.x) * (cx - t.x) + (cy - t.y) * (cy - t.y);
+        if (r2 <= t.srz * t.srz) zone = 'srz';
+        else if (r2 <= t.ctrl * t.ctrl && zone !== 'srz') zone = 'tpz';
+      });
+      if (d > 0.4) over = 'fill'; else if (d < -0.5) over = 'cut';
+      out.push({x0: x0, y0: y0, x1: x1, y1: y1, cx: cx, cy: cy,
+        now: now, goal: goal, d: d, built: built, zone: zone, over: over,
+        survey: app.onSurvey(cx, cy)});
+    }
+    return out;
+  }
+
+  /* Cut is warm, fill is cool, and ground that does not move is left alone. The
+     scale is the same on both sheets so a colour means one thing. */
+  function gridFill(c) {
+    if (c.built) return '#efeae0';
+    var d = c.d;
+    if (d > 0.02) { var t = Math.min(1, d / 0.6); return 'rgb(' + Math.round(226 - 66 * t) + ',' + Math.round(238 - 46 * t) + ',' + Math.round(248 - 22 * t) + ')'; }
+    if (d < -0.02) { var u = Math.min(1, -d / 0.6); return 'rgb(' + Math.round(250 - 8 * u) + ',' + Math.round(234 - 60 * u) + ',' + Math.round(222 - 70 * u) + ')'; }
+    return '#f4f2ea';
+  }
+
+  function gridSheet(app, cells, marked) {
+    var M = 13, S = 5.4, W = ISOX * S + M * 2, H = ISOY * S + M * 2 + 11;
+    var g = '';
+    cells.forEach(function (c) {
+      var X = M + c.x0 * S, Y = M + (ISOY - c.y1) * S;
+      var w = (c.x1 - c.x0) * S, h = (c.y1 - c.y0) * S;
+      g += '<rect x="' + n1(X) + '" y="' + n1(Y) + '" width="' + n1(w) + '" height="' + n1(h)
+        + '" fill="' + gridFill(c) + '" stroke="#cfc7b6" stroke-width="0.25"/>';
+      if (c.built) return;
+      /* now on top, goal under it, and the change only where there is one */
+      g += '<text x="' + n1(X + w / 2) + '" y="' + n1(Y + h / 2 - 0.6) + '" text-anchor="middle" font-size="2.5" fill="' + MUT + '">' + c.now.toFixed(2) + '</text>'
+        + '<text x="' + n1(X + w / 2) + '" y="' + n1(Y + h / 2 + 2.6) + '" text-anchor="middle" font-size="2.9" font-weight="700" fill="' + INK + '">' + c.goal.toFixed(2) + '</text>';
+      if (Math.abs(c.d) > 0.02)
+        g += '<text x="' + n1(X + w / 2) + '" y="' + n1(Y + h / 2 + 5.4) + '" text-anchor="middle" font-size="2.3" fill="' + (c.d > 0 ? '#2f6ea8' : '#a8532a') + '">'
+          + (c.d > 0 ? '+' : '−') + Math.round(Math.abs(c.d) * 1000) + '</text>';
+      if (!marked) return;
+      if (c.zone) g += '<rect x="' + n1(X) + '" y="' + n1(Y) + '" width="' + n1(w) + '" height="' + n1(h)
+        + '" fill="none" stroke="' + (c.zone === 'srz' ? '#7a5b2a' : '#a08a52') + '" stroke-width="' + (c.zone === 'srz' ? 1.1 : 0.7) + '"/>';
+      if (c.over) g += '<circle cx="' + n1(X + w - 2.2) + '" cy="' + n1(Y + 2.2) + '" r="1.5" fill="'
+        + (c.over === 'cut' ? '#a8332a' : '#2f6ea8') + '"/>';
+      if (!c.survey) g += '<circle cx="' + n1(X + 2.2) + '" cy="' + n1(Y + 2.2) + '" r="1.2" fill="#9c9078"/>';
+    });
+    /* the boundary and the buildings over the top, so the grid is placeable */
+    var pt = function (x, y) { return n1(M + x * S) + ',' + n1(M + (ISOY - y) * S); };
+    g += '<polygon points="' + [[0, 0], [ISOX, 0], [ISOX, ISOY], [4.34, ISOY]].map(function (q) { return pt(q[0], q[1]); }).join(' ')
+      + '" fill="none" stroke="' + INK + '" stroke-width="0.7"/>';
+    (app.D.BOXH || []).forEach(function (b) {
+      g += '<polygon points="' + [[b[1], b[2]], [b[3], b[2]], [b[3], b[4]], [b[1], b[4]]].map(function (q) { return pt(q[0], q[1]); }).join(' ')
+        + '" fill="none" stroke="#8d8574" stroke-width="0.5"/>';
+    });
+    g += '<text x="' + n1(M) + '" y="' + n1(H - 7) + '" font-size="3.1" fill="' + MUT + '">Reserve boundary left, Duffy Street right. '
+      + GRIDM + ' m squares. Levels in metres AHD, taken at the middle of each square.</text>'
+      + '<text x="' + n1(M) + '" y="' + n1(H - 2.6) + '" font-size="3.1" fill="' + MUT + '">Grey is the ground now, black is what it finishes at, and the third line is the change in millimetres.</text>';
+    return '<svg viewBox="0 0 ' + n1(W) + ' ' + n1(H) + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">'
+      + '<rect width="' + n1(W) + '" height="' + n1(H) + '" fill="' + PAPER + '"/>' + g + '</svg>';
+  }
+
+  function gridView(app) {
+    var cells = gridCells(app);
+    var moved = cells.filter(function (c) { return !c.built && Math.abs(c.d) > 0.02; });
+    var cut = 0, fill = 0;
+    cells.forEach(function (c) { if (c.built) return;
+      var A = (c.x1 - c.x0) * (c.y1 - c.y0);
+      if (c.d > 0) fill += c.d * A; else cut -= c.d * A; });
+    var inZone = moved.filter(function (c) { return c.zone; });
+    var over = moved.filter(function (c) { return c.over; });
+
+    var sw = function (col, t) {
+      return '<span style="white-space:nowrap"><span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:' + col + ';vertical-align:-1px"></span> ' + t + '</span>';
+    };
+    return '<div class="ps-screen">'
+      + '<div class="ps-warn">' + WARN + '</div>'
+
+      + '<h4 style="margin:16px 0 2px;font-size:15px">Sheet one, as designed</h4>'
+      + '<p class="ps-fine" style="margin:0 0 8px">The levels on their own. Nothing here asks whether a tree plan or a site classification allows it.</p>'
+      + '<div class="ps-screen-plan">' + gridSheet(app, cells, false) + '</div>'
+      + '<div class="ps-screen-legend" style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--color-neutral-700)">'
+      + sw('rgb(160,178,178)', 'made up') + sw('rgb(242,174,152)', 'taken off')
+      + sw('#f4f2ea', 'left alone') + sw('#efeae0', 'under the house, nothing to set out')
+      + '</div>'
+
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Squares that move at all</td><td class="ps-num">' + moved.length + ' of ' + cells.filter(function (c) { return !c.built; }).length + '</td></tr>'
+      + '<tr><td>Ground to bring in</td><td class="ps-num">' + n1(fill) + ' m³</td></tr>'
+      + '<tr><td>Ground to take off</td><td class="ps-num">' + n1(cut) + ' m³</td></tr>'
+      + '<tr class="ps-tot"><td>Net</td><td class="ps-num">' + (fill - cut >= 0 ? 'import ' : 'export ') + n1(Math.abs(fill - cut)) + ' m³</td></tr>'
+      + '</tbody></table>'
+
+      + '<h4 style="margin:26px 0 2px;font-size:15px">Sheet two, what is in the way</h4>'
+      + '<p class="ps-fine" style="margin:0 0 8px">The same grid and the same numbers, marked where something has an opinion about them.</p>'
+      + '<div class="ps-screen-plan">' + gridSheet(app, cells, true) + '</div>'
+      + '<div class="ps-screen-legend" style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--color-neutral-700)">'
+      + '<span style="white-space:nowrap"><span style="display:inline-block;width:11px;height:11px;border:1.6px solid #7a5b2a;vertical-align:-1px"></span> structural root zone</span>'
+      + '<span style="white-space:nowrap"><span style="display:inline-block;width:11px;height:11px;border:1px solid #a08a52;vertical-align:-1px"></span> tree protection zone</span>'
+      + sw('#2f6ea8', 'over 400 mm of fill') + sw('#a8332a', 'over 500 mm of cut')
+      + sw('#9c9078', 'no survey here, the fitted surface answers')
+      + '</div>'
+
+      + '<table class="ps-tbl"><tbody>'
+      + '<tr><td>Squares that move inside a protection zone</td><td class="ps-num">' + inZone.length + '</td></tr>'
+      + '<tr><td>Squares past the 400 mm fill or 500 mm cut limit</td><td class="ps-num">' + over.length + '</td></tr>'
+      + '<tr class="ps-tot"><td>Squares that move and nothing objects to</td><td class="ps-num">' + (moved.length - new Set(inZone.concat(over)).size) + '</td></tr>'
+      + '</tbody></table>'
+
+      + '<p class="ps-fine">Set out from the survey plan, not from this. The levels here are the surveyor’s surface, exact where they measured and interpolated between, and the goal is what the plan grades to. '
+      + 'A square marked inside a protection zone is not a square you cannot touch. It is one the tree plan wants hand or hydro dug, in the approved scope, with an arborist there. '
+      + 'The 400 mm fill and 500 mm cut marks are the point at which the geotechnical report’s Class P classification has to be looked at again. '
+      + 'Both sheets carry the same numbers, so nothing is being softened on the first one.</p>'
+      + '</div>';
+  }
+
   /* ---------------------------------------------------------------- water --- */
 
   /* The half of the drainage design that is not a pipe. Every surface on the plan
@@ -1496,5 +1646,5 @@ window.PRINTSHEET = (function () {
       + '</div>';
   }
 
-  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, levelsView: levelsView, waterView: waterView, isoView: isoView};
+  return {open: open, close: close, build: build, bloomChart: bloomChart, earthView: earthView, levelsView: levelsView, waterView: waterView, isoView: isoView, gridView: gridView};
 })();
