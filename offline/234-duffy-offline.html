@@ -2577,7 +2577,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;heigh
 const SITE={lat:-35.25622,lon:149.15585,tz:10,nb:345.6611};
 /* Shown on the Schemes sheet. Bump it with CACHE in sw.js, so what a device is
    actually running can be read off the device rather than guessed at. */
-const BUILD='v49';
+const BUILD='v50';
 /* the printed sheets are a separate file and need the block's bearing to point north */
 window.SITEBEARING=SITE.nb;
 const SNAP=0.05, BUDGET=10000;
@@ -3924,6 +3924,25 @@ class Component extends DCLogic {
          differently. Which parts are new is a Works question, and the Shape
          view answers it from the flag in BOXH. */
       g+=((this.H&&this.H.BLDS)||D.BLDS).map(b=>'<path d="'+b.d+'" fill="'+COL.exFill+'" stroke="'+COL.exStroke+'" stroke-width="1" '+nss+'/>').join('');
+      /* Windows, drawn along the wall they sit in, so the plan shows what each
+         part of the garden is looked at from. Width is the one the model
+         reports: for a window that is the frame, and A2.02 draws the two bedroom
+         windows at 1.975 m against a reported 1.96, while their type name still
+         says 2160. Skylights sit in a roof rather than a wall and are marked
+         where they fall instead. */
+      if(this.H&&this.H.OPEN) g+=this.H.OPEN.filter(o=>o[0]==='window').map(o=>{
+        const w=o[6]>=0?this.H.WALL[o[6]]:null;
+        /* A skylight lies in a roof, so both of its figures are plan sizes: the
+           780 by 1180 pair draw as rectangles, not squares. */
+        if(!w){ const hx=o[3]/2, hy=o[4]/2;
+          return '<rect x="'+(o[1]-hx)+'" y="'+this.fy(o[2]+hy)+'" width="'+o[3]+'" height="'+o[4]
+            +'" fill="none" stroke="'+COL.water+'" stroke-width="1.1" stroke-dasharray="3 2" '+nss+'/>'; }
+        const dx=w[2]-w[0], dy=w[3]-w[1], L2=Math.hypot(dx,dy);
+        if(L2<1e-6) return '';
+        const ux=dx/L2, uy=dy/L2, h=o[3]/2;
+        return '<line x1="'+(o[1]-ux*h)+'" y1="'+this.fy(o[2]-uy*h)+'" x2="'+(o[1]+ux*h)+'" y2="'+this.fy(o[2]+uy*h)
+          +'" stroke="'+COL.water+'" stroke-width="2.6" stroke-linecap="butt" '+nss+'/>';
+      }).join('');
     }
     if(L.canopy) g+=D.TREES.map(t=>'<circle cx="'+t.x+'" cy="'+this.fy(t.y)+'" r="'+t.canopy+'" fill="none" stroke="'+COL.canopy+'" stroke-width="1.4" stroke-dasharray="4 3" '+nss+'/>').join('');
     g+='<path d="'+D.BNDP+'" fill="none" stroke="'+COL.ink+'" stroke-width="2.2" '+nss+'/>';

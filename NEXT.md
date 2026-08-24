@@ -70,6 +70,12 @@ disappears if it left no trace worth keeping. Git history is the log.
 - Floor levels confirmed throughout. FFL 611.650 and the sunken lounge 611.070
   match the architect exactly. The garage floor at 611.535 and its apron at
   611.575 are new to the app.
+- Windows are on the plan, drawn along the wall they sit in, with the three
+  skylights marked where they fall. Thirteen of them, which is what A2.02 tags
+  W01 to W13. Width is the one the model reports, because for a window that is
+  the frame: A2.02 draws the bedroom windows at 1.975 m against a reported 1.96
+  while their type name still says 2160. The opposite of a door, where the
+  reported width can be the pocket and the name carries the leaf.
 - Doors are drawn by what they do. Eight of the fifteen slide, so only the
   seven hinged ones carry a swing. Type and nominal leaf come off the family
   name, because the reported width is the pocket: the 1060 cavity sliders
@@ -82,7 +88,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   a roof was tried and drew the paved terrace as building, the terrace sitting
   under a transparent canopy.
 
-Live build at the time of writing: **v49**.
+Live build at the time of writing: **v50**.
 
 ## Todo
 

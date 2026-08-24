@@ -206,6 +206,25 @@ console.log('house');
   ok('no leaf is wider than the opening the model reports',
      doors.every(o => o[10] <= o[3] + 0.001),
      doors.filter(o => o[10] > o[3] + 0.001).map(o => o[8]).join(', '));
+  /* Windows. A2.02 tags W01 to W13 and the model holds thirteen, ten in walls
+     and three skylights in roofs. The skylights have no host and are marked
+     where they fall rather than drawn in a wall. */
+  const wins = HH.OPEN.filter(o => o[0] === 'window');
+  eq('windows', wins.length, 13);
+  eq('windows in a wall', wins.filter(o => o[6] >= 0).length, 10);
+  eq('skylights, which sit in a roof', wins.filter(o => /Skylight/i.test(o[8])).length, 3);
+  ok('every skylight is unhosted', wins.filter(o => /Skylight/i.test(o[8])).every(o => o[6] < 0));
+
+  /* A window's width is the one the model reports, which is the frame. Its
+     type name is not: the two bedroom windows are called 2160W and measure
+     1.975 m on A2.02 against a reported 1.96. This is the opposite of a door,
+     where the reported width can be the pocket and the name carries the leaf.
+     Reading the name here would draw both bedroom windows 200 mm too wide. */
+  const dbl = wins.filter(o => /Dbl Plain/.test(o[8]));
+  eq('the two bedroom windows and the dining one', dbl.length, 3);
+  ok('they are the width the model reports, not the 2160 in their name',
+     dbl.every(o => Math.abs(o[10] - 1.96) < 0.01), dbl.map(o => o[10]).join(', '));
+
   /* The feature entry door is unhosted in the model and cuts nothing, so it
      drew nowhere: the plan can only put an opening in a wall. It takes its
      nearest wall now, 2 mm away. */
