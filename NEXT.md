@@ -70,6 +70,11 @@ disappears if it left no trace worth keeping. Git history is the log.
 - Floor levels confirmed throughout. FFL 611.650 and the sunken lounge 611.070
   match the architect exactly. The garage floor at 611.535 and its apron at
   611.575 are new to the app.
+- Doors are drawn by what they do. Eight of the fifteen slide, so only the
+  seven hinged ones carry a swing. Type and nominal leaf come off the family
+  name, because the reported width is the pocket: the 1060 cavity sliders
+  report 2.196 m. Checked against the floor plan A2.02, which calls up the two
+  full height cavity sliders, the 820 square set and the three track slider.
 - The site plan draws the model's outline, one path per building, as built.
   It does not tint new work: Shape still does, from the flag in BOXH. The
   footprint is 245.0 m² against the 284.4 m² the boxes claimed.
@@ -77,7 +82,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   a roof was tried and drew the paved terrace as building, the terrace sitting
   under a transparent canopy.
 
-Live build at the time of writing: **v47**.
+Live build at the time of writing: **v48**.
 
 ## Todo
 

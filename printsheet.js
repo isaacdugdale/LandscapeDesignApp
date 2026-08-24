@@ -1746,32 +1746,60 @@ window.PRINTSHEET = (function () {
     });
 
     /* Openings are painted over the wall rather than cut out of it: a white
-       rectangle the width of the unit, then glass for a window and a swing for
-       a door. Boolean geometry would buy nothing a reader can see. */
+       rectangle the width of the leaf, then the glyph. Boolean geometry would
+       buy nothing a reader can see.
+
+       The glyph is what the door does. A2.02 draws a swing on the hinged doors
+       and none on the sliders, and eight of the fifteen doors here slide: two
+       full height cavity sliders at 1060, two cavity sliders at 870, one at
+       1100, two two-panel sliding doors and the three track slider at the
+       patio. Drawing them all as swings, which is what this did first, put an
+       arc through eight rooms that have none.
+
+       The leaf is the nominal width off the type name, not the reported one.
+       For a cavity slider the reported width is the pocket: the 1060 sliders
+       report 2.196 m, which would draw a hole twice the door. */
     H.OPEN.forEach(function (o) {
       var w = o[6] >= 0 ? H.WALL[o[6]] : null;
       if (!w) return;
       var dx = w[2] - w[0], dy = w[3] - w[1], L = Math.hypot(dx, dy);
       if (L < 1e-6) return;
       var ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
-      var hw = Math.min(o[3], 2.2) / 2, ht = w[4] / 2 + 0.03;
-      var q = [[o[1] - ux * hw + nx * ht, o[2] - uy * hw + ny * ht],
-               [o[1] + ux * hw + nx * ht, o[2] + uy * hw + ny * ht],
-               [o[1] + ux * hw - nx * ht, o[2] + uy * hw - ny * ht],
-               [o[1] - ux * hw - nx * ht, o[2] - uy * hw - ny * ht]];
-      plan += '<path d="' + q.map(function (p, i) {
-        return (i ? 'L' : 'M') + n1(sx(p[0])) + ' ' + n1(sy(p[1]));
-      }).join('') + 'Z" fill="' + PAPER + '"/>';
+      var leaf = o[10] || o[3], panels = o[11] || 1;
+      var hw = Math.min(leaf, 3.6) / 2, ht = w[4] / 2 + 0.03;
+      var pt = function (a, b) { return n1(sx(o[1] + ux * a + nx * b)) + ' ' + n1(sy(o[2] + uy * a + ny * b)); };
+      plan += '<path d="M' + pt(-hw, ht) + 'L' + pt(hw, ht) + 'L' + pt(hw, -ht) + 'L' + pt(-hw, -ht)
+        + 'Z" fill="' + PAPER + '"/>';
+
       if (o[0] === 'window') {
-        plan += '<line x1="' + n1(sx(o[1] - ux * hw)) + '" y1="' + n1(sy(o[2] - uy * hw))
-          + '" x2="' + n1(sx(o[1] + ux * hw)) + '" y2="' + n1(sy(o[2] + uy * hw))
-          + '" stroke="' + COLI.glass + '" stroke-width="0.7"/>';
-      } else {
-        plan += '<path d="M' + n1(sx(o[1] - ux * hw)) + ' ' + n1(sy(o[2] - uy * hw))
-          + 'A' + n1(hw * 2 * k) + ' ' + n1(hw * 2 * k) + ' 0 0 1 '
-          + n1(sx(o[1] - ux * hw + nx * hw * 2)) + ' ' + n1(sy(o[2] - uy * hw + ny * hw * 2))
-          + '" fill="none" stroke="' + MUT + '" stroke-width="0.3"/>';
+        plan += '<path d="M' + pt(-hw, 0) + 'L' + pt(hw, 0) + '" stroke="' + COLI.glass + '" stroke-width="0.7" fill="none"/>';
+        return;
       }
+      if (o[9] === 'slide') {
+        /* The leaf sits just inside one face and runs back into its pocket.
+           The pocket goes towards whichever end of the host wall has room for
+           it, which is the longer of the two runs either side of the opening. */
+        var t = ((o[1] - w[0]) * ux + (o[2] - w[1]) * uy);
+        var dir = t > L / 2 ? -1 : 1;
+        var off = w[4] * 0.22;
+        var i2;
+        for (i2 = 0; i2 < panels; i2++) {
+          var a0 = -hw + (2 * hw) * i2 / panels, a1 = -hw + (2 * hw) * (i2 + 1) / panels;
+          var b = off * (panels > 1 ? (i2 % 2 ? 1 : -1) : 1);
+          plan += '<path d="M' + pt(a0, b) + 'L' + pt(a1, b) + '" stroke="' + INK
+            + '" stroke-width="' + (panels > 1 ? 0.55 : 0.8) + '" fill="none" stroke-linecap="butt"/>';
+        }
+        if (panels === 1) {
+          /* the pocket, faint, the length of the leaf beyond the jamb */
+          plan += '<path d="M' + pt(dir * hw, off) + 'L' + pt(dir * (hw + 2 * hw), off)
+            + '" stroke="' + FAINT + '" stroke-width="0.4" fill="none" stroke-dasharray="1.2 0.8"/>';
+        }
+        return;
+      }
+      /* hinged: the leaf, and the arc it sweeps */
+      plan += '<path d="M' + pt(-hw, 0) + 'L' + pt(-hw, 2 * hw) + '" stroke="' + MUT + '" stroke-width="0.5" fill="none"/>'
+        + '<path d="M' + pt(hw, 0) + 'A' + n1(2 * hw * k) + ' ' + n1(2 * hw * k) + ' 0 0 1 '
+        + pt(-hw, 2 * hw) + '" fill="none" stroke="' + MUT + '" stroke-width="0.3"/>';
     });
 
     H.CWALL.forEach(function (c) {
@@ -1981,6 +2009,7 @@ window.PRINTSHEET = (function () {
       + '<ul class="ps-fine">'
       + '<li>The plan and the section share one scale. A wall in the section sits under the wall it cuts.</li>'
       + '<li>Walls in ink are external. The model flags all 67 as external, so the floor decides it instead.</li>'
+      + '<li>Eight of the fifteen doors slide, so only the seven hinged ones carry a swing. Type and leaf width come off the family name, checked against A2.02.</li>'
       + '<li>Roof lines are the heights the model carries. The ' + H.ROOF.length + ' roofs set the ridges and eaves the sun map uses.</li>'
       + '<li>The ground is the surveyor\u2019s surface, dashed where the design finishes it.</li>'
       + '<li>From ' + esc(H.SRC) + ', placed by tools/house-extract.js.</li>'

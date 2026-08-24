@@ -264,13 +264,52 @@ say(walls.filter(w => w.ext).length + ' of ' + walls.length + ' walls read as ex
 const wallIdx = {};
 walls.forEach((w, i) => { wallIdx[w.id] = i; });
 
+/* How a door opens, and how wide the leaf really is.
+
+   Two things in the export cannot be drawn from directly. width_m is the IFC
+   OverallWidth of the whole unit, which for a cavity slider is the pocket and
+   not the leaf: the 1060 sliders report 2.196 m. And nothing in the geometry
+   says whether a door swings or slides.
+
+   Both are in the type name, which carries the family and the nominal leaf:
+   ASA_Concealed Cavity Slider:1060 x 2400. The architect's floor plan A2.02
+   agrees with it, calling up two full height cavity sliders at 1060, a square
+   set at 820 and a three track sliding door at the patio, and drawing a swing
+   only on the feature entry door. Where the two could differ the plan is the
+   record, so these are the rules the plan draws by:
+
+     swings   the arc is drawn, and the leaf is the nominal width
+     slides   no arc, the leaf runs back into its pocket
+
+   Door - Solidcore is the feature entry door at 870, which A2.02 draws with a
+   swing. It carries no size in its name, so its reported width stands. */
+const openKind = name => {
+  const n = String(name || '');
+  if (/Slider|Sliding/i.test(n)) return 'slide';
+  return 'hinge';
+};
+const openPanels = name => {
+  const m = /(\d)[\s_-]*Panel/i.exec(String(name || ''));
+  return m ? +m[1] : 1;
+};
+const openLeaf = (name, fallback) => {
+  const m = /:(\d{3,4})\s*w?\s*[xX]\s*(\d{3,4})/.exec(String(name || ''));
+  if (!m) return fallback;
+  const mm = +m[1];
+  return mm >= 300 && mm <= 6000 ? r3(mm / 1000) : fallback;
+};
 const openings = H.openings.map(o => {
-  const c = T(o.centre);
-  return [o.class === 'IfcDoor' ? 'door' : 'window', r3(c[0]), r3(c[1]),
+  const c = T(o.centre), door = o.class === 'IfcDoor';
+  return [door ? 'door' : 'window', r3(c[0]), r3(c[1]),
           r3(o.width_m), r3(o.height_m), r3(o.sill_z),
           o.host_wall != null && wallIdx[o.host_wall] != null ? wallIdx[o.host_wall] : -1,
-          sIdx(o.storey), o.name];
+          sIdx(o.storey), o.name,
+          door ? openKind(o.name) : null,
+          door ? openLeaf(o.name, r3(o.width_m)) : r3(o.width_m),
+          door ? openPanels(o.name) : 1];
 });
+const slid = openings.filter(o => o[9] === 'slide').length;
+say(slid + ' of ' + openings.filter(o => o[0] === 'door').length + ' doors slide, the rest swing');
 
 /* Glazing came across as a bounding box and nothing else, and the box is
    axis-aligned to the IFC world rather than to the building. A panel 2.75 m

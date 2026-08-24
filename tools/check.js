@@ -187,6 +187,28 @@ console.log('house');
     return b && Math.abs(b[5] - 616.06) < 0.005;
   })(), 'the surviving face runs ridge to eave, so the massing is unhurt');
 
+  /* How a door opens is drawn from the type name, and the plan drew every door
+     as a swing until this was noticed. A2.02 calls up two full height cavity
+     sliders at 1060, two cavity sliders at 870, one at 1100, two two-panel
+     sliding doors and the three track slider at the patio: eight of fifteen. */
+  const doors = HH.OPEN.filter(o => o[0] === 'door');
+  eq('doors', doors.length, 15);
+  eq('doors that slide', doors.filter(o => o[9] === 'slide').length, 8);
+  eq('doors that swing', doors.filter(o => o[9] === 'hinge').length, 7);
+  ok('every door says how it opens', doors.every(o => o[9] === 'slide' || o[9] === 'hinge'));
+  ok('no door name says slide while the door swings',
+     !doors.some(o => o[9] === 'hinge' && /Slider|Sliding/i.test(o[8])),
+     doors.filter(o => o[9] === 'hinge' && /Slider|Sliding/i.test(o[8])).map(o => o[8]).join(', '));
+  /* The leaf is the nominal width off the type name. Reading the IFC width
+     instead draws a 1060 cavity slider as a 2.196 m hole. */
+  ok('the two full height cavity sliders are 1060',
+     doors.filter(o => /Concealed Cavity Slider/.test(o[8])).every(o => o[10] === 1.06));
+  ok('no leaf is wider than the opening the model reports',
+     doors.every(o => o[10] <= o[3] + 0.001),
+     doors.filter(o => o[10] > o[3] + 0.001).map(o => o[8]).join(', '));
+  eq('the patio slider has three panels',
+     (doors.find(o => /3 Panel/.test(o[8])) || [])[11], 3);
+
   /* A door has to be in the wall it says it is in, or the section cuts a hole
      in thin air. Checked as a distance from the host wall's axis. */
   const stray = HH.OPEN.filter(o => {
