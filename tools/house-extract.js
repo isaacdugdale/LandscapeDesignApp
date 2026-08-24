@@ -298,16 +298,36 @@ const openLeaf = (name, fallback) => {
   const mm = +m[1];
   return mm >= 300 && mm <= 6000 ? r3(mm / 1000) : fallback;
 };
+/* The feature entry door is placed in the model without a host and cuts
+   nothing, so it was drawn nowhere: the plan skips an opening it cannot put in
+   a wall. Its centre sits 2 mm off a 230 double brick wall, so the wall it
+   belongs to is not in doubt. Anything unhosted takes the nearest wall within
+   300 mm, and stays unhosted past that rather than being guessed onto one. */
+let adopted = 0;
+const nearestWall = c => {
+  let best = -1, bd = 0.3;
+  walls.forEach((w, i) => {
+    const dx = w.b[0] - w.a[0], dy = w.b[1] - w.a[1], L = Math.hypot(dx, dy);
+    if (L < 1e-6) return;
+    const t = Math.max(0, Math.min(1, ((c[0] - w.a[0]) * dx + (c[1] - w.a[1]) * dy) / (L * L)));
+    const d = Math.hypot(c[0] - (w.a[0] + dx * t), c[1] - (w.a[1] + dy * t));
+    if (d < bd) { bd = d; best = i; }
+  });
+  return best;
+};
 const openings = H.openings.map(o => {
   const c = T(o.centre), door = o.class === 'IfcDoor';
+  let host = o.host_wall != null && wallIdx[o.host_wall] != null ? wallIdx[o.host_wall] : -1;
+  if (host < 0) { host = nearestWall(c); if (host >= 0) adopted++; }
   return [door ? 'door' : 'window', r3(c[0]), r3(c[1]),
           r3(o.width_m), r3(o.height_m), r3(o.sill_z),
-          o.host_wall != null && wallIdx[o.host_wall] != null ? wallIdx[o.host_wall] : -1,
+          host,
           sIdx(o.storey), o.name,
           door ? openKind(o.name) : null,
           door ? openLeaf(o.name, r3(o.width_m)) : r3(o.width_m),
           door ? openPanels(o.name) : 1];
 });
+if (adopted) say(adopted + ' unhosted opening takes its nearest wall');
 const slid = openings.filter(o => o[9] === 'slide').length;
 say(slid + ' of ' + openings.filter(o => o[0] === 'door').length + ' doors slide, the rest swing');
 

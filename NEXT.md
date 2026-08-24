@@ -82,7 +82,7 @@ disappears if it left no trace worth keeping. Git history is the log.
   a roof was tried and drew the paved terrace as building, the terrace sitting
   under a transparent canopy.
 
-Live build at the time of writing: **v48**.
+Live build at the time of writing: **v49**.
 
 ## Todo
 

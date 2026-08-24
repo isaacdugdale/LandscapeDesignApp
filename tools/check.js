@@ -206,6 +206,11 @@ console.log('house');
   ok('no leaf is wider than the opening the model reports',
      doors.every(o => o[10] <= o[3] + 0.001),
      doors.filter(o => o[10] > o[3] + 0.001).map(o => o[8]).join(', '));
+  /* The feature entry door is unhosted in the model and cuts nothing, so it
+     drew nowhere: the plan can only put an opening in a wall. It takes its
+     nearest wall now, 2 mm away. */
+  ok('every door is in a wall', doors.every(o => o[6] >= 0),
+     doors.filter(o => o[6] < 0).map(o => o[8]).join(', '));
   eq('the patio slider has three panels',
      (doors.find(o => /3 Panel/.test(o[8])) || [])[11], 3);
 
